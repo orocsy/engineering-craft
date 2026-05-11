@@ -81,6 +81,13 @@ Before declaring "implementation done" on any feature, the implementer MUST be a
 
 If any box is unchecked, do NOT mark the feature ready for review. Loop back.
 
+## Top-level catalog (read this FIRST for fastest routing)
+
+[INDEX.md](INDEX.md) — Layer A catalog (~80 lines). Stats + by-phase recommendations
++ by-trigger keyword routing. Hit this BEFORE diving into a category README. Borrowed
+from Karpathy's LLM Wiki 3-level progressive index pattern (article: "Harness isn't
+the goal, knowledge is the moat", 2026-05).
+
 ## Categories
 
 ### Defensive patterns
@@ -101,6 +108,12 @@ If any box is unchecked, do NOT mark the feature ready for review. Loop back.
 | Tooling footguns | [categories/tooling-footguns/README.md](categories/tooling-footguns/README.md) | 1 | CLI behavior is different from what the docs imply (gh secret set --body -) |
 | Library choice | [categories/library-choice/README.md](categories/library-choice/README.md) | 1 | Hand-rolled regex/parsing for well-studied domains; library default was "almost right" |
 | Process | [categories/process/README.md](categories/process/README.md) | 2 | Tests pass + lint clean = floor; post-merge deploy not verified |
+
+### Meta
+
+| Category | Index | Rule count | When it bites |
+|----------|-------|-----------|---------------|
+| Knowledge management | [categories/knowledge-management/README.md](categories/knowledge-management/README.md) | 1 | When maintaining the skill itself — adding rules, retiring rules, deciding what graduates from project docs |
 
 ## Templates (copy-paste ready)
 
