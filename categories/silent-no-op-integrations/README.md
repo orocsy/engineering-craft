@@ -33,6 +33,7 @@ The three required behaviors:
 | [configured-state-visible](rules/configured-state-visible.md) | CRITICAL | Wrapping any third-party API client |
 | [required-variant-for-security](rules/required-variant-for-security.md) | CRITICAL | Security-critical call sites that depend on the integration |
 | [regression-test-the-no-op](rules/regression-test-the-no-op.md) | HIGH | Testing the wrapper itself |
+| [middleware-error-mapping](rules/middleware-error-mapping.md) | MEDIUM | Every npm middleware throwing non-HttpException needs a domain-specific filter |
 
 ## Templates
 

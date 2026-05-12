@@ -28,6 +28,7 @@ This applies to:
 |------|--------|---------|
 | [security-literal-grep](rules/security-literal-grep.md) | CRITICAL | Removing/changing any security-relevant literal |
 | [api-rename-cross-cut-grep](rules/api-rename-cross-cut-grep.md) | HIGH | Renaming a function/type referenced across modules |
+| [payload-shape-drift-against-strict-dto](rules/payload-shape-drift-against-strict-dto.md) | HIGH | Form `{...formState}` spread; regex tightening on legacy persisted values |
 
 ## Anti-patterns
 

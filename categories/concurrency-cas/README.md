@@ -31,6 +31,11 @@ They reduce the race window but never close it.
 | [single-use-token-consumption](rules/single-use-token-consumption.md) | CRITICAL | Any `consumedAt`/`usedAt`/`spent` flag |
 | [sibling-resource-invariants](rules/sibling-resource-invariants.md) | HIGH | Multiple credentials grant the same action (link + OTP) |
 | [race-test-contract](rules/race-test-contract.md) | CRITICAL | Every shared-state mutation needs a `Promise.allSettled` test |
+| [cross-tx-cas-recompute-inside-tx](rules/cross-tx-cas-recompute-inside-tx.md) | HIGH | Read → derive → write across tx boundary; recompute INSIDE tx |
+| [tx-rollback-contract-layers](rules/tx-rollback-contract-layers.md) | HIGH | Service A calls service B inside tx; B must use `*InTx(tx, ...)` variant |
+| [status-set-creep-on-state-machine-evolution](rules/status-set-creep-on-state-machine-evolution.md) | HIGH | `status !== 'X'` denylists silently include any new enum addition |
+| [mint-once-vs-mint-on-demand](rules/mint-once-vs-mint-on-demand.md) | MEDIUM | Shareable / printable tokens (QR receipts, magic links) — never re-mint on read |
+| [monetary-decimal-symmetry](rules/monetary-decimal-symmetry.md) | MEDIUM | Money fields use `Prisma.Decimal` end-to-end; cross-path selects must align |
 
 ## Templates
 

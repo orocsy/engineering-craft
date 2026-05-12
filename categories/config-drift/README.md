@@ -34,6 +34,7 @@ For some vars, additional consumers:
 | [secret-existence-vs-exposure](rules/secret-existence-vs-exposure.md) | CRITICAL | Adding a `${{ secrets.X }}` line in deploy.yml |
 | [validator-runbook-parity](rules/validator-runbook-parity.md) | HIGH | Updating a Zod validator on an env var |
 | [env-deploy-parity-test](rules/env-deploy-parity-test.md) | HIGH | The CI-time guard that catches drift before deploy |
+| [empty-string-vs-undefined-and-five-surface-rule](rules/empty-string-vs-undefined-and-five-surface-rule.md) | HIGH | GH Actions emits `""` not `undefined`; preprocess every optional env; 5-surface checklist |
 
 ## Templates
 

@@ -114,6 +114,19 @@ JSON sidecar at the end of the run:
 
 Save to `.claude/knowledge-refs-{sha}.json` per review run.
 
+### Rule ID format + path resolution
+
+Rule IDs in sidecars use the form `<category>/<rule-slug>`, e.g.
+`concurrency-cas/state-machine-first`. The resolver expands to:
+```
+~/.claude/skills/engineering-craft/categories/<category>/rules/<rule-slug>.md
+```
+The `/rules/` segment is implicit — sidecar IDs don't include it. This keeps
+IDs short and human-readable while the actual file layout puts rules in
+`rules/` subdirectories.
+
+Reference implementation in `scripts/lint.py` and the consolidation spec.
+
 ### What `/dev-pipeline:consolidate-lessons` does with it
 
 Aggregates `knowledgeReferences` across all sessions in the consolidation window.

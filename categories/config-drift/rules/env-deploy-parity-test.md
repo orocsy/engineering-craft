@@ -14,6 +14,8 @@ applies-to: |
 related-rules:
   - four-consumer-rule
   - secret-existence-vs-exposure
+historical-incidents:
+  - PR#85 round 4 [89bffb6] — CUSTOMER_CONTACT_HASH_SECRET in env.schema but missing from deploy.yml; this test catches that class
 ---
 
 ## What this test does
