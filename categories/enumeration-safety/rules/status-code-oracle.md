@@ -17,7 +17,7 @@ related-rules:
   - timing-oracle
   - multi-tenant-fail-closed
 historical-incidents:
-  - PR#85 round 1
+  - PR#85 round 1 [6a2fde0]
 ---
 
 ## Why this matters

@@ -16,7 +16,7 @@ related-rules:
   - postgres-optimistic-cas
   - single-use-token-consumption
 historical-incidents:
-  - PR#85 round 1 (link reset TOCTOU)
+  - PR#85 round 1 (link reset TOCTOU) [6a2fde0]
 ---
 
 ## Why this matters

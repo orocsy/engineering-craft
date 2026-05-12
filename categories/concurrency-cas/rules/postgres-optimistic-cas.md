@@ -17,7 +17,7 @@ related-rules:
   - storage-gate-not-js
   - sibling-resource-invariants
 historical-incidents:
-  - PR#85 round 4 (cross-method password write race)
+  - PR#85 round 4 (cross-method password write race) [89bffb6]
 ---
 
 ## Why this matters

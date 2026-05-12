@@ -14,7 +14,7 @@ applies-to: |
 related-rules:
   - timing-oracle
 historical-incidents:
-  - PR#85 round 1 (initial equalizer didn't cover the 503 branch)
+  - PR#85 round 1 (initial equalizer didn't cover the 503 branch) [6a2fde0]
 ---
 
 ## Quality bar checklist

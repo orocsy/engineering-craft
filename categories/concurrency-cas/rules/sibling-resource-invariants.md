@@ -16,7 +16,7 @@ related-rules:
   - single-use-token-consumption
   - postgres-optimistic-cas
 historical-incidents:
-  - PR#85 round 3 (sibling-resource invariant)
+  - PR#85 round 3 (sibling-resource invariant) [0428f5f]
 ---
 
 ## The bug

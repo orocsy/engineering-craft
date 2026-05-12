@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - timing-oracle
 historical-incidents:
-  - PR#85 round 2
+  - PR#85 round 2 [11fb1aa]
 ---
 
 ## Why this matters

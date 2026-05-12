@@ -17,7 +17,7 @@ related-rules:
   - postgres-optimistic-cas
   - sibling-resource-invariants
 historical-incidents:
-  - PR#85 round 1
+  - PR#85 round 1 [6a2fde0]
 ---
 
 ## The pattern

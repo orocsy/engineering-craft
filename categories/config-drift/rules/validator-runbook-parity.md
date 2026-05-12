@@ -14,7 +14,7 @@ applies-to: |
 related-rules:
   - four-consumer-rule
 historical-incidents:
-  - PR#85 round 4 (RESEND_FROM_EMAIL display-name parity)
+  - PR#85 round 4 (RESEND_FROM_EMAIL display-name parity) [89bffb6]
 ---
 
 ## The bug

@@ -9,17 +9,19 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 5 | 23 |
-| Frontend patterns | 3 | 3 |
+| Defensive patterns (backend correctness) | 5 | 27 |
+| Frontend patterns | 4 | 4 |
 | Process & habits | 5 | 9 |
+| Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 1 |
-| **Total** | **14** | **36** |
+| **Total** | **15** | **43** |
 
 Templates: 7 · Checklists: 4
 
 ## Maturity distribution
 
-After 2026-05-12 backfill + fix-history mining: 17 proven · 19 verified · 0 draft.
+After 2026-05-12 backfill + fix-history mining + first consolidation:
+17 proven · 26 verified · 0 draft.
 
 ## By-phase recommendations (which categories to load when)
 

@@ -17,7 +17,7 @@ related-rules:
   - status-code-oracle
   - equalizer-quality-bar
 historical-incidents:
-  - PR#85 round 2 (email-send latency oracle)
+  - PR#85 round 2 (email-send latency oracle) [11fb1aa]
 ---
 
 ## Why this matters

@@ -18,7 +18,7 @@ related-rules:
   - configured-state-visible
   - status-code-oracle
 historical-incidents:
-  - PR#85 round 1
+  - PR#85 round 1 [6a2fde0]
 ---
 
 ## Why two variants

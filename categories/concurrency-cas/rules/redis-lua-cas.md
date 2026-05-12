@@ -17,9 +17,9 @@ related-rules:
   - storage-gate-not-js
   - single-use-token-consumption
 historical-incidents:
-  - PR#85 round 2 (OTP wrong-attempt SET XX overwrote fresh state)
-  - PR#85 round 3 (OTP consume DEL deleted fresh key)
-  - PR#85 round 5 (audit-found counter swallow)
+  - PR#85 round 2 (OTP wrong-attempt SET XX overwrote fresh state) [11fb1aa]
+  - PR#85 round 3 (OTP consume DEL deleted fresh key) [0428f5f]
+  - PR#85 round 5 (audit-found counter swallow) [2c4e5b0]
 ---
 
 ## Why this matters

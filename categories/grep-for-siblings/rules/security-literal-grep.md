@@ -16,7 +16,7 @@ applies-to: |
 related-rules:
   - api-rename-cross-cut-grep
 historical-incidents:
-  - PR#85 round 5
+  - PR#85 round 5 [2c4e5b0]
 ---
 
 ## The pattern

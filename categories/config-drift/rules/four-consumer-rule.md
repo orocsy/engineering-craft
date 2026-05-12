@@ -17,7 +17,7 @@ related-rules:
   - validator-runbook-parity
   - env-deploy-parity-test
 historical-incidents:
-  - PR#85 round 4 (CUSTOMER_CONTACT_HASH_SECRET)
+  - PR#85 round 4 (CUSTOMER_CONTACT_HASH_SECRET) [89bffb6]
 ---
 
 ## The 4 standard consumers
