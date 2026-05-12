@@ -1,5 +1,8 @@
 ---
 title: Timing Equalizer Implementation Quality Bar
+last-referenced: 2026-05-12
+maturity: verified
+type: guideline
 impact: HIGH
 impact-description: |
   A bad equalizer is worse than no equalizer because it gives a false sense of safety.

@@ -1,5 +1,8 @@
 ---
 title: Single-Use Token Consumption Predicates the Update on `consumedAt: null`
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   Any "consume once" semantic (reset link, magic link, invite, refund credit) needs the

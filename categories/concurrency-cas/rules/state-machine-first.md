@@ -1,5 +1,8 @@
 ---
 title: Draw the State Machine BEFORE Writing Code
+last-referenced: 2026-05-12
+maturity: proven
+type: process
 impact: CRITICAL
 impact-description: |
   Skipping this step was the single root cause of all 5 PR#85 review rounds. Forty

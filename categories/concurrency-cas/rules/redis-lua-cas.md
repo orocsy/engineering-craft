@@ -1,5 +1,8 @@
 ---
 title: Redis Compare-And-Modify on Stored Value Requires Lua
+last-referenced: 2026-05-12
+maturity: proven
+type: pitfall
 impact: CRITICAL
 impact-description: |
   `SET XX` only protects key existence, not value match. If you need to mutate IFF the

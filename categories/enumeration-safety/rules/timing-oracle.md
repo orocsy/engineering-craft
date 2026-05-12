@@ -1,5 +1,8 @@
 ---
 title: Timing Oracle — Equal Wall-Clock Envelope on Both Branches
+last-referenced: 2026-05-12
+maturity: proven
+type: pitfall
 impact: CRITICAL
 impact-description: |
   If the existing-account branch awaits an outbound HTTP call (200-2000ms) while the

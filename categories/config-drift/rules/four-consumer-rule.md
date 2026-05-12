@@ -1,5 +1,8 @@
 ---
 title: Every Env Var Has 4+ Consumers — Update Them All in the Same Commit
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   Forgetting to update deploy.yml when adding a production-required env var crashes

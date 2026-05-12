@@ -1,5 +1,8 @@
 ---
 title: Status-Code Oracle — Same Status on Both Branches Under ALL Failure Modes
+last-referenced: 2026-05-12
+maturity: proven
+type: pitfall
 impact: CRITICAL
 impact-description: |
   If your endpoint contract says "always returns 204," ANY non-204 (including 503,

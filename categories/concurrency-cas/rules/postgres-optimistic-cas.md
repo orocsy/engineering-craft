@@ -1,5 +1,8 @@
 ---
 title: Postgres Optimistic CAS via WHERE Predicate (tokenVersion Pattern)
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   When N entry points lead to the same write, the CAS goes on the WRITE, not on each

@@ -1,5 +1,8 @@
 ---
 title: Validator Must Accept Every Format the Runbook Recommends
+last-referenced: 2026-05-12
+maturity: verified
+type: pitfall
 impact: HIGH
 impact-description: |
   Runbook says "set RESEND_FROM_EMAIL to `Name <addr@host>` for nicer display." Validator

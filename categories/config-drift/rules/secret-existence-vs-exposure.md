@@ -1,5 +1,8 @@
 ---
 title: A GitHub Secret Existing ≠ The Container Has the Env Var
+last-referenced: 2026-05-12
+maturity: proven
+type: pitfall
 impact: CRITICAL
 impact-description: |
   PR#85 had the deploy.yml `-e VAR="${{ secrets.VAR }}"` line correctly wired AND

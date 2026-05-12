@@ -1,5 +1,8 @@
 ---
 title: Multi-Tenant Fail-Closed on Ambiguous Identifiers
+last-referenced: 2026-05-12
+maturity: verified
+type: guideline
 impact: HIGH
 impact-description: |
   When the same identifier (email, phone) could match >1 user across tenants, `findFirst`

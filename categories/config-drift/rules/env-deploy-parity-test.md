@@ -1,5 +1,8 @@
 ---
 title: CI Test That Fails If Env Schema and Deploy.yml Drift
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   Catches "added env to schema, forgot to add to deploy.yml" at validation gate, before

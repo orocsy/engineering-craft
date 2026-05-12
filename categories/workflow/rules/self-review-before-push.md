@@ -1,5 +1,8 @@
 ---
 title: Self-Review the Diff With code-reviewer Agent BEFORE Every Push
+last-referenced: 2026-05-12
+maturity: proven
+type: process
 impact: CRITICAL
 impact-description: |
   Codex is a second opinion, not the primary correctness filter. PR#37 had an A→B→A

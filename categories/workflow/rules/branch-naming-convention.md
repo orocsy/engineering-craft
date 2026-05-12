@@ -1,5 +1,8 @@
 ---
 title: Use feat/fix/chore/docs Prefix; NEVER Use claude/* For Auto-Spawned Branches
+last-referenced: 2026-05-12
+maturity: verified
+type: guideline
 impact: MEDIUM
 impact-description: |
   Branch names should match commit-scope vocabulary so the scope can be inferred from

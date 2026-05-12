@@ -1,5 +1,8 @@
 ---
 title: Provide *Required() Variants for Security-Critical Call Sites
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   Some call sites cannot accept "silently skipped." Password reset email is the

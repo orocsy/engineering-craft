@@ -1,5 +1,8 @@
 ---
 title: Push Back on Reviews After Serious Investigation; Don't Auto-Fix False Positives
+last-referenced: 2026-05-12
+maturity: verified
+type: guideline
 impact: HIGH
 impact-description: |
   Codex/PR-bots produce some false positives. Auto-fixing every finding accumulates

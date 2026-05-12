@@ -1,5 +1,8 @@
 ---
 title: Single-Use Applies to the User, Not Just to a Single Token
+last-referenced: 2026-05-12
+maturity: verified
+type: guideline
 impact: HIGH
 impact-description: |
   When a user-facing action (password reset) is reachable via multiple credentials (link

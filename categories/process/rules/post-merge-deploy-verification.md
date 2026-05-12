@@ -1,5 +1,8 @@
 ---
 title: Watch the Deploy After Every Merge — "Tests Passed" Is Not "Deploy Succeeded"
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   PR#85 was merged. Tests passed. Deploy crashed in production with

@@ -1,5 +1,8 @@
 ---
 title: Regression-Test the No-Op Branch
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   The integration has TWO branches: LIVE (sends real call) and DISABLED (returns

@@ -1,5 +1,8 @@
 ---
 title: The Atomic Gate Lives in the Storage Layer, Not in JS
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   Read-then-write across a network call is never atomic. JS-level checks reduce the race

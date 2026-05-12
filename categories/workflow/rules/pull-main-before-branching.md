@@ -1,5 +1,8 @@
 ---
 title: Always Pull Latest Main Before Creating a New Branch
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   Squash-merges break local-history assumptions. If you branch from local main without

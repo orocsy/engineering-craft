@@ -1,5 +1,8 @@
 ---
 title: Renaming a Function/Type/Flag Triggers Multi-Search
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   TypeScript catches direct calls but misses string literals containing the name,

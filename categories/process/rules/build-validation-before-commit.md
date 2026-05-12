@@ -1,5 +1,8 @@
 ---
 title: Run pnpm build (or project equivalent) BEFORE Every Commit
+last-referenced: 2026-05-12
+maturity: verified
+type: process
 impact: HIGH
 impact-description: |
   PR#31 postmortem: broken git hooks + an incomplete `replace_all` Edit shipped a TS

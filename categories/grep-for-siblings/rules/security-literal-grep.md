@@ -1,5 +1,8 @@
 ---
 title: Every Security-Relevant Literal Removal Triggers a Repo-Wide Grep
+last-referenced: 2026-05-12
+maturity: proven
+type: process
 impact: CRITICAL
 impact-description: |
   PR#85 round 5: removed `'dev-secret-change-in-production'` from one file. Three other

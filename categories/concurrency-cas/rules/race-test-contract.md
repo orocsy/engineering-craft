@@ -1,5 +1,8 @@
 ---
 title: Every Shared-State Mutation Needs a `Promise.allSettled` Race Test
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   Race conditions don't show up in sequential unit tests. The contract is

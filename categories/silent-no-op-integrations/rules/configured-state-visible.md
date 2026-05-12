@@ -1,5 +1,8 @@
 ---
 title: Configured State Must Be Visible at Boot
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: CRITICAL
 impact-description: |
   A wrapper that silently no-ops when its API key is missing is the worst possible

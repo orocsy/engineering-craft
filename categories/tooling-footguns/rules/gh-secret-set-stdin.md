@@ -1,5 +1,8 @@
 ---
 title: gh secret set --body - Sets the Literal String "-", Not stdin
+last-referenced: 2026-05-12
+maturity: verified
+type: pitfall
 impact: HIGH
 impact-description: |
   During the getluxebook.com cutover, 10 GitHub Secrets were set with `gh secret set

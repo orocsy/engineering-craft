@@ -1,5 +1,8 @@
 ---
 title: Library First — Don't Hand-Roll Parsing/Regex/Dates/URLs
+last-referenced: 2026-05-12
+maturity: proven
+type: guideline
 impact: HIGH
 impact-description: |
   PR#59 had 4 rounds of Codex reviews catching the same meta-anti-pattern: hand-rolled
