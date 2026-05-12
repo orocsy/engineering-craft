@@ -24,7 +24,10 @@ metadata:
     silent-no-op-integrations, grep-for-siblings). Renamed to engineering-craft 2026-05-11 to
     cover all engineering lessons, not just defensive patterns. New category groups added:
     workflow, tooling-footguns, library-choice, process.
-  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews)
+  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12)
+  rule-count: 36
+  category-count: 14
+  last-mined: 2026-05-12
 ---
 
 # Engineering Craft
@@ -53,6 +56,18 @@ Rules are organized into TWO macro-groups:
 | Adding/changing env var or secret | config-drift, grep-for-siblings, tooling-footguns (gh secret) |
 | Integrating third-party API | silent-no-op-integrations, config-drift |
 | Multi-tenant query with email/phone/handle | concurrency-cas (fail-closed), enumeration-safety |
+| Scheduling / availability / cross-midnight blocks / time formatting | **time-and-timezone (server-local-trap)** |
+| Cross-service mutation in tx, store-credit-issue from cancel-flow | **concurrency-cas (cross-tx-cas-recompute, tx-rollback-contract-layers)** |
+| Status enum predicate (`status !== 'X'` in business logic) | **concurrency-cas (status-set-creep-on-state-machine-evolution)** |
+| Money / Decimal fields touching admin + customer paths | **concurrency-cas (monetary-decimal-symmetry)** |
+| Shareable / printable token (QR receipt, magic link) | **concurrency-cas (mint-once-vs-mint-on-demand)** |
+| Form submit with `{...formState}` spread, regex tightening on existing field | **grep-for-siblings (payload-shape-drift-against-strict-dto)** |
+| Tailwind class change, breakpoint stack, native input restyling | **frontend-design-system-drift (silent-css-class-vacuum)** |
+| React effect with server-data dep, A→B→A click sequence, fire-and-forget IIFE | **frontend-async-state (orphan-promise-and-stale-closure)** |
+| Tooltip / popover with aria-describedby, viewport-edge clamp | **accessibility-state-sync (aria-lockstep-and-viewport-clamp)** |
+| Rename label/role/test-id/copy in code touching E2E | **e2e-test-resilience (selector-coupling-and-blast-radius)** |
+| ≥2 review rounds on same PR, deferred-P2 in earlier round | **review-discipline (round-cascade-and-deferred-p2)** |
+| Installing third-party middleware (multer/csurf/etc) | **silent-no-op-integrations (middleware-error-mapping)** |
 | Starting any new branch | workflow (pull-main-first, branch-naming) |
 | Before pushing any branch | workflow (self-review-discipline), checklists/pre-merge-self-review.md |
 | Reviewing a Codex/PR-bot finding | workflow (push-back-on-reviews-when-verified) |
