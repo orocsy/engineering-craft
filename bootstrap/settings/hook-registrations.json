@@ -1,0 +1,17 @@
+{
+  "_comment": "engineering-craft hook registrations. Merge these into ~/.claude/settings.json. The install.sh script does this automatically using jq.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/post-codex-fix-extract-lesson.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

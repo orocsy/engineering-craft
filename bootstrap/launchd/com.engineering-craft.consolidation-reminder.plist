@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.engineering-craft.consolidation-reminder</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-lc</string>
+        <string>$HOME/.claude/skills/engineering-craft/scripts/consolidation-reminder.sh</string>
+    </array>
+
+    <!-- Fire every 2 days = 172800 seconds -->
+    <key>StartInterval</key>
+    <integer>172800</integer>
+
+    <!-- Don't fire at load (would noise on every login) -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/engineering-craft-reminder.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/engineering-craft-reminder.err</string>
+</dict>
+</plist>
