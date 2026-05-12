@@ -7,6 +7,32 @@ cites a historical incident SHA so readers can trace back to evidence, not opini
 Public mirror: https://github.com/orocsy/engineering-craft (auto-updated every 2 days
 via `/dev-pipeline:consolidate-lessons`)
 
+## Fresh-machine setup (one command)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/orocsy/engineering-craft/main/bootstrap/curl-install.sh | bash
+```
+
+Clones engineering-craft, then runs `bootstrap/install.sh` which:
+- Clones the dev-pipeline plugin (private — needs SSH or HTTPS+token)
+- Clones spec-forge (private — same)
+- Installs hooks at `~/.claude/hooks/`
+- Merges hook registrations into `~/.claude/settings.json` (jq-merge, doesn't clobber)
+- Installs the launchd 2-day consolidation reminder
+
+Idempotent — safe to re-run. See [bootstrap/HANDOFF.md](bootstrap/HANDOFF.md) for prerequisites,
+SSH-vs-HTTPS overrides, troubleshooting, and uninstall instructions.
+
+If you've already cloned this repo, run the installer directly:
+```bash
+bash ~/.claude/skills/engineering-craft/bootstrap/install.sh
+```
+
+Or from inside Claude Code:
+```
+/dev-pipeline:setup-machine
+```
+
 ## Two macro-groups
 
 ### Defensive patterns
