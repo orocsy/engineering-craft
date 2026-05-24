@@ -4,8 +4,11 @@ Distilled engineering craft from real production work — defensive patterns, wo
 discipline, tooling footguns, library-choice reflexes, and process habits. Every rule
 cites a historical incident SHA so readers can trace back to evidence, not opinion.
 
-Public mirror: https://github.com/orocsy/engineering-craft (auto-updated every 2 days
-via `/dev-pipeline:consolidate-lessons`)
+Public mirror: https://github.com/orocsy/engineering-craft. Refresh cadence: a launchd
+job (`com.luxebook.consolidate-lessons`, every 2 days) counts pending journal entries
+and posts a macOS reminder; the user runs `/dev-pipeline:consolidate-lessons` in Claude
+to fold them into refined rules and push to this mirror. Classification stays
+interactive because deciding "new pattern vs refinement vs noise" needs LLM judgment.
 
 ## Fresh-machine setup (one command)
 
@@ -75,9 +78,27 @@ boot-mode log.
 
 ## How this stays alive
 
-Auto-updated by the dev-pipeline plugin's `/dev-pipeline:consolidate-lessons` command.
-A journal of review-fix commits is folded into refined rules every 2 days; updated
-content auto-pushes to the public mirror.
+A three-piece pipeline owned by the [dev-pipeline plugin](https://github.com/orocsy/dev-pipeline):
+
+1. **Capture** — `hooks/post-commit` (installed via `~/.claude/setup-git-hooks.sh`)
+   appends an entry to `<repo>/.learnings/JOURNAL.md` on every commit whose subject
+   matches `fix(`, `hotfix(`, `regression(`, `revert(`, or `review-fix:`. Failures
+   never block the commit.
+2. **Remind** — `~/Library/LaunchAgents/com.luxebook.consolidate-lessons.plist` runs
+   every 2 days (`StartInterval=172800`), invokes a sweep script that counts
+   unconsolidated entries across `~/projects/*/.learnings/JOURNAL.md`, and posts a
+   macOS notification when the backlog warrants it. Silent on zero backlog.
+3. **Consolidate (interactive)** — the user runs `/dev-pipeline:consolidate-lessons`
+   in Claude. The command classifies each entry against existing categories
+   (`new-pattern` / `refinement` / `noise`), updates files in this repo's local
+   clone, commits + pushes, and marks processed entries with
+   `<!-- consolidated: YYYY-MM-DD verdict=... -->` so future runs skip them.
+   Source journals are edited in place but never auto-committed; the user pushes at
+   their own cadence.
+
+Why not fully automatic via `claude -p`? Classification is the LLM-judgment-heavy
+part — fully scheduled runs would either rubber-stamp noise into the repo or fail
+silently on auth issues. Notification + interactive review keeps quality high.
 
 ## Contributing
 
