@@ -5,10 +5,16 @@ discipline, tooling footguns, library-choice reflexes, and process habits. Every
 cites a historical incident SHA so readers can trace back to evidence, not opinion.
 
 Public mirror: https://github.com/orocsy/engineering-craft. Refresh cadence: a launchd
-job (`com.luxebook.consolidate-lessons`, every 2 days) counts pending journal entries
-and posts a macOS reminder; the user runs `/dev-pipeline:consolidate-lessons` in Claude
-to fold them into refined rules and push to this mirror. Classification stays
-interactive because deciding "new pattern vs refinement vs noise" needs LLM judgment.
+job (`com.engineering-craft.consolidation-reminder`, every 2 days) counts pending
+journal entries and posts a macOS reminder; the user runs
+`/dev-pipeline:consolidate-lessons` in Claude to fold them into refined rules and
+push to this mirror. Classification stays interactive because deciding "new pattern
+vs refinement vs noise" needs LLM judgment.
+
+**Multi-machine setup**: each device runs the bootstrap (`bootstrap/curl-install.sh`)
+once. The journal hook captures fix-commits per-device-per-repo; consolidation can
+be run on any device and pushes to the same mirror, so the curated rule set stays
+unified across machines even though each device has its own local backlog.
 
 ## Fresh-machine setup (one command)
 
@@ -84,10 +90,13 @@ A three-piece pipeline owned by the [dev-pipeline plugin](https://github.com/oro
    appends an entry to `<repo>/.learnings/JOURNAL.md` on every commit whose subject
    matches `fix(`, `hotfix(`, `regression(`, `revert(`, or `review-fix:`. Failures
    never block the commit.
-2. **Remind** — `~/Library/LaunchAgents/com.luxebook.consolidate-lessons.plist` runs
-   every 2 days (`StartInterval=172800`), invokes a sweep script that counts
+2. **Remind** — `~/Library/LaunchAgents/com.engineering-craft.consolidation-reminder.plist`
+   runs every 2 days (`StartInterval=172800`), invokes a sweep script that counts
    unconsolidated entries across `~/projects/*/.learnings/JOURNAL.md`, and posts a
    macOS notification when the backlog warrants it. Silent on zero backlog.
+   Installed automatically by `bootstrap/install.sh` (step 7); points at the
+   dev-pipeline plugin's `hooks/consolidate-lessons-notify.sh` so the script body
+   updates with `git pull` on the plugin, not with `git pull` on this repo.
 3. **Consolidate (interactive)** — the user runs `/dev-pipeline:consolidate-lessons`
    in Claude. The command classifies each entry against existing categories
    (`new-pattern` / `refinement` / `noise`), updates files in this repo's local

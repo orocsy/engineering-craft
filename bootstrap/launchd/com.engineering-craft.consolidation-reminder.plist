@@ -9,7 +9,7 @@
     <array>
         <string>/bin/bash</string>
         <string>-lc</string>
-        <string>$HOME/.claude/skills/engineering-craft/scripts/consolidation-reminder.sh</string>
+        <string>$HOME/.claude/plugins/marketplaces/local/plugins/dev-pipeline/hooks/consolidate-lessons-notify.sh</string>
     </array>
 
     <!-- Fire every 2 days = 172800 seconds -->
