@@ -10,11 +10,12 @@
 | Group | Categories | Rules |
 |-------|-----------|-------|
 | Defensive patterns (backend correctness) | 5 | 27 |
+| Observability (errors, analytics, health) | 1 | 2 |
 | Frontend patterns | 4 | 4 |
 | Process & habits | 5 | 9 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 1 |
-| **Total (hand-authored)** | **15** | **43** |
+| **Total (hand-authored)** | **16** | **45** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
@@ -65,6 +66,8 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | `aria-describedby`, tooltip position math | **accessibility-state-sync/aria-lockstep-and-viewport-clamp** |
 | Form state spread → API, regex tightening on existing field | **grep-for-siblings/payload-shape-drift-against-strict-dto** |
 | `multer`, `body-parser`, third-party middleware | **silent-no-op-integrations/middleware-error-mapping** |
+| `Sentry`, `PostHog`, `beforeSend`, telemetry, `setTag`, error tracking, analytics | **observability** (tenant tagging + cross-tenant guard) |
+| PII in telemetry, `sendDefaultPii`, scrub, redact, exception message with user data | **observability/pii-scrubbing-defense-in-depth** |
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 
 ## Categories at a glance
@@ -79,6 +82,12 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | silent-no-op-integrations | 4 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 3 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO |
 | cross-file-seams ⟳ | 10 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the 7-trace seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit. |
+
+### Observability
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| observability | 2 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth (KEY+VALUE, all event surfaces, immutable, shared); tag tenant unconditionally + guard untagged leaks |
 
 ### Frontend patterns
 
