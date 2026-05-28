@@ -3,17 +3,17 @@
 **When this category bites**: an env var is added in one consumer (e.g., `env.schema.ts`)
 but missing from another (e.g., `deploy.yml`). The next deploy crashes at boot.
 
-**Source incidents**: PR#85 round 4 (`CUSTOMER_CONTACT_HASH_SECRET` schema-required
-without `deploy.yml` pass-through), PR#85 round 4 (`RESEND_FROM_EMAIL` validator rejected
-the runbook-documented format), and the **post-merge production deploy failure** —
-deploy.yml had the line, but the GitHub Secret itself was never set.
+**Source incidents**: an HMAC secret schema-required without a `deploy.yml` pass-through,
+a from-email validator that rejected the runbook-documented display-name format, and a
+**post-merge production deploy failure** — deploy.yml had the line, but the GitHub Secret
+itself was never set.
 
 ## The bedrock rule
 
 **A configuration value has at least 4 consumers, often more. Changing one without
 checking the others = production crash at next deploy.**
 
-The 4 standard consumers in this project:
+The 4 standard consumers:
 1. `apps/api/src/config/env.schema.ts` — runtime validation (Zod)
 2. `.github/workflows/deploy.yml` — `-e VAR=...` pass-through to docker
 3. `apps/api/.env.example` (if exists) — local dev hint
@@ -24,7 +24,7 @@ For some vars, additional consumers:
 6. Vercel project env vars (frontend secrets like `NEXT_PUBLIC_*`)
 7. Test fixtures (`buildDisabledBillingEnv`, `jest-setup.ts`)
 8. **GitHub Secrets** — the value behind `${{ secrets.X }}` MUST exist (this is what
-   bit production after PR#85 was merged)
+   bit production after the deploy.yml line was already in place)
 
 ## Rules in this category
 
@@ -53,8 +53,8 @@ For some vars, additional consumers:
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule that would have prevented it |
+| Incident | One-line | Rule that would have prevented it |
 |------------|----------|----------------------------------|
-| PR#85 round 4 | Schema required `CUSTOMER_CONTACT_HASH_SECRET`; deploy.yml didn't pass it through | four-consumer-rule + env-deploy-parity-test |
-| PR#85 round 4 | `RESEND_FROM_EMAIL` validator rejected display-name format that the runbook recommended | validator-runbook-parity |
-| PR#85 post-merge | Deploy.yml had the secret line but GitHub Secret itself was never set; container crashed at boot | secret-existence-vs-exposure |
+| Schema/deploy drift | Schema required an HMAC secret; deploy.yml didn't pass it through | four-consumer-rule + env-deploy-parity-test |
+| Validator/runbook drift | A from-email validator rejected the display-name format that the runbook recommended | validator-runbook-parity |
+| Missing secret | Deploy.yml had the secret line but the GitHub Secret itself was never set; container crashed at boot | secret-existence-vs-exposure |

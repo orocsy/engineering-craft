@@ -7,8 +7,8 @@ impact: CRITICAL
 impact-description: |
   Race conditions don't show up in sequential unit tests. The contract is
   `expect(fulfilled).toHaveLength(1)` — exactly one fulfilled, not "at least one" and
-  not "errors thrown." Missing this test is the structural reason PR#85 needed 5 review
-  rounds.
+  not "errors thrown." Missing this test is the structural reason a real OTP feature
+  needed 5 review rounds.
 tags: testing, concurrency, race-condition, promise-allsettled
 applies-to: |
   Every endpoint or service method that mutates shared state. Treat as a HARD
@@ -21,7 +21,7 @@ references-existing-skill: |
   but ranks MEDIUM impact and only triggers on "writing tests"). Production-defensive
   ranks it CRITICAL and triggers on the FEATURE category, not the test phase.
 historical-incidents:
-  - PR#85 (all 5 rounds — none of them had a race test until round 4)
+  - OTP password-reset feature (all 5 review rounds — none of them had a race test until round 4)
 ---
 
 ## Why this matters
@@ -161,8 +161,8 @@ test. The transition matrix in your design doc IS the test plan.
 
 ## Anti-patterns
 
-- "I'll add the race test if Codex flags one" → backwards. Codex flags it because it
-  wasn't there.
+- "I'll add the race test if the reviewer flags one" → backwards. The reviewer flags it
+  because it wasn't there.
 - "Race tests are flaky in CI" → flavor 2/3 are deterministic. Flaky flavor 1 means
   your test isn't isolating its DB/Redis state.
 - "It's a unit test, mocks make it sequential" → see flavor 2 — mocks can simulate

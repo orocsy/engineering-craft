@@ -17,8 +17,8 @@ applies-to: |
 related-rules:
   - libs-first-no-reinventing
 historical-incidents:
-  - 8197fcf — `as unknown as number` cast around Prisma.Decimal was unnecessary tech-debt cargo-culted from booking.service
-  - 8507532 — customer cancel select included tenantId; admin cancel didn't; pre-existing asymmetry surfaced when adding depositPaid to both
+  - `as unknown as number` cast around Prisma.Decimal was unnecessary tech-debt cargo-culted from booking.service
+  - customer cancel select included tenantId; admin cancel didn't; pre-existing asymmetry surfaced when adding depositPaid to both
 ---
 
 ## Why this matters

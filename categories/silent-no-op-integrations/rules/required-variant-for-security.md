@@ -18,7 +18,7 @@ related-rules:
   - configured-state-visible
   - status-code-oracle
 historical-incidents:
-  - PR#85 round 1 [6a2fde0]
+  - a real incident: call site ignored sendEmail's return value, "delivered=false" bubbled up as silent success
 ---
 
 ## Why two variants
@@ -42,8 +42,8 @@ async sendEmailRequired(args): Promise<void>;
 Two reasons:
 
 1. **Caller can't forget to check.** Returning `{ delivered: boolean }` requires the
-   call site to inspect and branch. People forget. PR#85 had exactly this bug — the
-   call site `await sendEmail(...)` ignored the return value, and "delivered=false"
+   call site to inspect and branch. People forget. A real incident had exactly this bug —
+   the call site `await sendEmail(...)` ignored the return value, and "delivered=false"
    bubbled up as silent success.
 
 2. **Stack trace points to the call site.** When the integration is misconfigured in

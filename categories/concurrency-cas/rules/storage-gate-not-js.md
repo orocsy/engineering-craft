@@ -16,7 +16,7 @@ related-rules:
   - postgres-optimistic-cas
   - single-use-token-consumption
 historical-incidents:
-  - PR#85 round 1 (link reset TOCTOU) [6a2fde0]
+  - a real incident: password-reset link TOCTOU — read `consumedAt` then update, both requests passed the check
 ---
 
 ## Why this matters
@@ -35,7 +35,7 @@ The pattern fails IDENTICALLY across:
 The fix is always the same: **the predicate that gates the write must be evaluated by the
 storage layer at the moment of the write, not by JS at the moment of the read.**
 
-## Incorrect (the pattern that bit PR#85 round 1)
+## Incorrect (the pattern that bit a real password-reset link race)
 
 ```typescript
 // ❌ Two concurrent /reset-password requests with the same jti.
@@ -65,7 +65,7 @@ What's wrong line-by-line:
 - The `update` doesn't predicate on `consumedAt: null` — it predicates only on `jti`.
 - Postgres happily writes both updates. Race window: ~5ms in production. Plenty.
 
-## Correct (PR#85 fix)
+## Correct (the fix)
 
 ```typescript
 // ✅ The gate IS the WHERE clause. Postgres takes the row lock, re-evaluates
@@ -123,9 +123,10 @@ predicate against the latest committed row at lock time, even if your earlier
 `findUnique` (in the same tx) read a stale value. You do NOT need SERIALIZABLE for this
 pattern.
 
-For the booking flow's two-layer protection (Redis lock + serializable tx), see the
-project's `apps/api/src/modules/booking/booking.service.ts` — that's a different pattern
-because the predicate spans multiple rows and time ranges, not a single-row CAS.
+For a multi-row reservation flow's two-layer protection (Redis lock + serializable tx),
+that's a different pattern because the predicate spans multiple rows and time ranges, not
+a single-row CAS — see [postgres-optimistic-cas.md](postgres-optimistic-cas.md) for when
+to reach for SERIALIZABLE instead.
 
 ## Tests that prove it
 
@@ -153,7 +154,7 @@ it('two concurrent valid consumes with the same jti — only one succeeds', asyn
 
 The contract is **`expect(fulfilled).toHaveLength(1)`** — exactly one fulfilled, not
 "at least one" and not "two errors" and not "no double-write logged". Anything weaker
-gets you PR#85.
+gets you the double-consume incident this rule came from.
 
 ## Anti-patterns flagged
 

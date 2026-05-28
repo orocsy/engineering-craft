@@ -19,11 +19,11 @@ related-rules:
   - state-machine-first
   - tx-rollback-contract-layers
 historical-incidents:
-  - 9b18e7e — admin cancelBooking recomputed cancellation outcome with PRE-tx startTime; concurrent reschedule landed; wrong outcome persisted (B3.2)
-  - 06e22e2 — same race on cancelBookingManage (B3.3)
-  - edc4229 — store credit issued post-commit; booking CANCELLED + CREDIT_ISSUED with no actual ledger row (B3.4)
-  - 64eeb08 — grant() did read-after-commit to fetch "the row I just wrote"; returned the OTHER concurrent grant's row
-  - 5bb10c3 — assertNoStaffOverlapInTx missed effectiveEndAt extension; IN_PROGRESS extended booking allowed concurrent insert
+  - admin cancelBooking recomputed cancellation outcome with PRE-tx startTime; concurrent reschedule landed; wrong outcome persisted (B3.2)
+  - same race on cancelBookingManage (B3.3)
+  - store credit issued post-commit; booking CANCELLED + CREDIT_ISSUED with no actual ledger row (B3.4)
+  - grant() did read-after-commit to fetch "the row I just wrote"; returned the OTHER concurrent grant's row
+  - assertNoStaffOverlapInTx missed effectiveEndAt extension; IN_PROGRESS extended booking allowed concurrent insert
 ---
 
 ## Why this matters

@@ -15,10 +15,10 @@ applies-to: |
 related-rules:
   - state-machine-first
 historical-incidents:
-  - a3b6fcf — QR card rendered for "non-terminal" bookings including PENDING; should have been allow-list of {CONFIRMED, CHECKED_IN, IN_PROGRESS}
-  - c3171ca — deriveOperationalFlags LATE_NO_CHECKIN polluted by PENDING bookings whose scheduled time passed (never confirmed → false alert)
-  - 6dcbf61 — admin Reschedule menu item showed for IN_PROGRESS even though executeRescheduleCore rejects them; Complete missing for IN_PROGRESS
-  - 9a355d5 — reminders for PENDING reschedules; unsent reminders should be CLEARED, not synced
+  - a real incident: QR card rendered for "non-terminal" bookings including PENDING; should have been allow-list of {CONFIRMED, CHECKED_IN, IN_PROGRESS}
+  - a real incident: deriveOperationalFlags LATE_NO_CHECKIN polluted by PENDING bookings whose scheduled time passed (never confirmed → false alert)
+  - a real incident: admin Reschedule menu item showed for IN_PROGRESS even though executeRescheduleCore rejects them; Complete missing for IN_PROGRESS
+  - a real incident: reminders for PENDING reschedules; unsent reminders should be CLEARED, not synced
 ---
 
 ## Why this matters
@@ -30,8 +30,8 @@ A denylist predicate (`status !== 'CANCELLED' && status !== 'COMPLETED'`) is a
 
 When you add `IN_PROGRESS` to the enum, you have to grep for every
 `status !== 'X'` in the codebase and decide if `IN_PROGRESS` belongs in or out.
-You will miss some. PR#85 missed 3 surfaces: QR card rendering, LATE_NO_CHECKIN
-flags, Reschedule menu item.
+You will miss some. One real rollout missed 3 surfaces: QR card rendering,
+LATE_NO_CHECKIN flags, Reschedule menu item.
 
 ## Incorrect — denylist drift
 
@@ -136,7 +136,7 @@ update.
 
 - `status !== 'X'` — denylist creep
 - `!['X', 'Y'].includes(status)` — same problem, harder to spot
-- "I'll grep when we add a new status" — see PR#85: 3 surfaces missed
+- "I'll grep when we add a new status" — a real rollout did exactly that: 3 surfaces missed
 - Inlining the predicate at every call site — diverges over time
 - Boolean column on the row (`isCancelled`) — adds storage, doesn't enforce the
   full state machine

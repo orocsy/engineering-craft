@@ -3,8 +3,8 @@
 Run this BEFORE writing code for any credential flow: login, signup, password reset,
 OTP, magic links, 2FA enrollment, session invalidation.
 
-This is the densest concentration of defensive patterns in the project. Every
-sub-section here corresponds to a real PR#85 finding.
+This is the densest concentration of defensive patterns in the knowledge base. Every
+sub-section here corresponds to a real production review finding.
 
 ## Step 0 — design phase (before any code)
 
@@ -124,4 +124,4 @@ In addition to the standard unit/integration/E2E suite:
 - [silent-no-op-integrations/README.md](../categories/silent-no-op-integrations/README.md)
 - [config-drift/README.md](../categories/config-drift/README.md)
 - [grep-for-siblings/README.md](../categories/grep-for-siblings/README.md)
-- Real example: [docs/owner-password-reset/case-study.md](file:///Users/SeanCai/Desktop/projects/luxebook/docs/owner-password-reset/case-study.md)
+- Distilled from a real owner-password-reset case study (project-local Layer 3 doc).

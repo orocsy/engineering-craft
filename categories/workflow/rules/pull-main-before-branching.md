@@ -14,7 +14,7 @@ applies-to: |
 related-rules:
   - branch-naming-convention
 historical-incidents:
-  - getluxebook.com cutover (May 2026) — branched off stale main, had to rebase
+  - A production domain cutover — branched off stale main, had to rebase
 ---
 
 ## The discipline

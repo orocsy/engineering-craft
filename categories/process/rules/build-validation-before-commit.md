@@ -5,7 +5,7 @@ maturity: verified
 type: process
 impact: HIGH
 impact-description: |
-  PR#31 postmortem: broken git hooks + an incomplete `replace_all` Edit shipped a TS
+  A real postmortem: broken git hooks + an incomplete `replace_all` Edit shipped a TS
   error to main. The TS check would have caught it; the broken pre-commit hook
   meant it never ran. Lesson: don't trust hooks; run the validation manually.
 tags: process, build, validation, pre-commit, typescript
@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - self-review-before-push (workflow)
 historical-incidents:
-  - PR#31 (broken hooks + incomplete replace_all → TS error to main)
+  - broken hooks + an incomplete replace_all edit shipped a TS error to main
 ---
 
 ## The discipline
@@ -23,7 +23,7 @@ historical-incidents:
 Before `git commit`, run the project's full validation gate manually:
 
 ```bash
-# Monorepo at LuxeBook
+# Example: pnpm-based monorepo
 pnpm lint        # eslint
 pnpm type-check  # tsc --noEmit
 pnpm test        # jest unit tests
@@ -44,7 +44,7 @@ The pre-commit hook can be:
 - Bypassed (`git commit --no-verify`, sometimes accidentally)
 - Silently failing (hook syntax error → exits 0)
 
-PR#31 had a broken pre-commit hook that silently passed. The TS error reached main.
+A real incident had a broken pre-commit hook that silently passed. The TS error reached main.
 
 The hook is defense-in-depth, not the primary gate. The primary gate is your conscious
 "did I run the build?" check before commit.

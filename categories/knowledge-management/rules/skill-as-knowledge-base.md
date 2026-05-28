@@ -15,19 +15,19 @@ applies-to: |
   reorganizing categories, deciding what graduates from project docs to skill rules.
 related-rules: []
 historical-incidents:
-  - PDF-2026-05 ("Harness isn't the goal, knowledge is the moat") — formalized today's PR#85 retro thesis
+  - Source article ("Harness isn't the goal, knowledge is the moat") — formalized the multi-round-review retro thesis
 last-referenced: 2026-05-12
 ---
 
 ## Why this matters
 
-We built engineering-craft today (renamed from production-defensive-patterns) as a
-response to PR#85's 5-round review loop. The article confirms our approach AND surfaces
-several mechanisms we hadn't built yet:
+We built engineering-craft (renamed from production-defensive-patterns) as a
+response to a feature that needed a 5-round review loop. The article confirms our
+approach AND surfaces several mechanisms we hadn't built yet:
 
 | Mechanism | Why we need it |
 |-----------|----------------|
-| 5-layer separation | Right now Layer 1 (this skill) and Layer 2 (LuxeBook business rules) are mixed in project CLAUDE.md. Future projects can't cleanly inherit Layer 1. |
+| 5-layer separation | When Layer 1 (this skill) and Layer 2 (project-specific business rules) are mixed in a project CLAUDE.md, future projects can't cleanly inherit Layer 1. |
 | Maturity lifecycle | Without `draft → verified → proven`, every rule looks equally trustworthy. New rules from one incident shouldn't gate-block reviews like rules backed by 5 incidents. |
 | Auto-decay | Without decay, a rule from 2 years ago about a deprecated framework keeps loading and confusing agents. |
 | Reference tracking | Without `last-referenced`, we can't tell which rules are dead weight. Decay can't fire. |
@@ -42,7 +42,7 @@ When you maintain the skill, follow this checklist:
 
 1. **Decide the layer** (see knowledge-management/README.md): cross-project tech? → here. Project-specific? → docs/. Personal? → ~/.claude/CLAUDE.md.
 2. **Pick one MECE type**: model / decision / guideline / pitfall / process. Forces clarity on what this rule actually is.
-3. **Cite ≥1 historical incident SHA** in frontmatter. No incident = no rule. Ideas without evidence belong in a TODO, not the skill.
+3. **Cite ≥1 historical incident** in frontmatter. No incident = no rule. Ideas without evidence belong in a TODO, not the skill.
 4. **Initial maturity = draft** unless backed by ≥2 incidents. Let it earn promotion.
 5. **Update INDEX.md statistics + category README rule list** in the same commit.
 
@@ -55,7 +55,7 @@ When you maintain the skill, follow this checklist:
 
 ### When PROMOTING a Layer 3 doc to Layer 1 rule
 
-1. **Confirm cross-project applicability**: would this rule have helped on a DIFFERENT project? If only LuxeBook, keep at Layer 2.
+1. **Confirm cross-project applicability**: would this rule have helped on a DIFFERENT project? If it's specific to this one project, keep at Layer 2.
 2. **Write the rule** in engineering-craft format (frontmatter + body).
 3. **Cite the originating Layer 3 doc** as the first historical incident.
 4. **Initial maturity = verified** (one application — the originating project).
@@ -64,11 +64,11 @@ When you maintain the skill, follow this checklist:
 ### When CONSOLIDATING (every 2 days)
 
 `/dev-pipeline:consolidate-lessons` should:
-1. Read journal at `~/.claude/lessons-journal/codex-fixes.jsonl`.
+1. Read the fix-lessons journal (per-repo `.learnings/JOURNAL.md`).
 2. For each entry, decide: new rule (draft), refines existing rule (bump maturity by one if possible), or duplicate (drop with note).
 3. For every rule that was referenced in any session since last consolidation: update `last-referenced` field.
 4. For every rule whose `last-referenced` exceeds the decay threshold: demote one level.
-5. Push to public mirror at `github.com/orocsy/engineering-craft`.
+5. Push to the public mirror.
 
 ## Tests / verification
 

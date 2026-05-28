@@ -2,7 +2,7 @@
 
 **When this category bites**: a CLI does something different from what the docs imply, and you discover it only when production breaks.
 
-**Source incidents**: getluxebook.com cutover where 10 GitHub Secrets were silently set to the literal string `"-"` because of `gh secret set --body -`.
+**Source incident**: a production domain cutover where 10 GitHub Secrets were silently set to the literal string `"-"` because of `gh secret set --body -`.
 
 ## Rules in this category
 
@@ -17,6 +17,6 @@
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule |
+| Incident | One-line | Rule |
 |------------|----------|------|
-| getluxebook.com cutover | `gh secret set --body -` set the literal string "-" as the value, silently. 10 secrets crashed the API container | gh-secret-set-stdin |
+| Production domain cutover | `gh secret set --body -` set the literal string "-" as the value, silently. 10 secrets crashed the API container | gh-secret-set-stdin |

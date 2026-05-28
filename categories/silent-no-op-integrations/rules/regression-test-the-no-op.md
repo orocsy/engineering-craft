@@ -15,7 +15,7 @@ related-rules:
   - configured-state-visible
   - required-variant-for-security
 historical-incidents:
-  - Pre-PR#85 (sendEmail no-op went undetected for months)
+  - a real incident: sendEmail no-op went undetected for months
 ---
 
 ## Why this matters
@@ -25,8 +25,8 @@ caller's args into the SDK's call shape correctly. They do NOT verify the DISABL
 branch — the wrapper short-circuits cleanly when the API key is missing.
 
 If the no-op branch is broken (e.g., it throws instead of returning, or it returns the
-wrong shape), tests pass and the bug ships. PR#85's pre-incident `sendEmail` had been
-returning `false` from the no-op branch for months; nobody noticed because the call
+wrong shape), tests pass and the bug ships. In a real incident, a `sendEmail` wrapper had
+been returning `false` from the no-op branch for months; nobody noticed because the call
 sites that depended on it didn't have prod-environment-equivalent tests.
 
 ## Test matrix

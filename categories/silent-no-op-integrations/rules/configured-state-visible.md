@@ -15,7 +15,7 @@ related-rules:
   - required-variant-for-security
   - regression-test-the-no-op
 historical-incidents:
-  - Pre-PR#85 (sendEmail silent no-op)
+  - a real incident: sendEmail silent no-op
 ---
 
 ## The discipline

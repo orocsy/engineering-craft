@@ -4,9 +4,10 @@
 manipulator instead of using the battle-tested library. The library handled edge cases
 your hand-roll missed.
 
-**Source incidents**: PR#59 had 4 rounds of Codex reviews, each catching a bug from the
-same meta-anti-pattern: hand-rolled hex color regex, URL host parsing, YYYY-MM-DD
-parsing instead of `@IsHexColor()`, `new URL().origin`, `date-fns-tz/fromZonedTime`.
+**Source incidents**: a real change took 4 rounds of automated review, each catching a
+bug from the same meta-anti-pattern: hand-rolled hex color regex, URL host parsing,
+YYYY-MM-DD parsing instead of `@IsHexColor()`, `new URL().origin`,
+`date-fns-tz/fromZonedTime`.
 
 ## Rules in this category
 
@@ -25,8 +26,8 @@ parsing instead of `@IsHexColor()`, `new URL().origin`, `date-fns-tz/fromZonedTi
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule |
+| Incident | One-line | Rule |
 |------------|----------|------|
-| PR#59 | Hand-rolled hex color regex; should have used `@IsHexColor()` from class-validator | libs-first-no-reinventing |
-| PR#59 | Hand-rolled URL host regex; should have used `new URL(x).origin` | libs-first-no-reinventing |
-| PR#59 | `parseISO` for date-with-tz; should have used `date-fns-tz/fromZonedTime`. Bug latent on UTC EC2; would break any non-UTC deploy | libs-first-no-reinventing |
+| Hand-rolled parsing | Hand-rolled hex color regex; should have used `@IsHexColor()` from class-validator | libs-first-no-reinventing |
+| Hand-rolled parsing | Hand-rolled URL host regex; should have used `new URL(x).origin` | libs-first-no-reinventing |
+| Hand-rolled parsing | `parseISO` for date-with-tz; should have used `date-fns-tz/fromZonedTime`. Bug latent on a UTC server; would break any non-UTC deploy | libs-first-no-reinventing |

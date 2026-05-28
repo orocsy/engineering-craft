@@ -7,7 +7,7 @@ impact: HIGH
 impact-description: |
   Code "works on UTC EC2" silently breaks for any non-UTC tenant or any developer
   running locally in HKT/PST/etc. Same class of bug recurred at 6 different code
-  sites in this codebase because no rule said "every time op gets an explicit timezone."
+  sites in one production system because no rule said "every time op gets an explicit timezone."
 tags: timezone, date-fns, scheduling, server-local, host-invariance
 applies-to: |
   Any code that touches user-visible scheduling: availability, calendar boundaries,
@@ -15,12 +15,12 @@ applies-to: |
 related-rules:
   - libs-first-no-reinventing
 historical-incidents:
-  - aeb6fe5 — date-fns parse('HH:mm', date) evaluated in server local TZ; HK 10:00 became 10:00Z, no daytime slots offered
-  - 22e66c0 — parseISO('2026-04-20') produces server-local midnight; latent on UTC EC2, fatal on any non-UTC host (Codex round 4 P1)
-  - 5fc96d7 — getBlocksForDate used server startOfDay/endOfDay while availability used tenant-local bounds; cross-midnight blocks missed; double-booking
-  - 95aa55d — admin calendar Date#getHours() returned viewer-local hour; bookings vanished from day view at 23:30 HK
-  - c3171ca — moved time formatting fully backend-driven via Intl.DateTimeFormat({ timeZone })
-  - 5dd1ede — "TZ=UTC tests" — fake-timer fixtures hid timezone bugs by simulating UTC server output
+  - date-fns parse('HH:mm', date) evaluated in server local TZ; HK 10:00 became 10:00Z, no daytime slots offered
+  - parseISO('2026-04-20') produces server-local midnight; latent on UTC EC2, fatal on any non-UTC host (P1 from automated review)
+  - getBlocksForDate used server startOfDay/endOfDay while availability used tenant-local bounds; cross-midnight blocks missed; double-booking
+  - admin calendar Date#getHours() returned viewer-local hour; bookings vanished from day view at 23:30 HK
+  - moved time formatting fully backend-driven via Intl.DateTimeFormat({ timeZone })
+  - "TZ=UTC tests" — fake-timer fixtures hid timezone bugs by simulating UTC server output
 ---
 
 ## Why this matters

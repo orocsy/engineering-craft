@@ -5,16 +5,16 @@ maturity: proven
 type: guideline
 impact: HIGH
 impact-description: |
-  PR#59 had 4 rounds of Codex reviews catching the same meta-anti-pattern: hand-rolled
-  parsing for well-studied domains. The libraries exist because the edge cases bite
-  every implementer the same way.
+  A real incident took 4 rounds of automated review to clear, each catching the same
+  meta-anti-pattern: hand-rolled parsing for well-studied domains. The libraries exist
+  because the edge cases bite every implementer the same way.
 tags: library, regex, parsing, date-fns-tz, url, class-validator, hand-rolled
 applies-to: |
   About to write a regex, parser, date math, URL manipulation, or any input
   validation/normalization for a well-studied domain.
 related-rules: []
 historical-incidents:
-  - PR#59 (4 rounds: hex color, URL host, parseISO timezone)
+  - 4 rounds of review catching hand-rolled hex color, URL host, and parseISO timezone parsing
 ---
 
 ## Pre-write checklist
@@ -97,7 +97,7 @@ describe('myDateFunction', () => {
 });
 ```
 
-PR#59's `parseISO` bug was latent on the UTC production EC2. It would have broken any
+A real `parseISO` bug was latent on a UTC production server. It would have broken any
 non-UTC deploy. The env-invariance test catches it before that breaks anyone.
 
 ## Red-flag phrases (stop and reach for lib)

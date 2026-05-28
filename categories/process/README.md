@@ -3,9 +3,9 @@
 **When this category bites**: tests pass + lint clean = "done" but deploy breaks; build
 ran locally but not in CI; merged PR auto-deployed and crashed because nobody watched.
 
-**Source incidents**: PR#85 post-merge deploy crash (CUSTOMER_CONTACT_HASH_SECRET
-missing); PR#31 broken hooks shipped a TS error to main; constant E2E headless mode
-when user wanted headed.
+**Source incidents**: a post-merge deploy crash (CUSTOMER_CONTACT_HASH_SECRET
+missing); broken hooks shipped a TS error to main; constant E2E headless mode
+when the user wanted headed.
 
 ## Rules in this category
 
@@ -23,7 +23,7 @@ when user wanted headed.
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule |
+| Incident | One-line | Rule |
 |------------|----------|------|
-| PR#85 post-merge | Deploy crashed in prod (CUSTOMER_CONTACT_HASH_SECRET missing); not noticed for hours | post-merge-deploy-verification |
-| PR#31 | Broken git hooks + incomplete `replace_all` shipped TS error to main | build-validation-before-commit |
+| Post-merge deploy crash | Deploy crashed in prod (CUSTOMER_CONTACT_HASH_SECRET missing); not noticed for hours | post-merge-deploy-verification |
+| Broken hooks to main | Broken git hooks + incomplete `replace_all` shipped TS error to main | build-validation-before-commit |

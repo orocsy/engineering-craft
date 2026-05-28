@@ -15,12 +15,12 @@ applies-to: |
 related-rules:
   - timing-oracle
 historical-incidents:
-  - PR#85 round 2 [11fb1aa]
+  - a real incident: findFirst on cross-tenant email collision in a password-reset flow
 ---
 
 ## Why this matters
 
-Our schema allows the same email across tenants:
+A multi-tenant schema commonly allows the same email across tenants:
 ```prisma
 model User {
   id       String
@@ -30,7 +30,7 @@ model User {
 }
 ```
 
-This is correct: a single human can be a salon owner at Tenant A AND a customer-facing
+This is correct: a single human can be an admin at Tenant A AND a customer-facing
 operator at Tenant B with the same business email.
 
 But the password-reset endpoint takes ONLY the email (no tenant context — the user hasn't
@@ -43,7 +43,7 @@ the attacker's Tenant B account; we email a reset link for the attacker's accoun
 happens to the victim. Worse: if the email-link generator uses tenant from the row picked,
 the victim never gets a reset and has no idea why.
 
-(In our app the link goes to the `User.email` directly so the victim DOES get *some* link
+(If the link goes to the `User.email` directly the victim DOES get *some* link
 — but if it's keyed to the attacker's tenant, the link resets the attacker's password.
 Net: confusion + denial-of-service for the legit owner. With more sophisticated payloads,
 hijack.)
@@ -93,8 +93,8 @@ clock time (equalizer) as the not-found branch. So:
 
 ## What about: just always fail closed on ambiguity?
 
-That's exactly what we do. The "edge case" (legit user with multi-tenant email) is rare
-enough that a support ticket is acceptable. The security gain (no hijack) is mandatory.
+That's exactly the prescription. The "edge case" (legit user with multi-tenant email) is
+rare enough that a support ticket is acceptable. The security gain (no hijack) is mandatory.
 
 ## Operational handling
 

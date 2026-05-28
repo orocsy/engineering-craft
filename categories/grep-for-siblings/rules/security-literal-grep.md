@@ -5,9 +5,9 @@ maturity: proven
 type: process
 impact: CRITICAL
 impact-description: |
-  PR#85 round 5: removed `'dev-secret-change-in-production'` from one file. Three other
-  files had the same fallback. Codex didn't catch round 5 — Claude Code's background
-  scan did. If I were just a model in chat, I would have shipped the inconsistent state.
+  In a real incident: removed `'dev-secret-change-in-production'` from one file. Three other
+  files had the same fallback. The automated reviewer didn't catch it — a background
+  repo-wide scan did. A model working only in chat would have shipped the inconsistent state.
 tags: security, grep, literal, refactor, secret
 applies-to: |
   Removing or changing any literal that has security implications: hardcoded secret
@@ -16,7 +16,7 @@ applies-to: |
 related-rules:
   - api-rename-cross-cut-grep
 historical-incidents:
-  - PR#85 round 5 [2c4e5b0]
+  - A dev-secret fallback removed from one file but left in three siblings; caught by a background repo-wide scan, not the automated reviewer
 ---
 
 ## The pattern
@@ -38,11 +38,11 @@ if (!secret) throw new Error('OTP_HASH_SECRET required');
 Done? **No.** Before you commit, run the grep:
 
 ```bash
-grep -rn "dev-secret-change-in-production\|luxebook-booking-manage-token-dev\|luxebook-local-contact-hash-secret" \
+grep -rn "dev-secret-change-in-production\|booking-manage-token-dev\|local-contact-hash-secret" \
   apps/ --include="*.ts" --include="*.js"
 ```
 
-PR#85 round 5 turned up matches in:
+The grep turned up matches in:
 - `auth.module.ts` — passes the same fallback to JWT module
 - `jwt.strategy.ts` — uses the same fallback for token verification
 - `booking.service.ts` — different literal but same pattern
@@ -75,7 +75,7 @@ it('no dev-secret literals remain in src', () => {
   let result = '';
   try {
     result = execSync(
-      `grep -rn "dev-secret-change-in-production\\|luxebook-local-contact-hash-secret" apps/api/src/ || true`,
+      `grep -rn "dev-secret-change-in-production\\|local-contact-hash-secret" apps/api/src/ || true`,
       { encoding: 'utf-8' },
     );
   } catch (e: any) {

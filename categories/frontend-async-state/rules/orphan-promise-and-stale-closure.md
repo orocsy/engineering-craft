@@ -8,7 +8,7 @@ impact-description: |
   Async ops feeding component-local state across step/modal transitions don't carry
   their own request-id. Effects' dep arrays force a binary choice between "rerun on
   every change (lose user input)" and "never rerun (use stale data)." Fire-and-forget
-  promises orphan their error/loading state. Three real incidents in the codebase.
+  promises orphan their error/loading state. Three real production incidents.
 tags: react, async, hooks, useeffect, race-condition, fire-and-forget
 applies-to: |
   Any user-action mutation; any multi-step form; any modal that fires HTTP and then
@@ -17,11 +17,11 @@ applies-to: |
 related-rules:
   - race-test-contract
 historical-incidents:
-  - 19d22aa — startGoogleAuth was a fire-and-forget IIFE; outer promise resolved immediately, error banner showed but spinner stayed stuck on "Opening…" forever
-  - 2c739b2 — PR #37 race A→B→A on plan-change-modal; slow first-A resolved AFTER B mutate; closure tag still matched the ref; stale data populated
-  - 608b176 — service-form effect gated init on staffLoading; broke ALL form initialization on slow connections (typing into Service Name was wiped when query resolved)
-  - 05f4f3f — split into two latched effects (user-input fields run once; server-derived defaults run on data ready)
-  - e4fdc91 / faa6103 — slot-hold drift; stale slot key cached in component state across step transitions; expired holds slipped through
+  - startGoogleAuth was a fire-and-forget IIFE; outer promise resolved immediately, error banner showed but spinner stayed stuck on "Opening…" forever
+  - race A→B→A on plan-change-modal; slow first-A resolved AFTER B mutate; closure tag still matched the ref; stale data populated
+  - service-form effect gated init on staffLoading; broke ALL form initialization on slow connections (typing into Service Name was wiped when query resolved)
+  - fix — split into two latched effects (user-input fields run once; server-derived defaults run on data ready)
+  - slot-hold drift; stale slot key cached in component state across step transitions; expired holds slipped through
 ---
 
 ## Why this matters

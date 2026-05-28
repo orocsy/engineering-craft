@@ -106,7 +106,7 @@ When you wire the new wrapper into a feature:
 ## Anti-patterns
 
 - "I'll silently no-op so devs without the key can run the app" — exact failure mode
-  that bit PR#85
+  that bit a real production deploy
 - "I'll just throw if not configured everywhere" — breaks marketing/notification call
   sites where silent skip is correct
 - "I'll add a runtime check at the controller" — duplicates logic; misses non-controller

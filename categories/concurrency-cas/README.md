@@ -1,7 +1,7 @@
 # Concurrency & Compare-And-Swap
 
 **When this category bites**: two requests interleave; one silently overwrites the other.
-**Source incidents**: PR#85 had 5 review rounds, all in this category.
+**Source incidents**: a single password-reset review went through 5 rounds, all in this category.
 
 ## The bedrock rule
 
@@ -54,10 +54,10 @@ They reduce the race window but never close it.
 
 ## Historical incidents
 
-| SHA | One-line | Rule that would have prevented it |
-|-----|----------|----------------------------------|
-| PR#85 round 1 | Link reset TOCTOU — read `consumedAt` then update, two requests both pass check | storage-gate-not-js |
-| PR#85 round 2 | OTP wrong-attempt SET XX overwrote freshly issued state | redis-lua-cas |
-| PR#85 round 3 | OTP consume race deleted freshly issued key | redis-lua-cas |
-| PR#85 round 4 | Cross-method password write race — link CAS + OTP CAS both → applyPasswordReset | postgres-optimistic-cas, sibling-resource-invariants |
-| PR#85 round 5 | Stale-state OTP consume — wrongAttempt counter swallowed by SET race | redis-lua-cas |
+| Review round | One-line | Rule that would have prevented it |
+|--------------|----------|----------------------------------|
+| Round 1 | Link reset TOCTOU — read `consumedAt` then update, two requests both pass check | storage-gate-not-js |
+| Round 2 | OTP wrong-attempt SET XX overwrote freshly issued state | redis-lua-cas |
+| Round 3 | OTP consume race deleted freshly issued key | redis-lua-cas |
+| Round 4 | Cross-method password write race — link CAS + OTP CAS both → applyPasswordReset | postgres-optimistic-cas, sibling-resource-invariants |
+| Round 5 | Stale-state OTP consume — wrongAttempt counter swallowed by SET race | redis-lua-cas |

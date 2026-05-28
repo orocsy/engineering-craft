@@ -5,7 +5,7 @@ maturity: proven
 type: pitfall
 impact: CRITICAL
 impact-description: |
-  PR#85 had the deploy.yml `-e VAR="${{ secrets.VAR }}"` line correctly wired AND
+  A real incident had the deploy.yml `-e VAR="${{ secrets.VAR }}"` line correctly wired AND
   passed all CI. After merge, production deploy crashed at boot because the GitHub
   Secret itself was never set. The container saw the env var as the literal empty
   string, env.schema.ts validator failed, container exited.
@@ -16,7 +16,7 @@ applies-to: |
 related-rules:
   - four-consumer-rule
 historical-incidents:
-  - PR#85 post-merge production deploy failure
+  - A real post-merge production deploy failure (a referenced secret existed in deploy.yml but was never set in GitHub Secrets)
 ---
 
 ## The two-step model
@@ -47,8 +47,8 @@ Container exits 1. Health check fails. Restart loop. **Production down.**
 
 ## The bug pattern
 
-This bit PR#85: the `-e CUSTOMER_CONTACT_HASH_SECRET=...` line was added to deploy.yml
-in commit 89bffb6 (round 4 fix). PR was merged (squash merge `5e693db`). Deploy ran.
+This bit a real incident: the `-e CUSTOMER_CONTACT_HASH_SECRET=...` line was added to deploy.yml
+in a round-4 review fix. The PR was merged (squash merge). Deploy ran.
 But `gh secret list` for the repo showed:
 
 ```

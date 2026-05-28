@@ -25,7 +25,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 ## Maturity distribution
 
-After 2026-05-12 backfill + fix-history mining + first consolidation (hand-authored rules only):
+Hand-authored rules only (after fix-history mining + first consolidation):
 17 proven · 26 verified · 0 draft.
 
 ## By-phase recommendations (which categories to load when)
@@ -56,7 +56,7 @@ After 2026-05-12 backfill + fix-history mining + first consolidation (hand-autho
 | `qrToken`, `magic link`, printable receipt | **concurrency-cas/mint-once-vs-mint-on-demand** |
 | `git checkout -b`, branch creation | workflow/pull-main-before-branching |
 | Pre-push git operations | workflow/self-review-before-push |
-| Codex / PR-bot finding response | workflow/push-back-on-reviews-when-verified |
+| Automated-reviewer / PR-bot finding response | workflow/push-back-on-reviews-when-verified |
 | ≥2 review rounds on same PR | **review-discipline/round-cascade-and-deferred-p2** |
 | `gh workflow run`, post-merge | process/post-merge-deploy-verification |
 | `data-testid`, `getByRole`, label rename touching E2E | **e2e-test-resilience/selector-coupling-and-blast-radius** |
@@ -97,7 +97,7 @@ After 2026-05-12 backfill + fix-history mining + first consolidation (hand-autho
 | tooling-footguns | 1 | CLI behavior may differ from docs (gh secret set --body - sets the literal "-") |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
 | process | 2 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit |
-| review-discipline | 1 | Codex rounds cascade; treat deferred P2 as scheduled; self-review BEFORE Codex; explicit careful flow review post-E2E green |
+| review-discipline | 1 | Automated-review rounds cascade; treat deferred P2 as scheduled; self-review BEFORE the automated reviewer; explicit careful flow review post-E2E green |
 | time-and-timezone | 1 | Every Date/parseISO without explicit TZ uses host TZ; pre-format strings backend-side; add a TZ=Asia/Hong_Kong test project |
 
 ### Meta

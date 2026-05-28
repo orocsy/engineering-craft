@@ -6,9 +6,9 @@ type: pitfall
 impact: CRITICAL
 impact-description: |
   If your endpoint contract says "always returns 204," ANY non-204 (including 503,
-  500, 502, 504) on one branch but not the other is an existence oracle. Codex caught
-  this on PR#85 round 1 because Resend downtime would 503 only the existing-account
-  branch.
+  500, 502, 504) on one branch but not the other is an existence oracle. A real
+  incident surfaced this because email-provider downtime would 503 only the
+  existing-account branch.
 tags: enumeration, status-code, oracle, password-reset, forgot-password
 applies-to: |
   Any endpoint with a "look the same regardless of input" contract: forgot-password,
@@ -17,7 +17,7 @@ related-rules:
   - timing-oracle
   - multi-tenant-fail-closed
 historical-incidents:
-  - PR#85 round 1 [6a2fde0]
+  - forgot-password review round — email-provider 503 leaked existence via status-code divergence
 ---
 
 ## Why this matters

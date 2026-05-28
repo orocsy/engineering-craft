@@ -17,8 +17,8 @@ related-rules:
   - configured-state-visible
   - required-variant-for-security
 historical-incidents:
-  - fc5b2ee — multer file-size limit returned 500 instead of 413; admin UI showed "server error"
-  - e3205af — multer file-type validation returned 500 instead of 400
+  - multer file-size limit returned 500 instead of 413; admin UI showed "server error"
+  - multer file-type validation returned 500 instead of 400
 ---
 
 ## Why this matters

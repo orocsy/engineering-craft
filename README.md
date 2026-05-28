@@ -2,9 +2,9 @@
 
 Distilled engineering craft from real production work — defensive patterns, workflow
 discipline, tooling footguns, library-choice reflexes, and process habits. Every rule
-cites a historical incident SHA so readers can trace back to evidence, not opinion.
+cites a historical incident so readers can trace back to evidence, not opinion.
 
-Public mirror: https://github.com/orocsy/engineering-craft. Refresh cadence: a launchd
+Public mirror: https://github.com/<org>/engineering-craft. Refresh cadence: a launchd
 job (`com.engineering-craft.consolidation-reminder`, every 2 days) counts pending
 journal entries and posts a macOS reminder; the user runs
 `/dev-pipeline:consolidate-lessons` in Claude to fold them into refined rules and
@@ -19,7 +19,7 @@ unified across machines even though each device has its own local backlog.
 ## Fresh-machine setup (one command)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/orocsy/engineering-craft/main/bootstrap/curl-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/<org>/engineering-craft/main/bootstrap/curl-install.sh | bash
 ```
 
 Clones engineering-craft, then runs `bootstrap/install.sh` which:
@@ -88,7 +88,7 @@ boot-mode log.
 
 ## How this stays alive
 
-A three-piece pipeline owned by the [dev-pipeline plugin](https://github.com/orocsy/dev-pipeline):
+A three-piece pipeline owned by the [dev-pipeline plugin](https://github.com/<org>/dev-pipeline):
 
 1. **Capture** — `hooks/post-commit` (installed via `~/.claude/setup-git-hooks.sh`)
    appends an entry to `<repo>/.learnings/JOURNAL.md` on every commit whose subject

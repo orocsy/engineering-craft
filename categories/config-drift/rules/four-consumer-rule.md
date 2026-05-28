@@ -6,8 +6,8 @@ type: guideline
 impact: CRITICAL
 impact-description: |
   Forgetting to update deploy.yml when adding a production-required env var crashes
-  the next deploy at boot. PR#85 round 4 caught this for CUSTOMER_CONTACT_HASH_SECRET;
-  if Codex had missed it, prod would have been down.
+  the next deploy at boot. A real incident caught this for an HMAC secret;
+  if the automated reviewer had missed it, prod would have been down.
 tags: config, env, deploy, schema, drift
 applies-to: |
   Any time you add, rename, change validation of, or delete an env var. Same-commit
@@ -17,12 +17,12 @@ related-rules:
   - validator-runbook-parity
   - env-deploy-parity-test
 historical-incidents:
-  - PR#85 round 4 (CUSTOMER_CONTACT_HASH_SECRET) [89bffb6]
+  - a production-required env var missing from the deploy workflow's pass-through
 ---
 
 ## The 4 standard consumers
 
-Every env var in this project must be wired through the SAME commit at every consumer:
+Every env var must be wired through the SAME commit at every consumer:
 
 ### 1. `apps/api/src/config/env.schema.ts`
 
@@ -65,7 +65,7 @@ script: |
     -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
     -e CUSTOMER_CONTACT_HASH_SECRET="${{ secrets.CUSTOMER_CONTACT_HASH_SECRET }}" \
     # ... \
-    ghcr.io/orocsy/luxebook-api:latest
+    ghcr.io/<org>/api:latest
 ```
 
 ### 3. `apps/api/.env.example` (if exists)
@@ -82,7 +82,7 @@ CUSTOMER_CONTACT_HASH_SECRET=dev-otp-hmac-change-in-production
 
 `docs/<feature>/runbook.md`, `README.md`, `AGENTS.md` — wherever the var is referenced.
 
-## Additional consumers (project-specific)
+## Additional consumers (stack-specific)
 
 5. `docker-compose.yml` — local dev container.
 6. Vercel project env vars + `vercel.json` (for `NEXT_PUBLIC_*`).
@@ -120,7 +120,7 @@ Two reasons:
 1. **Rollback safety**: if you have to revert, you revert ALL consumers together. No
    half-rolled-back state.
 2. **Cognitive load**: if the four updates are spread across 3 PRs, one will be
-   forgotten. The empirical rate at LuxeBook is ~30% of split env-var changes have a
+   forgotten. The empirical rate is ~30% of split env-var changes have a
    missing consumer.
 
 ## Tests
@@ -156,7 +156,7 @@ it('every var declared production-required is also passed through deploy.yml', (
 });
 ```
 
-This catches the PR#85 round 4 failure mode at validation gate, not at next deploy attempt.
+This catches that failure mode at validation gate, not at next deploy attempt.
 
 ## When to merge a partial change
 

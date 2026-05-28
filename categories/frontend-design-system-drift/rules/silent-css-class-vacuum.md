@@ -16,9 +16,9 @@ applies-to: |
 related-rules:
   - aria-lockstep-and-viewport-clamp
 historical-incidents:
-  - fc5b2ee — border-danger-400, bg-danger-50, text-danger-600 — preset only defined error/error-soft; every error state silently rendered zero CSS
-  - 7e557b2 — mobile settings used xl:grid-cols-[…] without grid-cols-1 base; implicit auto column sized to min-content of unbreakable URL; 175px horizontal overflow on mobile portrait
-  - 0ca6225 — <input type="color"> with custom 40×40 + custom border-radius silently dropped iOS Safari color-picker tap targets
+  - border-danger-400, bg-danger-50, text-danger-600 — preset only defined error/error-soft; every error state silently rendered zero CSS
+  - mobile settings used xl:grid-cols-[…] without grid-cols-1 base; implicit auto column sized to min-content of unbreakable URL; 175px horizontal overflow on mobile portrait
+  - <input type="color"> with custom 40×40 + custom border-radius silently dropped iOS Safari color-picker tap targets
 ---
 
 ## Why this matters

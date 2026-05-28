@@ -17,7 +17,7 @@ related-rules:
   - postgres-optimistic-cas
   - sibling-resource-invariants
 historical-incidents:
-  - PR#85 round 1 [6a2fde0]
+  - a real incident: password-reset link consume read `consumedAt` in JS, two concurrent submissions both consumed
 ---
 
 ## The pattern
@@ -75,7 +75,7 @@ await tx.passwordResetToken.updateMany({
 
 Without this: an attacker who intercepted the user's first email can replay that link
 AFTER the user successfully resets via the second email, and overwrite the user's
-just-set password. PR#85 sibling-resource finding.
+just-set password. This was a real sibling-resource finding.
 
 See [sibling-resource-invariants.md](sibling-resource-invariants.md) for the full pattern.
 

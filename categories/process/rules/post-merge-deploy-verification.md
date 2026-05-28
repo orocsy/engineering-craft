@@ -5,7 +5,7 @@ maturity: verified
 type: process
 impact: HIGH
 impact-description: |
-  PR#85 was merged. Tests passed. Deploy crashed in production with
+  A real PR was merged. Tests passed. Deploy crashed in production with
   CUSTOMER_CONTACT_HASH_SECRET missing because nobody verified the secret existed.
   Hours of production downtime that 30 seconds of `gh run watch` would have prevented.
 tags: process, deploy, ci, verification, post-merge
@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - secret-existence-vs-exposure (config-drift)
 historical-incidents:
-  - PR#85 post-merge deploy crash
+  - A real post-merge deploy crash (required secret missing from GitHub Secrets)
 ---
 
 ## The discipline

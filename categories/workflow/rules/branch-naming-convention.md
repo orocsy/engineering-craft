@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - pull-main-before-branching
 historical-incidents:
-  - PR#87 directive ("rename auto-spawned claude/<name> worktree branches BEFORE first push")
+  - A directive from review ("rename auto-spawned claude/<name> worktree branches BEFORE first push")
 ---
 
 ## The convention
@@ -35,7 +35,7 @@ Examples:
 - `chore/upgrade-deps` ✓
 - `claude/foo` ✗ (auto-spawned, rename before push)
 - `my-branch` ✗ (no scope prefix)
-- `seancai/feature` ✗ (personal namespace, use scope instead)
+- `alice/feature` ✗ (personal namespace, use scope instead)
 
 ## When the harness auto-spawns a branch
 
@@ -61,5 +61,5 @@ vocabulary as the commit messages.
 
 - `claude/foo` reaches main — squash commit subject reads `claude/foo` as the branch
   name; PR scope is invisible
-- `seancai/feature` — personal namespace; the scope (feat/fix/chore) carries more info
+- `alice/feature` — personal namespace; the scope (feat/fix/chore) carries more info
 - `WIP-foo` — vague; pick a scope and a noun phrase

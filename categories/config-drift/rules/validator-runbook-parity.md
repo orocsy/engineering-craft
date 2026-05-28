@@ -7,25 +7,25 @@ impact: HIGH
 impact-description: |
   Runbook says "set RESEND_FROM_EMAIL to `Name <addr@host>` for nicer display." Validator
   is `z.string().email()`. User follows runbook. Validator rejects. Prod boot fails.
-  PR#85 round 4 caught this; without Codex it would have been a deploy mystery.
+  A real incident caught this; without the automated reviewer it would have been a deploy mystery.
 tags: config, env, validator, zod, documentation
 applies-to: |
   When you add or change a Zod validator on an env var that has a documented format.
 related-rules:
   - four-consumer-rule
 historical-incidents:
-  - PR#85 round 4 (RESEND_FROM_EMAIL display-name parity) [89bffb6]
+  - a validator rejecting the display-name email format the runbook recommended
 ---
 
 ## The bug
 
 Two artifacts disagree:
 - `apps/api/src/config/env.schema.ts`: `RESEND_FROM_EMAIL: z.string().email()`
-- `docs/owner-password-reset/runbook.md`: "Recommended format: `LuxeBook <noreply@...>`"
+- `docs/owner-password-reset/runbook.md`: "Recommended format: `Acme <noreply@...>`"
 
 Result:
-- Operator follows runbook → sets `LuxeBook <noreply@...>` in GitHub Secrets
-- Container boots → Zod runs → `z.string().email()` rejects `"LuxeBook <noreply@...>"`
+- Operator follows runbook → sets `Acme <noreply@...>` in GitHub Secrets
+- Container boots → Zod runs → `z.string().email()` rejects `"Acme <noreply@...>"`
   (it's not a valid bare email per RFC 5322 strict)
 - Container exits 1
 - Operator looks at error: "Invalid email" — runbook says this format works! Confusion.
@@ -64,8 +64,8 @@ And add tests for BOTH:
 describe('RESEND_FROM_EMAIL validator', () => {
   it.each([
     ['bare email', 'noreply@example.com'],
-    ['display-name format', 'LuxeBook <noreply@example.com>'],
-    ['display-name with quoted name', '"LuxeBook" <noreply@example.com>'],
+    ['display-name format', 'Acme <noreply@example.com>'],
+    ['display-name with quoted name', '"Acme" <noreply@example.com>'],
   ])('accepts %s', (_, value) => {
     expect(envSchema.parse({ ...validBase, RESEND_FROM_EMAIL: value })
       .RESEND_FROM_EMAIL).toBe(value);

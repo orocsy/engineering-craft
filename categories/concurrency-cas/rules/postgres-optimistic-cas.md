@@ -17,12 +17,12 @@ related-rules:
   - storage-gate-not-js
   - sibling-resource-invariants
 historical-incidents:
-  - PR#85 round 4 (cross-method password write race) [89bffb6]
+  - a real incident: cross-method password write race — link CAS and OTP CAS both reached `applyPasswordReset`
 ---
 
 ## Why this matters
 
-In PR#85, two flows could both reach the user-row write:
+In a real password-reset incident, two flows could both reach the user-row write:
 - Email-link reset gates on `passwordResetToken.consumedAt` CAS (Postgres)
 - OTP reset gates on Redis Lua compare-and-delete
 
@@ -175,8 +175,8 @@ and cheaper.
 - "I'll lock with `SELECT FOR UPDATE`" → fine and equivalent for single-row CAS, but
   more verbose and requires raw SQL or Prisma `$queryRaw`. The optimistic pattern is
   cleaner for the common case.
-- "I'll just trust the upstream gate" → that's the bug. PR#85 round 4. Per-entry gates
-  are layered defenses, not the load-bearing one.
+- "I'll just trust the upstream gate" → that's the bug — the exact cross-method write race
+  this rule came from. Per-entry gates are layered defenses, not the load-bearing one.
 - "I'll add a single global mutex" → kills throughput; doesn't generalize.
 
 ## Templates

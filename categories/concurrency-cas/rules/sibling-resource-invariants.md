@@ -16,7 +16,7 @@ related-rules:
   - single-use-token-consumption
   - postgres-optimistic-cas
 historical-incidents:
-  - PR#85 round 3 (sibling-resource invariant) [0428f5f]
+  - a real incident: sibling-resource invariant — a consumed reset credential left its siblings valid
 ---
 
 ## The bug
@@ -71,7 +71,7 @@ emails. The fix needs to be a `updateMany WHERE userId AND consumedAt: null`, no
 
 ## Cross-mechanism revocation: link + OTP
 
-Password reset is reachable via TWO mechanisms in our app:
+Password reset is commonly reachable via TWO mechanisms:
 - Reset link (Postgres `passwordResetToken` row)
 - OTP (Redis `pwreset:otp:<tenantId>:<userId>` key)
 

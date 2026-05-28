@@ -2,7 +2,7 @@
 
 **When this category bites**: a click sequence A→B→A returns A's data; an effect overwrites user input on slow connections; a fire-and-forget IIFE leaves a spinner stuck on "Opening…" forever.
 
-**Source incidents**: 19d22aa, 2c739b2, 608b176/05f4f3f, e4fdc91/faa6103 (3-4 commits).
+**Source incidents**: 3-4 commits.
 
 ## Bedrock rule
 

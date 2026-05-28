@@ -9,7 +9,7 @@ Run this BEFORE `git push` on any branch that touches:
 - Anything that mutates shared state from >1 entry point
 
 Skipping this checklist when working in any of the above is the structural reason
-PR#85 needed 5 review rounds. Treat it as a hard gate.
+a real auth feature needed 5 review rounds. Treat it as a hard gate.
 
 ## How to use
 
@@ -139,12 +139,12 @@ Receive findings. If any are real, loop back. Do NOT push with open findings.
 
 ## Why this is a one-pass gate, not a "fix it in review" loop
 
-Codex (and human reviewers) are second opinions, not primary correctness gates. If
-this checklist is treated as optional, the review loop becomes the gate — and the
-review loop is high-latency, expensive in tokens, and frustrating in UX. PR#85 spent
-30+ hours in 5 review rounds because this checklist didn't exist.
+Automated reviewers (and human reviewers) are second opinions, not primary correctness
+gates. If this checklist is treated as optional, the review loop becomes the gate — and the
+review loop is high-latency, expensive in tokens, and frustrating in UX. One real auth
+feature spent 30+ hours in 5 review rounds because this checklist didn't exist.
 
 The one-pass quality bar is: implementer runs this checklist BEFORE push. Reviewers
-catch the things the implementer missed despite the checklist (rare). Codex catches
-what reviewers missed (rarer). Three layers, each one a small additional filter — not
-a single high-latency review serving as the only filter.
+catch the things the implementer missed despite the checklist (rare). The automated
+reviewer catches what reviewers missed (rarer). Three layers, each one a small additional
+filter — not a single high-latency review serving as the only filter.

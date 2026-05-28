@@ -3,8 +3,8 @@
 **When this category bites**: an attacker discovers which emails/handles exist on your
 system by observing differences in HTTP responses or response timing.
 
-**Source incidents**: PR#85 had two distinct enumeration-oracle bugs (status code via
-503 leak, timing via email-send latency).
+**Source incidents**: a single review round on a real project surfaced two distinct
+enumeration-oracle bugs (status code via 503 leak, timing via email-send latency).
 
 ## The bedrock rule
 
@@ -42,8 +42,8 @@ If you leak on ANY of these, your "always returns 204" contract is broken.
 
 ## Historical incidents
 
-| SHA | One-line | Rule that would have prevented it |
-|-----|----------|----------------------------------|
-| PR#85 round 1 | Resend down → 503 only on existing-account branch | status-code-oracle |
-| PR#85 round 2 | Email send took ~500ms; not-found returned in ~10ms | timing-oracle |
-| PR#85 round 2 | findFirst on cross-tenant email collision | multi-tenant-fail-closed |
+| Incident | One-line | Rule that would have prevented it |
+|----------|----------|----------------------------------|
+| Review round 1 | Resend down → 503 only on existing-account branch | status-code-oracle |
+| Review round 2 | Email send took ~500ms; not-found returned in ~10ms | timing-oracle |
+| Review round 2 | findFirst on cross-tenant email collision | multi-tenant-fail-closed |

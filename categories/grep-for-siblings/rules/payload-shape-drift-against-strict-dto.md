@@ -17,9 +17,9 @@ related-rules:
   - api-rename-cross-cut-grep
   - libs-first-no-reinventing
 historical-incidents:
-  - 88c416d — replace_all from @IsObject → @IsValidWorkingHours missed UpdateWorkingHoursDto AND removed @IsObject from imports; TS2552 build failure on main
-  - ed085cb — admin Save forwarded unchanged legacy logoUrl on every color save; new strict regex DTO rejected the round-tripped legacy value with 400; color-only saves broken
-  - aa5f3ee — logoUrl regex with capture group `https?:\/\/[^\s\/]+)?\/uploads\/...` accepted ANY hostname; SSRF/tracking-pixel vector (Codex P1)
+  - replace_all from @IsObject → @IsValidWorkingHours missed UpdateWorkingHoursDto AND removed @IsObject from imports; TS2552 build failure on main
+  - admin Save forwarded unchanged legacy logoUrl on every color save; new strict regex DTO rejected the round-tripped legacy value with 400; color-only saves broken
+  - logoUrl regex with capture group `https?:\/\/[^\s\/]+)?\/uploads\/...` accepted ANY hostname; SSRF/tracking-pixel vector (P1 from automated review)
 ---
 
 ## Why this matters
@@ -116,7 +116,7 @@ const LOGO_URL = /^(https?:\/\/[^\s\/]+)?\/uploads\/[a-z0-9-]+\.(png|jpg)$/i;
 // "https://attacker.com/uploads/x.png" → MATCHES (capture group is optional)
 
 // ✅ Parse + allowlist
-const ALLOWED_ORIGINS = ['https://cdn.luxe-book.com', process.env.MEDIA_PUBLIC_URL];
+const ALLOWED_ORIGINS = ['https://cdn.example.com', process.env.MEDIA_PUBLIC_URL];
 function isValidLogoUrl(input: string): boolean {
   try {
     const url = new URL(input);
@@ -152,16 +152,16 @@ describe('UpdateServiceDto whitelist', () => {
 
 describe('logoUrl validator (after tightening)', () => {
   it.each([
-    'https://cdn.luxe-book.com/uploads/abc.png',
-    'https://cdn.luxe-book.com/uploads/xyz-123.webp',
+    'https://cdn.example.com/uploads/abc.png',
+    'https://cdn.example.com/uploads/xyz-123.webp',
   ])('accepts canonical: %s', (url) => {
     expect(isValidLogoUrl(url)).toBe(true);
   });
 
   it.each([
     'https://attacker.com/uploads/x.png', // wrong host
-    'http://cdn.luxe-book.com/uploads/x.png', // wrong scheme
-    'https://cdn.luxe-book.com/x.png', // wrong path
+    'http://cdn.example.com/uploads/x.png', // wrong scheme
+    'https://cdn.example.com/x.png', // wrong path
     '/uploads/x.png', // relative
   ])('rejects: %s', (url) => {
     expect(isValidLogoUrl(url)).toBe(false);

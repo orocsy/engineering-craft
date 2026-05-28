@@ -4,9 +4,9 @@
 because the API key wasn't configured. Tests pass against the contract; production
 silently drops emails / SMS / payments / events.
 
-**Source incidents**: PR#85 receipt — `notification.service` `sendEmail()` had been
-silently returning `false` in any env without `RESEND_API_KEY` for months. Tests proved
-contract delivery, not actual delivery. Discovered only when password reset stopped
+**Source incidents**: a real production receipt — a `notification.service` `sendEmail()`
+had been silently returning `false` in any env without `RESEND_API_KEY` for months. Tests
+proved contract delivery, not actual delivery. Discovered only when password reset stopped
 working in production.
 
 ## The bedrock rule
@@ -54,7 +54,7 @@ The three required behaviors:
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule that would have prevented it |
-|------------|----------|----------------------------------|
-| Pre-PR#85 | `sendEmail` silently returned false without RESEND_API_KEY for months | configured-state-visible + required-variant-for-security |
-| PR#85 round 1 | Password reset endpoint awaited `sendEmail` which short-circuited; user got "success" but no email | required-variant-for-security |
+| Incident | One-line | Rule that would have prevented it |
+|----------|----------|----------------------------------|
+| Pre-incident | `sendEmail` silently returned false without RESEND_API_KEY for months | configured-state-visible + required-variant-for-security |
+| Review round 1 | Password reset endpoint awaited `sendEmail` which short-circuited; user got "success" but no email | required-variant-for-security |

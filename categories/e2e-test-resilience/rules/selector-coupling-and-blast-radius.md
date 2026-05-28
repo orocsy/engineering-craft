@@ -17,11 +17,11 @@ related-rules:
   - api-rename-cross-cut-grep
   - tx-rollback-contract-layers
 historical-incidents:
-  - c0acb40 — phone field split into country select + national-number textbox; 4 specs broke
-  - 802454d — Next.js basePath '/admin' missing in scanUrl; dual-lane DOM strict-mode failure
-  - 7521e45 — hardcoded "Demo Salon" tenant name; real seed was "Glamour Nails"
-  - 9b3e234 — Stripe webhook field moved + portal opens in _blank + React 18 batching makes "Opening checkout..." copy unobservable
-  - 169621c — getByRole flakes on slow CI; should default to findByRole
+  - phone field split into country select + national-number textbox; 4 specs broke
+  - Next.js basePath '/admin' missing in scanUrl; dual-lane DOM strict-mode failure
+  - hardcoded "Demo Salon" tenant name; real seed was "Glamour Nails"
+  - Stripe webhook field moved + portal opens in _blank + React 18 batching makes "Opening checkout..." copy unobservable
+  - getByRole flakes on slow CI; should default to findByRole
 ---
 
 ## Why this matters
@@ -31,7 +31,7 @@ your selectors. A rename in a component file produces zero compile errors in the
 files that target it. The spec breaks at runtime — usually in CI on someone else's
 PR — with a 30-second timeout that masks the actual cause as "flaky test."
 
-Five concrete failure modes from this codebase:
+Five concrete failure modes seen in production codebases:
 
 1. **Field rename without spec sweep**. PR renames `<input name="phone">` to
    `<select name="phone-country">` + `<input name="phone-national">`. Spec
@@ -127,7 +127,7 @@ When the route changes (real change), the test fails loudly. When the copy chang
 - "I'll update the spec when CI fails" — wastes the next PR's CI cycle, blames the
   wrong author
 - "Tests are flaky on CI" — usually means `getBy*` instead of `findBy*`
-- "Hardcoded seed name is fine, we never rename tenants" — until you do, in PR #87
+- "Hardcoded seed name is fine, we never rename tenants" — until you do, in some later PR
 - "Dual-lane DOM is just a CSS trick" — Playwright sees both
 - "React 18 batching doesn't affect us" — yes it does, on every assertion against
   transient copy

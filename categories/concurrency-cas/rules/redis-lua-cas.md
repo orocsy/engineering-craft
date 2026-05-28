@@ -17,9 +17,9 @@ related-rules:
   - storage-gate-not-js
   - single-use-token-consumption
 historical-incidents:
-  - PR#85 round 2 (OTP wrong-attempt SET XX overwrote fresh state) [11fb1aa]
-  - PR#85 round 3 (OTP consume DEL deleted fresh key) [0428f5f]
-  - PR#85 round 5 (audit-found counter swallow) [2c4e5b0]
+  - a real incident: OTP wrong-attempt SET XX overwrote freshly-issued state
+  - a real incident: OTP consume DEL deleted a freshly-issued key
+  - a real incident: audit-found wrong-attempt counter swallow
 ---
 
 ## Why this matters
@@ -29,14 +29,14 @@ the existing value to anything. So if a concurrent writer has already overwritte
 your value but the key still exists, your `SET XX` succeeds and silently clobbers the
 concurrent writer's update.
 
-This was the root cause of PR#85 round 2 and 3 — and was repeated in 5+ subtle variants
-across the OTP code path.
+This was the root cause of two consecutive review rounds — and was repeated in 5+ subtle
+variants across the OTP code path.
 
 The only correct primitive for "mutate IFF current value matches X" is a Lua script.
 Lua scripts in Redis are atomic by construction: Redis is single-threaded, so the entire
 script runs without interruption.
 
-## Incorrect — the pattern that bit PR#85 round 2
+## Incorrect — the pattern that bit a real wrong-attempt race
 
 ```typescript
 // ❌ User submits a wrong code. Bump attempts in Redis.
@@ -162,7 +162,7 @@ if state['codeHash'] ~= ARGV[1] then return 0 end
 return redis.call('DEL', KEYS[1])
 ```
 
-This prevents PR#85 round 3: a stale consume cannot delete a freshly issued key.
+This prevents the stale-consume race: a stale consume cannot delete a freshly issued key.
 
 ## Why `pcall(cjson.decode, raw)` and not `cjson.decode(raw)`
 

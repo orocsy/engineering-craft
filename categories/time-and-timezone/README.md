@@ -2,7 +2,7 @@
 
 **When this category bites**: scheduling code that "works on UTC EC2" silently breaks for any non-UTC tenant or any developer running locally in HKT/PST/etc.
 
-**Source incidents**: 6 commits across 6 months (aeb6fe5, 22e66c0, 5fc96d7, 95aa55d, c3171ca, 5dd1ede).
+**Source incidents**: 6 commits across 6 months.
 
 ## Bedrock rule
 

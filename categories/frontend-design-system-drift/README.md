@@ -2,7 +2,7 @@
 
 **When this category bites**: a Tailwind class typo or off-spec native input renders zero CSS / drops behaviors. Tests pass because they assert state, not pixels. A real user reports "the danger badge is white" or "the color picker doesn't open on iOS Safari."
 
-**Source incidents**: fc5b2ee, 7e557b2, 0ca6225 (3 commits + ongoing risk).
+**Source incidents**: 3 commits + ongoing risk.
 
 ## Bedrock rule
 

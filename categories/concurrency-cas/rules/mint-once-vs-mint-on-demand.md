@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - single-use-token-consumption
 historical-incidents:
-  - 1bea785 — ensureQrToken re-minted on every call past expiry-grace; overwrote original; old screenshots returned 404 instead of 410
+  - a real incident: ensureQrToken re-minted on every call past expiry-grace; overwrote the original; old screenshots returned 404 instead of 410
 ---
 
 ## Why this matters
@@ -27,8 +27,8 @@ Tokens have two shapes:
 For mint-once tokens, **the value MUST be stable across requests for the same
 resource**. Re-minting orphans every previously-shared copy.
 
-The PR#85 incident: `ensureQrToken(bookingId)` overwrote the booking's QR token
-on every call past expiry-grace. Customers who had:
+The incident this rule came from: `ensureQrToken(bookingId)` overwrote the booking's QR
+token on every call past expiry-grace. Customers who had:
 - Printed the QR
 - Saved a screenshot
 - Forwarded the email confirmation

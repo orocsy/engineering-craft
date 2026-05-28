@@ -16,7 +16,7 @@ related-rules:
   - cross-tx-cas-recompute-inside-tx
   - postgres-optimistic-cas
 historical-incidents:
-  - 59377d9 — PR #66 P1 — store-credit issueCredit opened its own tx instead of accepting an existing tx; outer booking tx had already committed; booking-cancel update could rollback while credit ledger row stayed written
+  - store-credit incident — issueCredit opened its own tx instead of accepting an existing tx; outer booking tx had already committed; booking-cancel update could rollback while credit ledger row stayed written
 ---
 
 ## Why this matters
@@ -68,7 +68,7 @@ class StoreCreditService {
 Naming convention: `methodName` opens its own tx; `methodNameInTx(tx, ...)` joins
 caller's. The `InTx` suffix is searchable; absence is a red flag.
 
-## Incorrect — the PR#66 P1 pattern
+## Incorrect — the partial-commit pattern
 
 ```typescript
 // ❌ Outer service opens tx; inner opens its OWN tx

@@ -2,7 +2,7 @@
 
 **When this category bites**: an unrelated PR renames a field/copy/role/test-id; 4 E2E specs break at once; the fix is "update selectors" but the same class of bug keeps recurring.
 
-**Source incidents**: 8+ commits over 6 months (c0acb40, 802454d, 7521e45, 9b3e234, 169621c, …).
+**Source incidents**: 8+ commits over 6 months.
 
 ## Bedrock rule
 

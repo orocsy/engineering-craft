@@ -19,11 +19,11 @@ related-rules:
   - secret-existence-vs-exposure
   - env-deploy-parity-test
 historical-incidents:
-  - ce35b7f — Stripe envs required at Zod startup but optional secret in GH Actions; EC2 boot crash
-  - 418c867 — GH Actions emits literal "" for unset secrets, not undefined; Zod .optional() only handles undefined; rejected empty strings; boot fail
-  - 4cc5e25 — deploy.yml missing 5 docker -e pass-throughs (STRIPE_BILLING_ENABLED, ADMIN_APP_URL, RESEND_FROM_EMAIL, etc.); billing stayed disabled in prod
-  - 89bffb6 — CUSTOMER_CONTACT_HASH_SECRET env-schema-required-in-prod but missing from deploy.yml -e list (Codex round 4)
-  - 711d1ab — API_PUBLIC_URL required-in-prod superRefine but not wired into deploy.yml; 3-min HTTP 000 outage
+  - payment envs required at Zod startup but optional secret in CI; server boot crash
+  - CI emits literal "" for unset secrets, not undefined; Zod .optional() only handles undefined; rejected empty strings; boot fail
+  - deploy.yml missing several docker -e pass-throughs (a billing flag, an app URL, a from-email, etc.); billing stayed disabled in prod
+  - an HMAC secret env-schema-required-in-prod but missing from deploy.yml -e list
+  - a public-URL var required-in-prod via superRefine but not wired into deploy.yml; 3-min HTTP 000 outage
 ---
 
 ## Why this matters
@@ -152,7 +152,7 @@ describe('production env parsing', () => {
 - "GH Actions handles missing secrets gracefully" — yes, by emitting `""`. Your
   Zod doesn't.
 - ".optional() means it's fine without" — only for `undefined`, not for `""`
-- "I'll add the deploy.yml line later" — see PR#85 round 4
+- "I'll add the deploy.yml line later" — that line is the one that gets forgotten and crashes the deploy
 - "The secret is set, that's enough" — see secret-existence-vs-exposure for why
   existence ≠ exposure
 - "I'll tighten the validator and migrate later" — boot-time validation runs FIRST;

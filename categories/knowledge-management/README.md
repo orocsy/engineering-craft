@@ -6,7 +6,7 @@ deciding where they live, knowing when to retire them, designing for query effic
 **Source**: distilled from a 2026-05 article ("Harness isn't the goal, knowledge is the
 moat") by an AI engineering delivery team that built a 16-stage harness with knowledge as
 the primary artifact, not the workflow. Their key lesson matches what we observed in
-PR#85: workflow harnesses are replaceable, knowledge is permanent.
+a real multi-round review incident: workflow harnesses are replaceable, knowledge is permanent.
 
 ## The bedrock thesis
 
@@ -31,12 +31,12 @@ fresh, and queryable.
 | **0-P** Personal | `~/.claude/CLAUDE.md` (Agent Directives) | Per-user preferences | Stable; rare changes |
 | **0-T** Team | `team-conventions/` (future, when team grows) | Team coding/commit style | Quarterly review |
 | **1** Tech | `~/.claude/skills/engineering-craft/categories/{concurrency-cas,enumeration-safety,...}/` | Cross-project tech patterns | Auto-decay (proven 12mo, verified 6mo) |
-| **2** Business | `apps/api/AGENTS.md` + project CLAUDE.md (LuxeBook tenant rules, booking locks) | Project-specific business rules | Quarterly review |
+| **2** Business | `apps/api/AGENTS.md` + project CLAUDE.md (e.g. tenant-isolation rules, booking locks) | Project-specific business rules | Quarterly review |
 | **3** Project | `docs/<feature>/*.md` (e.g., docs/owner-password-reset/) | Feature-only context | Archive when feature retires |
 
 **Promotion rule**: a Layer 3 entry that gets cited by 2+ different features → propose
 promotion to Layer 1 in the next consolidation. The current rule "race-test-contract"
-was originally in PR#85's docs as a project-specific lesson; promoted to Layer 1
+was originally a project-specific lesson in a feature's docs; promoted to Layer 1
 because it generalized.
 
 ## The 5-type MECE taxonomy (what each rule describes)
@@ -145,7 +145,7 @@ Inspired by the source article's 16-stage state machine:
 - `/dev-pipeline:pipeline` should auto-run `git -C ~/.claude/external-mirrors/engineering-craft pull` to ensure local skill matches the public mirror's latest. Currently NOT wired — manual today. Planned.
 
 ### ARCHIVE (workflow end)
-- After each successful PR merge, the post-codex-fix-extract-lesson hook journals new entries to `~/.claude/lessons-journal/codex-fixes.jsonl`. **This works today.**
+- The post-commit hook journals new fix-commit entries to the repo's `.learnings/JOURNAL.md`. **This works today.**
 - `/dev-pipeline:consolidate-lessons` reads journal, fetches diffs, refines rules, archives entries. **This works today.**
 - Auto-promotion (Layer 3 doc → Layer 1 rule) is **manual today** — I have to make the call when consolidating.
 
@@ -211,7 +211,7 @@ applies-to: |
 related-rules:
   - <other rule files>
 historical-incidents:
-  - <SHA or PR#: one-line description>
+  - <one-line description of the incident that motivated this rule>
 last-referenced: <ISO date — auto-updated by consolidation>
 ---
 ```

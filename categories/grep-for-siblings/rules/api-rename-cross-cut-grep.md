@@ -15,7 +15,7 @@ applies-to: |
 related-rules:
   - security-literal-grep
 historical-incidents:
-  - PR#59 round 4 (parseISO timezone bug across 6 callers)
+  - A real review round (parseISO timezone bug across 6 callers)
 ---
 
 ## TypeScript is necessary but not sufficient
@@ -52,10 +52,10 @@ For env-var renames, also include:
 10. Vercel project env vars (out-of-band check via Vercel API)
 11. GitHub Secrets (`gh secret list`)
 
-## Worked example: renaming `parseISO` (PR#59)
+## Worked example: renaming `parseISO`
 
-The pre-PR#59 codebase had `parseISO` from `date-fns` used as a default in 6 files.
-PR#59 wanted to swap to `fromZonedTime` from `date-fns-tz` in one file. The rename
+The codebase had `parseISO` from `date-fns` used as a default in 6 files.
+A change wanted to swap to `fromZonedTime` from `date-fns-tz` in one file. The rename
 caught the direct call but missed:
 
 - 5 other files still called `parseISO`

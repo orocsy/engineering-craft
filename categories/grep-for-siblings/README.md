@@ -4,10 +4,10 @@
 file but lingers in two more. The "fix" is half-applied, leaving the same vulnerability
 elsewhere.
 
-**Source incidents**: PR#85 round 5 — the literal `'dev-secret-change-in-production'`
+**Source incident**: a real review round — the literal `'dev-secret-change-in-production'`
 was removed from `auth.service.ts`'s `hashOtpCode`. Background scan caught two more
 files (`auth.module.ts`, `jwt.strategy.ts`, plus `booking.service.ts` for a different
-literal). Codex didn't catch it; only a manual sibling-grep did.
+literal). The automated reviewer didn't catch it; only a manual sibling-grep did.
 
 ## The bedrock rule
 
@@ -38,7 +38,7 @@ This applies to:
 
 ## Historical incidents
 
-| SHA / event | One-line | Rule that would have prevented it |
+| Incident | One-line | Rule that would have prevented it |
 |------------|----------|----------------------------------|
-| PR#85 round 5 (background-scan find) | `'dev-secret-change-in-production'` removed in 1 file, present in 3 others | security-literal-grep |
-| PR#59 round 4 | `parseISO` removed in 1 file, called from 6 others (timezone bug) | api-rename-cross-cut-grep |
+| Background-scan find during review | `'dev-secret-change-in-production'` removed in 1 file, present in 3 others | security-literal-grep |
+| API rename round | `parseISO` removed in 1 file, called from 6 others (timezone bug) | api-rename-cross-cut-grep |

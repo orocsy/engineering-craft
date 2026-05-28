@@ -2,7 +2,7 @@
 
 **When this category bites**: tooltip dismisses on Escape but `aria-describedby` still references the unmounted tooltip element; tooltip slides off the right edge of a narrow viewport; keyboard users land on dangling references.
 
-**Source incidents**: 6cee019, 7894e8a, 130ee6b (3 commits).
+**Source incidents**: 3 commits.
 
 ## Bedrock rule
 

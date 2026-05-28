@@ -5,8 +5,8 @@ maturity: proven
 type: process
 impact: CRITICAL
 impact-description: |
-  Skipping this step was the single root cause of all 5 PR#85 review rounds. Forty
-  minutes drawing the state machine would have eliminated 9 of 11 production findings.
+  Skipping this step was the single root cause of all 5 rounds of a real OTP feature's
+  review. Forty minutes drawing the state machine would have eliminated 9 of 11 findings.
 tags: concurrency, design-phase, state-machine, race-condition, otp, token
 applies-to: |
   Any feature with shared mutable state — Redis keys (especially TTL'd), single-use
@@ -15,7 +15,7 @@ related-rules:
   - storage-gate-not-js
   - race-test-contract
 historical-incidents:
-  - PR#85 (all 5 rounds)
+  - OTP password-reset feature — all 5 review rounds traced to un-enumerated concurrent transitions
 ---
 
 ## Why this matters
@@ -24,13 +24,13 @@ Bugs in shared-mutable-state code don't surface in sequential unit tests — the
 when two requests interleave. You cannot enumerate the interleavings while reading code;
 you have to enumerate them on a state diagram first, *then* implement.
 
-In PR#85, every concurrency bug traced to a transition pair I never enumerated:
+In that OTP feature, every concurrency bug traced to a transition pair I never enumerated:
 - `consumeOk × consumeOk` — should mutually exclude (didn't)
 - `consumeMiss × consumeMiss` — counter should increment exactly twice (didn't)
 - `consumeOk × requestOtp` — consume must NOT delete the freshly issued key (did)
 - `consumeMiss × requestOtp` — wrong-attempt must NOT overwrite fresh state (did)
 
-I "knew" these races could exist. I never wrote them down. Codex did, in five rounds.
+I "knew" these races could exist. I never wrote them down. The automated reviewer did, in five rounds.
 
 ## The discipline
 
@@ -76,7 +76,7 @@ Transitions:
   capHit         attempts >= MAX       DEL key               EVICTED
   ttl            time > issuedAt+15m   (Redis evicts)        EXPIRED
 
-Concurrent transition pairs (THE PART I SKIPPED ON PR#85):
+Concurrent transition pairs (THE PART I SKIPPED):
 
   consumeOk × consumeOk
     → BOTH pass hashMatch in JS, both DEL. Two password writes via applyPasswordReset.
@@ -105,14 +105,14 @@ Concurrent transition pairs (THE PART I SKIPPED ON PR#85):
     → Gate: Lua atomically tests cap and deletes; consumeOk sees -1 cleanly.
 ```
 
-## What this would have looked like in the original PR#85 design doc
+## What this would have looked like in the original design doc
 
 Section 4 of the design document should have been a markdown table laid out like the
 "Concurrent transition pairs" block above. Every row is a test case to write. Every
 "Gate:" line is a constraint to enforce in code.
 
 When the implementation diverges from the gate column, that's a review finding
-**before the first commit**, not a Codex finding after merge.
+**before the first commit**, not an automated-reviewer finding after merge.
 
 ## Templates
 

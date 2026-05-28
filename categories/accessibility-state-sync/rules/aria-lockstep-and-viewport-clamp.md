@@ -16,9 +16,9 @@ applies-to: |
 related-rules:
   - silent-css-class-vacuum
 historical-incidents:
-  - 6cee019 — chip's aria-describedby="calendar-booking-tooltip" referenced an element no longer in DOM after Escape/scroll dismissed parent's tooltip
-  - 7894e8a — tooltip dismiss on scroll/resize, focus + blur ARIA toggle, undefined-handler safety
-  - 130ee6b — bottom-placement tooltip left clamped at viewport-left only; tooltip slid off-screen on narrow viewports
+  - chip's aria-describedby="calendar-booking-tooltip" referenced an element no longer in DOM after Escape/scroll dismissed parent's tooltip
+  - tooltip dismiss on scroll/resize, focus + blur ARIA toggle, undefined-handler safety
+  - bottom-placement tooltip left clamped at viewport-left only; tooltip slid off-screen on narrow viewports
 ---
 
 ## Why this matters

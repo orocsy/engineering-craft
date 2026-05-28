@@ -6,8 +6,8 @@ type: process
 impact: HIGH
 impact-description: |
   Catches "added env to schema, forgot to add to deploy.yml" at validation gate, before
-  the next deploy crashes at boot. PR#85 round 4 would have failed this test in CI
-  instead of waiting for Codex review.
+  the next deploy crashes at boot. A real incident would have failed this test in CI
+  instead of waiting for post-merge review.
 tags: config, env, deploy, ci, parity-test
 applies-to: |
   Add this test to the API project's test suite. Run on every PR.
@@ -15,7 +15,7 @@ related-rules:
   - four-consumer-rule
   - secret-existence-vs-exposure
 historical-incidents:
-  - PR#85 round 4 [89bffb6] — CUSTOMER_CONTACT_HASH_SECRET in env.schema but missing from deploy.yml; this test catches that class
+  - an HMAC secret in env.schema but missing from deploy.yml; this test catches that class
 ---
 
 ## What this test does
