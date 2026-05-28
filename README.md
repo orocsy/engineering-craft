@@ -57,6 +57,10 @@ Or from inside Claude Code:
   configured-state-visible, *Required() variant, regression-test the no-op
 - [grep-for-siblings](categories/grep-for-siblings/README.md) — security literal
   removal triggers repo-wide grep; renames need 7 separate searches
+- [cross-file-seams](categories/cross-file-seams/README.md) ⟳ — **generated mirror** of the
+  dev-pipeline plugin's `cross-file-reasoning` catalog: the 7-trace seam check (env-var
+  fallback, route prefix, SDK option name, event tx semantics, mock drift, conditional
+  coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit here.
 
 ### Process & habits
 

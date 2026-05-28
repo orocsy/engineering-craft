@@ -14,13 +14,18 @@
 | Process & habits | 5 | 9 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 1 |
-| **Total** | **15** | **43** |
+| **Total (hand-authored)** | **15** | **43** |
+| Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
 
+⟳ = generated, read-only mirror. The `cross-file-seams` category is published from the
+dev-pipeline plugin's `cross-file-reasoning` catalog by `/dev-pipeline:consolidate-lessons`;
+it is NOT hand-authored here and is excluded from the maturity distribution below.
+
 ## Maturity distribution
 
-After 2026-05-12 backfill + fix-history mining + first consolidation:
+After 2026-05-12 backfill + fix-history mining + first consolidation (hand-authored rules only):
 17 proven · 26 verified · 0 draft.
 
 ## By-phase recommendations (which categories to load when)
@@ -60,6 +65,7 @@ After 2026-05-12 backfill + fix-history mining + first consolidation:
 | `aria-describedby`, tooltip position math | **accessibility-state-sync/aria-lockstep-and-viewport-clamp** |
 | Form state spread → API, regex tightening on existing field | **grep-for-siblings/payload-shape-drift-against-strict-dto** |
 | `multer`, `body-parser`, third-party middleware | **silent-no-op-integrations/middleware-error-mapping** |
+| `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 
 ## Categories at a glance
 
@@ -72,6 +78,7 @@ After 2026-05-12 backfill + fix-history mining + first consolidation:
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
 | silent-no-op-integrations | 4 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 3 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO |
+| cross-file-seams ⟳ | 10 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the 7-trace seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit. |
 
 ### Frontend patterns
 
