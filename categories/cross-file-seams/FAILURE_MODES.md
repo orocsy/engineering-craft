@@ -5,7 +5,7 @@
 
 # Failure Mode Catalog
 
-General-form bugs that hide at file boundaries. Each entry was a real production-bound bug that the implementing agent shipped and a reviewer (Codex / human) caught after the fact. The catalog grows; do not delete entries even after they become "obvious" — that's exactly how they recur.
+General-form bugs that hide at file boundaries. Each entry was a real production-bound bug that the implementing agent shipped and a reviewer (automated or human) caught after the fact. The catalog grows; do not delete entries even after they become "obvious" — that's exactly how they recur.
 
 **How to use this file:**
 - Before running the seven traces in `SKILL.md`, skim the catalog. If the diff matches a pattern below, dive into the matching trace.
@@ -79,7 +79,7 @@ Then `grep` for any client-side fetch / link that targets that URL. If they don'
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P2 #1)**: PostHog reverse proxy mounted at `apps/admin/src/app/admin/posthog/[...path]/route.ts`. Next.js basePath `/admin` prepended at runtime → effective path `/admin/admin/posthog/*`. Every client analytics request 404'd silently. Fix: move file to `apps/admin/src/app/posthog/[...path]/route.ts`. Added `tests/e2e/admin/posthog-proxy.spec.ts` to pin the convention.
+- **Caught in post-merge review**: a PostHog reverse-proxy route file at `app/admin/posthog/[...path]/route.ts` under a Next.js `basePath: '/admin'`. The basePath was prepended at runtime → effective path `/admin/admin/posthog/*`. Every client analytics request 404'd silently. Fix: move the file out of the `admin/` dir to `app/posthog/[...path]/route.ts`. Added an E2E test to pin the convention.
 
 ### Related traces
 
@@ -122,7 +122,7 @@ For every `process.env.X ?? default` in the diff, ask: "in CI / Vercel / Docker,
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P2 #5)**: `apps/api/src/common/telemetry/posthog.service.ts` constructed PostHog with `process.env.POSTHOG_HOST ?? 'https://eu.posthog.com'`. When `POSTHOG_HOST` GitHub secret was unset, the deploy injected `POSTHOG_HOST=""` (empty), `??` passed it through, PostHog client built with empty host. Fix: change `??` to `||`.
+- **Caught in post-merge review**: a service constructed PostHog with `process.env.POSTHOG_HOST ?? 'https://eu.posthog.com'`. When the `POSTHOG_HOST` CI secret was unset, the deploy injected `POSTHOG_HOST=""` (empty), `??` passed it through, and the client built with an empty host. Fix: change `??` to `||`.
 
 ### Related traces
 
@@ -176,8 +176,8 @@ For every SDK config option in the diff, grep the installed `.d.ts`. If the opti
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P1 #4)**: `apps/admin/src/lib/telemetry/posthog-provider.tsx` set `session_recording: { maskAllInputs: true }` thinking that masked everything. It only masks `<input>` elements; customer phone numbers rendered as ordinary `<td>` text leaked into recordings. Investigation: posthog-js v1.376 has NO `maskAllText` option; correct API is `maskTextSelector: '*'`. Fix: use the CSS-selector form.
-- **2026-05-27 luxebook (post-Codex)**: reviewer suggested `disable_exception_autocapture: true` for posthog-js. Verified absent in v1.376 type defs. Correct option is `capture_exceptions: false`. Kept original code.
+- **Caught in post-merge review**: a PostHog provider set `session_recording: { maskAllInputs: true }` thinking that masked everything. It only masks `<input>` elements; customer phone numbers rendered as ordinary `<td>` text leaked into recordings. Investigation: posthog-js v1.376 has NO `maskAllText` option; correct API is `maskTextSelector: '*'`. Fix: use the CSS-selector form.
+- **Caught in review**: a reviewer suggested `disable_exception_autocapture: true` for posthog-js. Verified absent in v1.376 type defs. Correct option is `capture_exceptions: false`. Kept original code.
 
 ### Related traces
 
@@ -237,7 +237,7 @@ In React: a useEffect with multiple unrelated effects bodied is a code smell. Sp
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P2 #3)**: `apps/admin/src/lib/telemetry/posthog-provider.tsx` had Sentry `setUser` and `setTag` inside the same `useEffect` that gated PostHog init on `NEXT_PUBLIC_POSTHOG_KEY`. When PostHog wasn't configured (preview deploys without the secret), admin client errors fingerprinted as `no-tenant` because the Sentry tags never set. Fix: separate Sentry tagging into its own useEffect.
+- **Caught in post-merge review**: a telemetry provider had Sentry `setUser` and `setTag` inside the same `useEffect` that gated PostHog init on `NEXT_PUBLIC_POSTHOG_KEY`. When PostHog wasn't configured (preview deploys without the secret), client errors fingerprinted as `no-tenant` because the Sentry tags never set. Fix: separate Sentry tagging into its own useEffect.
 
 ### Related traces
 
@@ -297,7 +297,7 @@ For each side-effect type, build the matrix (from Trace 4 in `SKILL.md`):
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P2 #2)**: `BookingEventBridge.onBookingCreated` runs inside the booking serializable tx. PostHog `capture` is fire-and-forget. Estimated <0.1% of bookings under normal load would have ghost events. Fix: documented as accepted trade-off; transactional outbox tracked for Phase D.
+- **Caught in post-merge review**: an event-bridge handler (`onBookingCreated`) runs inside a serializable tx. PostHog `capture` is fire-and-forget. Estimated <0.1% of operations under normal load would emit ghost events. Fix: documented as accepted trade-off; transactional outbox tracked as follow-up.
 
 ### Related traces
 
@@ -366,7 +366,7 @@ For every `new Observable(subscriber => {...})`, `new Promise(resolve => {...})`
 
 ### Examples
 
-- **2026-05-27 luxebook PR #94 (Codex P1 #1)**: `TelemetryContextInterceptor` wrapped `next.handle().subscribe(...)` inside a new Observable without capturing the inner Subscription. Client cancellation (RxJS `takeUntil`, HTTP/2 stream close, request timeout) did not propagate. Fix: capture `innerSub`, return `() => innerSub?.unsubscribe()`.
+- **Caught in post-merge review**: a NestJS interceptor wrapped `next.handle().subscribe(...)` inside a new Observable without capturing the inner Subscription. Client cancellation (RxJS `takeUntil`, HTTP/2 stream close, request timeout) did not propagate. Fix: capture `innerSub`, return `() => innerSub?.unsubscribe()`.
 
 ### Related traces
 
@@ -415,7 +415,7 @@ For every test mock in the diff:
 
 ### Examples
 
-- **2026-05-27 luxebook MIU 8a**: `BookingService` constructor grew a 9th arg `PostHogService`. Two spec files instantiated `BookingService` directly. Forgot to add the mock at one site → spec failed at instantiation (TS error) immediately. OK case. Counter-example: `posthog.identify(userId, { tenantId, role })` is mocked as `{ identify: jest.fn() }` — passes regardless of whether `distinctId`, `groupId`, `properties` are correct. The dashboard-side correctness was never asserted.
+- **Real incident**: a service constructor grew a 9th arg (a telemetry service). Two spec files instantiated that service directly. Forgetting the mock at one site → the spec failed at instantiation (TS error) immediately. OK case. Counter-example: `posthog.identify(userId, { tenantId, role })` mocked as `{ identify: jest.fn() }` — passes regardless of whether `distinctId`, `groupId`, `properties` are correct. The dashboard-side correctness was never asserted.
 
 ### Related traces
 
@@ -456,7 +456,7 @@ Before declaring a bug fixed, ask: "what OTHER inputs would have triggered the s
 
 ### Examples
 
-- **2026-05-21 luxebook PR #92**: original "fix" was per-slug redirect rules. Right fix was to drop the fake-tenant fallback for `'not-found'` (keep it for `'error'`). See `docs/booking-tenant-fallback-postmortem.md`.
+- **Caused a production outage**: the original "fix" was per-slug redirect rules. The right fix was to drop a fake-entity fallback for the `'not-found'` case (keep it for `'error'`).
 
 ### Related traces
 
@@ -492,7 +492,7 @@ Before removing:
 
 ### Examples
 
-- **2026-05-21 luxebook PR #92**: removed `buildFallbackTenant()` thinking it was SEO pollution. Actually was transient-API-failure protection. Caused production outage. See `docs/booking-tenant-fallback-postmortem.md`.
+- **Caused a production outage**: removed a `buildFallbackEntity()` helper thinking it was SEO pollution. It was actually transient-API-failure protection; removing it took real pages down the moment the upstream API had a transient failure.
 
 ### Related traces
 
@@ -528,7 +528,7 @@ Or: write the assertion at the INVARIANT level — "real tenant URLs do not retu
 
 ### Examples
 
-- **2026-05-21 luxebook PR #92**: `services-page.test.tsx` had a test asserting the fallback behavior. PR rewrote it to assert the OPPOSITE (no fallback). Both versions passed. Bug shipped. See `docs/booking-tenant-fallback-postmortem.md`.
+- **Bug shipped to production**: a page test asserted the fallback behavior. The change rewrote that same test to assert the OPPOSITE (no fallback). Both versions passed green. The regression shipped — the test was rewritten to match the new (wrong) behavior instead of catching it.
 
 ### Related traces
 
@@ -548,7 +548,7 @@ The root cause is almost always single-file thinking applied to the FIX phase: t
 
 A review finds: `process.env.POSTHOG_HOST ?? '...'` is unsafe (empty string defeats nullish-coalescing).
 
-The agent finds ONE occurrence in `apps/api/src/common/telemetry/posthog.service.ts` and another in `apps/admin/src/lib/telemetry/posthog-provider.tsx`. Fixes only the admin one. Writes a commit message that says: "P2 fix: POSTHOG_HOST `??` → `||`". Pushes. The api one stays broken. Next reviewer sees the same finding on the api file and re-flags. The agent thinks Codex is "re-flagging a fixed issue" and dismisses.
+The agent finds ONE occurrence in the API service and another in an admin provider. Fixes only the admin one. Writes a commit message that says: "P2 fix: POSTHOG_HOST `??` → `||`". Pushes. The API one stays broken. The next review sees the same finding on the API file and re-flags. The agent thinks the reviewer is "re-flagging a fixed issue" and dismisses.
 
 The asymmetry: the fix was real but partial. The commit message generalized to "the fix" when the diff was specific.
 
@@ -572,7 +572,7 @@ When a reviewer re-flags something you thought was fixed: BEFORE arguing it's a 
 
 ### Examples
 
-- **2026-05-28 luxebook PR #94 (Codex round-2 + round-3)**: round 2 included Codex P2 #5 on `POSTHOG_HOST ?? '...'`. Commit `d09563b` message claimed "P2 Codex #5: POSTHOG_HOST now uses || not ?? so empty-string secret from GitHub Actions falls back to EU default". But `git log -p -- apps/api/src/common/telemetry/posthog.service.ts` showed `d09563b` did not touch that file at all — the `??` survived in the api code. Codex re-flagged at round 3 (correctly). When investigating the re-flag, the agent assumed it was stale and almost dismissed it; checking the actual current file content showed the bug was still there. Fix landed in commit `8b75c8a` together with the genuine new loading-gate fix.
+- **Caught when a re-flag was almost dismissed as stale**: an earlier commit's message claimed "POSTHOG_HOST now uses `||` not `??` so an empty-string secret falls back to the default". But `git log -p` on the actual file showed that commit did not touch it at all — the `??` survived in the API code. The reviewer re-flagged it on a later round (correctly). When investigating the re-flag, the agent assumed it was stale and almost dismissed it; checking the CURRENT file content showed the bug was still there. The lesson: verify a re-flag against the current file, never against a prior commit message's claim.
 
 ### Related traces
 
@@ -650,14 +650,13 @@ purpose is a side effect, the plan is incomplete.
 
 ### Examples
 
-- **2026-05-28 luxebook PR #94 (internal /dev-pipeline:review P1 #5)**: MIU 8a.3
+- **Caught in pre-push review (3 prior review rounds had missed it)**: a change
   added six `posthog.capture('slot_contention_detected', ...)` sites at booking
-  contention throw paths. The PostHogService mock satisfied the 9th constructor
-  arg; 119 booking tests passed; ZERO asserted any capture fired. The internal
-  review caught it (Codex's 3 prior rounds had not). Fix added explicit capture
-  assertions and, in the process, discovered a SEVENTH contention path
-  (`rescheduleBookingManage` lock-busy) that had no capture at all — invisible
-  precisely because nothing tested the captures.
+  contention throw paths. The PostHogService mock satisfied the constructor
+  arg; 119 tests passed; ZERO asserted any capture fired. The pre-push review
+  caught it. The fix added explicit capture assertions and, in the process,
+  discovered a SEVENTH contention path (a lock-busy reschedule path) that had no
+  capture at all — invisible precisely because nothing tested the captures.
 
 ### Related traces
 
@@ -684,9 +683,9 @@ It "works on my machine" because the local monorepo has the symlink + a TS-aware
 { "main": "./src/index.ts" }
 ```
 ```ts
-// apps/api (tsc → node dist/main) imports it:
+// a tsc → node dist/main service imports it:
 export { scrub } from '@scope/utils';   // tsc emits require('@scope/utils') → raw .ts → runtime crash
-// Docker build: COPY apps/api only → TS2307 (packages/ not in image)
+// Docker build: COPY the service dir only → TS2307 (packages/ not in image)
 // CI: Build Image job is `on: push: [main]` → never runs on the PR → merges green, breaks main
 ```
 
@@ -705,7 +704,7 @@ Decide, per package, which consumers it must serve, and make it consumable by AL
 
 ### Examples
 
-- **2026-05-28 luxebook PR #94 → #95**: a shared PII scrubber moved into `@luxebook/utils` (raw TS). Vercel admin+booking went green (they transpile it) and merged; the API Docker build (`on: push: [main]`) then failed on `main` with TS2307, and would have crashed `node dist/main` at startup. First "fix" only added `transpilePackages` (Vercel-only) — didn't touch the API. Resolved by compiling the package (dist JS + exports split) and wiring all four build contexts (Vercel `--filter=app...`, Dockerfile copy+build+root-tsconfig, jest mapper, turbo `^build`); verified with a real `docker build` + runtime `require` before merge. Two prior misses came from local gates (jest/tsc/one app's build) not exercising the Docker context.
+- **Broke `main` after a green PR**: a shared PII scrubber moved into a workspace package shipping raw TS. The bundled Next apps went green (they transpile it) and merged; the API's isolated Docker build (gated `on: push: [main]`) then failed on `main` with TS2307, and would have crashed `node dist/main` at startup. The first "fix" only added `transpilePackages` (bundler-only) — didn't touch the API. Resolved by compiling the package (dist JS + exports split) and wiring all four build contexts (Vercel `--filter=app...`, Dockerfile copy+build+root-tsconfig, jest mapper, turbo `^build`); verified with a real `docker build` + runtime `require` before merge. The two prior misses came from local gates (jest/tsc/one app's build) not exercising the Docker context.
 
 ### Related traces
 
@@ -753,7 +752,7 @@ How to spot this BEFORE shipping. The trace from `SKILL.md` to run. The grep / q
 
 ## Meta: why this catalog exists
 
-The session that triggered this catalog's creation shipped 4 cross-file bugs in PR #94, all caught by Codex post-push, none caught by the implementing agent during `/dev-pipeline:implement` OR by the agent during its own `/dev-pipeline:review` self-review.
+The session that triggered this catalog's creation shipped 4 cross-file bugs in a single PR, all caught by an automated reviewer post-push, none caught by the implementing agent during `/dev-pipeline:implement` OR during its own `/dev-pipeline:review` self-review.
 
 The unifying pattern: **single-file thinking**. The agent read each touched file deeply, made locally-correct changes, and shipped. The bugs lived at the seams the agent never looked at:
 

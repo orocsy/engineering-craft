@@ -124,8 +124,6 @@ feat(scope): short description
 
 - MIU 1: [what] - [why it matters]
 - Tests: what was verified
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Scopes**: {{COMMIT_SCOPES}}
