@@ -31,6 +31,7 @@ tenant identity, or you can't isolate a single tenant's incident from aggregate 
 |------|----------|
 | [pii-scrubbing-defense-in-depth](rules/pii-scrubbing-defense-in-depth.md) | An SDK "don't send PII" flag only covers what the SDK auto-collects; application-controlled values (exception messages, breadcrumbs, contexts) need an explicit KEY+VALUE scrubber that walks every event surface, returns a new object, and is shared across runtimes. |
 | [tenant-tagging-and-cross-tenant-guard](rules/tenant-tagging-and-cross-tenant-guard.md) | Tag every error + analytics event with the tenant id in its own unconditional step (never behind an unrelated gate); add a guard that fails loudly if a signal is about to leave untagged. |
+| [analytics-lifecycle-and-containment](rules/analytics-lifecycle-and-containment.md) | reset() on logout is part of the identify lifecycle (shared devices); gate identify/reset on auth-loading settled; contain every capture so telemetry can never roll back a business transaction. |
 
 ## Vendor-neutral note
 

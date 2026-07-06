@@ -59,7 +59,11 @@ Or from inside Claude Code:
   removal triggers repo-wide grep; renames need 7 separate searches
 - [observability](categories/observability/README.md) — three pillars (errors/analytics/
   health) every signal sliceable per-tenant; PII scrubbing as defense-in-depth (an SDK
-  flag is not enough); tag tenant unconditionally + guard against untagged leaks
+  flag is not enough); tag tenant unconditionally + guard against untagged leaks;
+  identify/reset lifecycle + contained captures
+- [auth-identity](categories/auth-identity/README.md) — unauthenticated OAuth may only
+  sign in an already-linked subject; email_verified ≠ ownership; linking is a
+  privileged, authenticated action
 - [cross-file-seams](categories/cross-file-seams/README.md) ⟳ — **generated mirror** of the
   dev-pipeline plugin's `cross-file-reasoning` catalog: the 7-trace seam check (env-var
   fallback, route prefix, SDK option name, event tx semantics, mock drift, conditional

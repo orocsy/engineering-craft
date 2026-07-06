@@ -13,6 +13,7 @@
 | Rule | Impact | Trigger |
 |------|--------|---------|
 | [orphan-promise-and-stale-closure](rules/orphan-promise-and-stale-closure.md) | HIGH | Any user-action mutation, any multi-step form, any modal that fires HTTP and then unmounts |
+| [web-storage-is-fallible](rules/web-storage-is-fallible.md) | HIGH | Any direct sessionStorage/localStorage access that can run inside an embedded webview (WeChat, Instagram) or strict-privacy context |
 
 ## Anti-patterns
 

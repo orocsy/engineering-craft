@@ -130,6 +130,15 @@ payloads — that's a separate SDK with its own masking config (input masking, a
 text masking, session-replay masking). Scrubbing errors does not scrub analytics. Treat
 each vendor surface independently.
 
+Two real leak shapes from one rollout: (1) autocapture sent element TEXT in event
+properties (`$elements`) even though session-replay masking was on — replay masking and
+autocapture masking are separate switches (`mask_all_text` + `mask_all_element_attributes`
+at the top level, verified in the installed types); (2) a server-side event carried a
+customer-typed free-text field (a cancellation reason with phones/emails) into analytics
+properties — the error-tracker scrubber never sees those. Fix shape: never forward raw
+free-text; emit derived analytics-safe fields (`hasReason`, `reasonLength`) and assert in
+a test that the raw text never appears in the captured payload.
+
 ## Tests
 
 - One test per event surface in the tree above — assert PII on that surface is redacted.

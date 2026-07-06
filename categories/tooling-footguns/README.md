@@ -9,6 +9,7 @@
 | Rule | Impact | Trigger |
 |------|--------|---------|
 | [gh-secret-set-stdin](rules/gh-secret-set-stdin.md) | HIGH | Setting any GitHub Secret via `gh secret set` |
+| [dockerignore-nested-patterns](rules/dockerignore-nested-patterns.md) | CRITICAL | Any monorepo .dockerignore meant to exclude nested files (env files, keys) |
 
 ## Anti-patterns
 

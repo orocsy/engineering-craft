@@ -1,6 +1,6 @@
 <!-- GENERATED — DO NOT EDIT.
      Canonical source: dev-pipeline plugin skills/cross-file-reasoning/FAILURE_MODES.md
-     Published by /dev-pipeline:consolidate-lessons on 2026-05-28.
+     Published by /dev-pipeline:consolidate-lessons on 2026-07-06.
      Hand-edits here are overwritten on the next consolidation. Edit the plugin instead. -->
 
 # Failure Mode Catalog
@@ -367,6 +367,7 @@ For every `new Observable(subscriber => {...})`, `new Promise(resolve => {...})`
 ### Examples
 
 - **Caught in post-merge review**: a NestJS interceptor wrapped `next.handle().subscribe(...)` inside a new Observable without capturing the inner Subscription. Client cancellation (RxJS `takeUntil`, HTTP/2 stream close, request timeout) did not propagate. Fix: capture `innerSub`, return `() => innerSub?.unsubscribe()`.
+- **Test-strategy corollary (same incident's later audit)**: every existing spec stubbed the handler with `of(...)` — a source that completes synchronously, so the teardown path was NEVER exercised and the buggy wrapper passed the whole suite. Lifecycle tests need non-completing sources: `new Observable(() => () => teardownSpy())`, a `NEVER` source, and a sync-throw source — each asserting its specific lifecycle invariant.
 
 ### Related traces
 
@@ -705,6 +706,7 @@ Decide, per package, which consumers it must serve, and make it consumable by AL
 ### Examples
 
 - **Broke `main` after a green PR**: a shared PII scrubber moved into a workspace package shipping raw TS. The bundled Next apps went green (they transpile it) and merged; the API's isolated Docker build (gated `on: push: [main]`) then failed on `main` with TS2307, and would have crashed `node dist/main` at startup. The first "fix" only added `transpilePackages` (bundler-only) — didn't touch the API. Resolved by compiling the package (dist JS + exports split) and wiring all four build contexts (Vercel `--filter=app...`, Dockerfile copy+build+root-tsconfig, jest mapper, turbo `^build`); verified with a real `docker build` + runtime `require` before merge. The two prior misses came from local gates (jest/tsc/one app's build) not exercising the Docker context.
+- **Sibling build-invocation in a dormant CI workflow (same incident, later review)**: a `workflow_dispatch`-only workflow built apps with raw `pnpm --filter <app> build` (no deps-first `...`) — the identical TS2307 class, latent because that workflow never ran on the PR. Caught by grepping ALL workflow files for direct build invocations before merge. This trace must cover every CI file, not just the workflows that ran.
 
 ### Related traces
 

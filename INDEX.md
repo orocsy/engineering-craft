@@ -9,13 +9,13 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 5 | 27 |
-| Observability (errors, analytics, health) | 1 | 2 |
-| Frontend patterns | 4 | 4 |
-| Process & habits | 5 | 9 |
+| Defensive patterns (backend correctness) | 6 | 28 |
+| Observability (errors, analytics, health) | 1 | 3 |
+| Frontend patterns | 4 | 5 |
+| Process & habits | 5 | 10 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 1 |
-| **Total (hand-authored)** | **16** | **45** |
+| **Total (hand-authored)** | **17** | **49** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
@@ -68,6 +68,10 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | `multer`, `body-parser`, third-party middleware | **silent-no-op-integrations/middleware-error-mapping** |
 | `Sentry`, `PostHog`, `beforeSend`, telemetry, `setTag`, error tracking, analytics | **observability** (tenant tagging + cross-tenant guard) |
 | PII in telemetry, `sendDefaultPii`, scrub, redact, exception message with user data | **observability/pii-scrubbing-defense-in-depth** |
+| `identify(`, `reset(`, analytics on logout / shared device, capture inside a tx | **observability/analytics-lifecycle-and-containment** |
+| "Sign in with Google", OAuth login, `email_verified`, account linking, SSO | **auth-identity/federated-identity-linking** |
+| `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
+| `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 
 ## Categories at a glance
@@ -81,13 +85,14 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
 | silent-no-op-integrations | 4 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 3 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO |
+| auth-identity | 1 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
 | cross-file-seams ⟳ | 10 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the 7-trace seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit. |
 
 ### Observability
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| observability | 2 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth (KEY+VALUE, all event surfaces, immutable, shared); tag tenant unconditionally + guard untagged leaks |
+| observability | 3 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth; tag tenant unconditionally + guard untagged leaks; identify/reset lifecycle + contained captures |
 
 ### Frontend patterns
 
@@ -95,7 +100,7 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 |----------|-------|----------|
 | e2e-test-resilience | 1 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes |
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
-| frontend-async-state | 1 | Orphan promises, stale closures (A→B→A), latched init effects (user-input vs server-derived), step-transition slot reacquisition |
+| frontend-async-state | 2 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews — guard + fail toward safety |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 
 ### Process & habits
@@ -103,7 +108,7 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | Category | Rules | One-line |
 |----------|-------|----------|
 | workflow | 4 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence |
-| tooling-footguns | 1 | CLI behavior may differ from docs (gh secret set --body - sets the literal "-") |
+| tooling-footguns | 2 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
 | process | 2 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit |
 | review-discipline | 1 | Automated-review rounds cascade; treat deferred P2 as scheduled; self-review BEFORE the automated reviewer; explicit careful flow review post-E2E green |
