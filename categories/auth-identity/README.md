@@ -22,6 +22,7 @@ local account is a privileged action that requires an authenticated session
 | Rule | Impact | Trigger |
 |------|--------|---------|
 | [federated-identity-linking](rules/federated-identity-linking.md) | CRITICAL | Any OAuth/SSO login that can encounter an existing same-email local account |
+| [server-rederives-sensitive-classification](rules/server-rederives-sensitive-classification.md) | HIGH | Sensitive-field gating (medical, PII) depends on payload structure the client creates |
 
 ## Anti-patterns
 

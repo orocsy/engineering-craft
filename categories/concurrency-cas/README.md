@@ -36,6 +36,8 @@ They reduce the race window but never close it.
 | [status-set-creep-on-state-machine-evolution](rules/status-set-creep-on-state-machine-evolution.md) | HIGH | `status !== 'X'` denylists silently include any new enum addition |
 | [mint-once-vs-mint-on-demand](rules/mint-once-vs-mint-on-demand.md) | MEDIUM | Shareable / printable tokens (QR receipts, magic links) — never re-mint on read |
 | [monetary-decimal-symmetry](rules/monetary-decimal-symmetry.md) | MEDIUM | Money fields use `Prisma.Decimal` end-to-end; cross-path selects must align |
+| [async-event-revalidates-live-pointer](rules/async-event-revalidates-live-pointer.md) | CRITICAL | Async success event (webhook, job completion) for an entity whose funding/source pointer is mutable |
+| [webhook-claim-adopt-completedat](rules/webhook-claim-adopt-completedat.md) | CRITICAL | Designing dedupe for any at-least-once event feed with post-commit effects |
 
 ## Templates
 

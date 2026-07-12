@@ -34,6 +34,7 @@ The three required behaviors:
 | [required-variant-for-security](rules/required-variant-for-security.md) | CRITICAL | Security-critical call sites that depend on the integration |
 | [regression-test-the-no-op](rules/regression-test-the-no-op.md) | HIGH | Testing the wrapper itself |
 | [middleware-error-mapping](rules/middleware-error-mapping.md) | MEDIUM | Every npm middleware throwing non-HttpException needs a domain-specific filter |
+| [unconsumed-terminal-events](rules/unconsumed-terminal-events.md) | HIGH | Local code puts a vendor object into a state (cancel/expire/void) whose event type is unhandled |
 
 ## Templates
 

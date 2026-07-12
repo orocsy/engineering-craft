@@ -14,7 +14,8 @@ description: |
   Trigger keywords: forgot-password, reset-password, otp, jwt, token, hmac, single-use, consume,
   invalidate, race, cas, compare-and-swap, lua, updateMany, optimistic, lock, tenantId, findFirst,
   enumeration, timing-oracle, env.schema, deploy.yml, third-party API key, gh secret, branch from
-  main, self-review, code-reviewer, regex, parseISO, hand-rolled, hand-write a, hex color, URL host.
+  main, self-review, code-reviewer, regex, parseISO, hand-rolled, hand-write a, hex color, URL host,
+  webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification.
 license: MIT
 metadata:
   author: luxebook
@@ -109,10 +110,10 @@ the goal, knowledge is the moat", 2026-05).
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 6 | Two requests interleave; one silently overwrites the other |
+| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 8 | Two requests interleave; one silently overwrites the other |
 | Enumeration safety | [categories/enumeration-safety/README.md](categories/enumeration-safety/README.md) | 4 | Attacker discovers which emails exist by status/timing diff |
 | Config drift | [categories/config-drift/README.md](categories/config-drift/README.md) | 4 | Env added in one consumer, missing in others → boot crash |
-| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 3 | Third-party wrapper "succeeds" while doing nothing |
+| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 4 | Third-party wrapper "succeeds" while doing nothing |
 | Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 2 | Security literal removed in one file, lingers in two more |
 
 ### Process & habits
@@ -128,7 +129,7 @@ the goal, knowledge is the moat", 2026-05).
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Knowledge management | [categories/knowledge-management/README.md](categories/knowledge-management/README.md) | 1 | When maintaining the skill itself — adding rules, retiring rules, deciding what graduates from project docs |
+| Knowledge management | [categories/knowledge-management/README.md](categories/knowledge-management/README.md) | 2 | When maintaining the skill itself — adding rules, retiring rules, deciding what graduates from project docs |
 
 ## Templates (copy-paste ready)
 

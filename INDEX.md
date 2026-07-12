@@ -9,13 +9,13 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 28 |
+| Defensive patterns (backend correctness) | 6 | 32 |
 | Observability (errors, analytics, health) | 1 | 3 |
 | Frontend patterns | 4 | 5 |
 | Process & habits | 5 | 10 |
 | Other (time, review-discipline) | — | (counted under process) |
-| Knowledge management (meta) | 1 | 1 |
-| **Total (hand-authored)** | **17** | **49** |
+| Knowledge management (meta) | 1 | 2 |
+| **Total (hand-authored)** | **17** | **54** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
@@ -73,6 +73,11 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
 | `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
+| `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
+| payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
+| async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
+| sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
+| terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |
 
 ## Categories at a glance
 
@@ -80,12 +85,12 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| concurrency-cas | 12 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
+| concurrency-cas | 14 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
 | enumeration-safety | 4 | Two responses on a sensitive condition must be indistinguishable on every observable channel |
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
-| silent-no-op-integrations | 4 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
+| silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 3 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO |
-| auth-identity | 1 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
+| auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
 | cross-file-seams ⟳ | 10 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the 7-trace seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit. |
 
 ### Observability
@@ -118,7 +123,7 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| knowledge-management | 1 | How the skill itself is structured, matured, decayed, and lint'd. Read once, apply forever. |
+| knowledge-management | 2 | How the skill itself is structured, matured, decayed, and lint'd. Read once, apply forever. |
 
 ## Maturity legend
 
