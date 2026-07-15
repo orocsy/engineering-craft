@@ -2,7 +2,7 @@
 title: Read → Compute → Write Across a Transaction Boundary Is Race-Vulnerable
 type: model
 maturity: proven
-last-referenced: 2026-05-12
+last-referenced: 2026-07-14
 impact: HIGH
 impact-description: |
   Any "read X → derive Y from X → write Y inside tx" splits across the tx boundary.
@@ -24,6 +24,7 @@ historical-incidents:
   - store credit issued post-commit; booking CANCELLED + CREDIT_ISSUED with no actual ledger row (B3.4)
   - grant() did read-after-commit to fetch "the row I just wrote"; returned the OTHER concurrent grant's row
   - assertNoStaffOverlapInTx missed effectiveEndAt extension; IN_PROGRESS extended booking allowed concurrent insert
+  - CoachFlow makeup-grant re-read booking status IN-TX but only INSERTed credit/ledger (never wrote the booking row); SSI had a one-way rw-dependency, no cycle, so it did NOT abort the racing cancel — double compensation. Fixed with SELECT … FOR UPDATE on the booking row (round-16)
 ---
 
 ## Why this matters
@@ -181,10 +182,61 @@ it('cancellation outcome reflects the in-tx booking startTime, not a stale read'
 });
 ```
 
+## Sharpening: an in-tx READ is not enough if the tx never WRITES the contended row
+
+The "Correct" example above works because the tx both **reads AND updates the
+booking row** — a concurrent writer to that same row creates a
+read-write *cycle*, which PostgreSQL SSI detects and aborts. But the retry
+guarantee quietly depends on that write. If your tx **reads the contended row
+and then only writes ELSEWHERE** (an INSERT into a different table), a plain
+in-tx `findFirst` is NOT sufficient:
+
+- Under SERIALIZABLE the in-tx read sees the transaction's **snapshot** — if the
+  conflicting write committed after your snapshot began, you read the OLD value,
+  so your app-level guard passes.
+- The read creates only a **one-way** rw-antidependency (you read what they
+  wrote). SSI aborts on a *dangerous structure* (a cycle / pivot), not a single
+  edge. With no write to the contended row, there is no back-edge, no cycle —
+  **both transactions commit.**
+
+Real incident (CoachFlow, round-16): a makeup-credit grant re-read
+`booking.status` inside the tx and rejected `CANCELED`, then INSERTed a
+`MakeupCredit` + `+1 MAKEUP_GRANT` ledger row. A cancellation racing in between
+committed `status=CANCELED` and its own `CANCEL_RESTORE` — but the grant's tx
+never wrote the booking row, so SSI had nothing to abort and the family was
+compensated twice. The plain in-tx read looked like a fix and even passed a
+seam test (which committed the cancel *before* the tx body, so both a snapshot
+read and a locking read observe CANCELED) — the gap only shows under true
+concurrency.
+
+**Fix: take an explicit lock or guarded write on the SAME row the other path
+mutates.**
+
+```typescript
+// ❌ in-tx read, but the tx only INSERTs elsewhere — SSI won't abort the racing cancel
+await tx.booking.findFirst({ where: { id }, select: { status: true } });
+// ✅ lock the contended row so the two paths serialize deterministically
+const [row] = await tx.$queryRaw<Array<{ status: BookingStatus }>>`
+  SELECT "status" FROM "Booking" WHERE "id" = ${id} AND "businessId" = ${businessId}
+  FOR UPDATE`;
+// a committed cancel is now read as CANCELED (→ 409); an in-flight cancel blocks
+```
+
+Equivalently, a guarded write against that row (a CAS `updateMany` with a
+status precondition, [postgres-optimistic-cas](postgres-optimistic-cas.md)) —
+`attendance.service`'s pattern — creates the write-write conflict SSI needs.
+Rule of thumb: **the thing you check must be the thing you lock or write.**
+"Recompute inside the tx" is necessary but not sufficient; if the recompute is a
+bare SELECT and your only writes are inserts elsewhere, add `FOR UPDATE` or a
+guarded write on the checked row.
+
 ## Anti-patterns
 
 - "I'll read first, that's faster" — you bought 1ms of latency at the cost of a
   silent wrong-outcome bug
+- "I re-read it inside the tx, so SERIALIZABLE protects me" — only if the tx also
+  WRITES that row; a read + insert-elsewhere is a one-way dependency SSI won't
+  abort. Lock it (`FOR UPDATE`) or do a guarded write on it
 - "The concurrent reschedule is unlikely" — until it isn't (race tests prove it)
 - "I'll wrap the whole thing in a try/catch" — try/catch doesn't add tx semantics;
   side-effects can still partially commit
