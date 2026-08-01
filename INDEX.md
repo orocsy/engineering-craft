@@ -13,9 +13,10 @@
 | Observability (errors, analytics, health) | 1 | 3 |
 | Frontend patterns | 4 | 5 |
 | Process & habits | 5 | 10 |
+| Deploy & delivery (CI/CD) | 1 | 12 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **17** | **54** |
+| **Total (hand-authored)** | **18** | **66** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
@@ -26,8 +27,9 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 ## Maturity distribution
 
-Hand-authored rules only (after fix-history mining + first consolidation):
-17 proven · 26 verified · 0 draft.
+Hand-authored rules only (after fix-history mining + consolidations through
+2026-08-01, incl. the deploy-delivery category — every rule incident-cited):
+17 proven · 38 verified · 0 draft.
 
 ## By-phase recommendations (which categories to load when)
 
@@ -44,6 +46,7 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 
 | Trigger keyword in diff or task | Load category first |
 |--------------------------------|---------------------|
+| `.github/workflows/deploy*`, `docker compose up`, `docker save`, `workflow_run`, `GHCR`/registry pull, `ssh-action`/`scp-action`, `.dockerignore`, deploy-time `npx` | **deploy-delivery** (+ tooling-footguns for the CLI scars) |
 | `forgot-password`, `reset-password`, `otp`, `jwt`, `session`, `tokenVersion` | concurrency-cas + enumeration-safety + auth-otp checklist |
 | `findFirst`, `email` lookup, multi-tenant | enumeration-safety/multi-tenant-fail-closed |
 | `env.schema`, `deploy.yml`, `secrets.X`, `gh secret set` | config-drift + tooling-footguns |
@@ -107,6 +110,12 @@ Hand-authored rules only (after fix-history mining + first consolidation):
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
 | frontend-async-state | 2 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews — guard + fail toward safety |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
+
+### Deploy & delivery (CI/CD)
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| deploy-delivery | 12 | A deploy pipeline is production code: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
 
 ### Process & habits
 
