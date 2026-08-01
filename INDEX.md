@@ -9,14 +9,14 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 32 |
+| Defensive patterns (backend correctness) | 6 | 35 |
 | Observability (errors, analytics, health) | 1 | 3 |
-| Frontend patterns | 4 | 5 |
-| Process & habits | 5 | 10 |
+| Frontend patterns | 4 | 6 |
+| Data & interchange | 1 | 1 |
+| Process & habits | 6 | 12 |
 | Deploy & delivery (CI/CD) | 1 | 12 |
-| Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **18** | **66** |
+| **Total (hand-authored)** | **20** | **71** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 10 (mirrored from plugin) |
 
 Templates: 7 · Checklists: 4
@@ -27,9 +27,9 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 ## Maturity distribution
 
-Hand-authored rules only (after fix-history mining + consolidations through
-2026-08-01, incl. the deploy-delivery category — every rule incident-cited):
-17 proven · 38 verified · 0 draft.
+Hand-authored rules after this consolidation: 24 proven · 34 verified · 1 draft
+with standard maturity frontmatter, plus 12 incident-cited deploy-delivery rules
+that currently use category-local P0/P1/P2 risk metadata.
 
 ## By-phase recommendations (which categories to load when)
 
@@ -37,8 +37,8 @@ Hand-authored rules only (after fix-history mining + consolidations through
 |---------------|---------------------|---------------------|
 | **G1 — Requirements** | (none) | workflow (pull-main-before-branching) |
 | **G2 — Design** | concurrency-cas (state-machine-first); time-and-timezone (if scheduling) | enumeration-safety (if "do not leak" endpoint) |
-| **G3 — Architecture** | concurrency-cas (sibling-resource-invariants, tx-rollback-contract-layers, mint-once-vs-mint-on-demand) | silent-no-op-integrations (if 3rd-party API), library-choice |
-| **G4 — Implementation** | concurrency-cas (storage-gate-not-js, race-test-contract, status-set-creep, monetary-decimal-symmetry, cross-tx-cas-recompute), config-drift (four-consumer-rule, empty-string-vs-undefined) | tooling-footguns (gh CLI), frontend-async-state (if React mutations), accessibility-state-sync (if tooltip/popover) |
+| **G3 — Architecture** | concurrency-cas (sibling-resource-invariants, tx-rollback-contract-layers, mint-once-vs-mint-on-demand; immutable-revision-log for collaborative documents) | portable-artifacts (if exact export/import), silent-no-op-integrations (if 3rd-party API), library-choice |
+| **G4 — Implementation** | concurrency-cas (storage-gate-not-js, race-test-contract, status-set-creep, monetary-decimal-symmetry, cross-tx-cas-recompute), config-drift (four-consumer-rule, empty-string-vs-undefined) | tooling-footguns (gh CLI), frontend-async-state (if React mutations/navigation), e2e-test-resilience (if proxy-auth multi-user tests), accessibility-state-sync (if tooltip/popover) |
 | **Pre-push self-review** | **ALL relevant by diff keywords** (see by-trigger table below) + workflow (self-review-before-push) | review-discipline (round-cascade), grep-for-siblings (if security literal removed), e2e-test-resilience (if rename touches E2E selectors), payload-shape-drift (if DTO/form changed) |
 | **Post-merge** | process (post-merge-deploy-verification) | review-discipline (deferred-P2 audit) |
 
@@ -77,10 +77,16 @@ Hand-authored rules only (after fix-history mining + consolidations through
 | `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
+| `headRevision`, `expectedRevision`, shared diagram/document save, fork, presence | **concurrency-cas/immutable-revision-log-and-head-cas** |
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
 | async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
 | sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
 | terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |
+| export/import workflow or diagram, exact round-trip, DOCX/PDF/Mermaid projection, checksum | **portable-artifacts/canonical-machine-artifact-human-projections** |
+| trusted proxy identity headers, synthetic users, multi-user Playwright | **e2e-test-resilience/mock-edge-identity-at-trusted-boundary** |
+| consumer subscription login expected to fund API quota | **auth-identity/identity-session-is-not-provider-entitlement** |
+| hosted preview handoff, “where is the repo/source?”, saved vs deployed version | **workflow/source-provenance-before-handoff** |
+| first navigation still loading when user chooses another route/anchor | **frontend-async-state/orphan-promise-and-stale-closure** |
 
 ## Categories at a glance
 
@@ -88,12 +94,12 @@ Hand-authored rules only (after fix-history mining + consolidations through
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| concurrency-cas | 14 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
+| concurrency-cas | 15 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; collaborative snapshots append immutably and move the head by CAS; tx scope matters; mint-once tokens never re-mint |
 | enumeration-safety | 4 | Two responses on a sensitive condition must be indistinguishable on every observable channel |
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
 | silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 3 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO |
-| auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
+| auth-identity | 3 | Unauthenticated OAuth may only sign in an already-linked subject; identity sessions do not imply provider API entitlement; sensitive classification is server-derived |
 | cross-file-seams ⟳ | 10 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the 7-trace seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit. |
 
 ### Observability
@@ -106,9 +112,9 @@ Hand-authored rules only (after fix-history mining + consolidations through
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| e2e-test-resilience | 1 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes |
+| e2e-test-resilience | 2 | E2E selectors over-couple to rendered shape; proxy-auth multi-user tests mock identity at the trusted harness boundary, never through a production login bypass |
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
-| frontend-async-state | 2 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews — guard + fail toward safety |
+| frontend-async-state | 2 | Orphan promises, stale closures (A→B→A), navigation-intent supersession, latched init effects; Web Storage access is fallible in webviews — guard + fail toward safety |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 
 ### Deploy & delivery (CI/CD)
@@ -117,11 +123,17 @@ Hand-authored rules only (after fix-history mining + consolidations through
 |----------|-------|----------|
 | deploy-delivery | 12 | A deploy pipeline is production code: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
 
+### Data & interchange
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| portable-artifacts | 1 | Exact editable handoff uses one deterministic, versioned machine artifact; documents, diagrams and AI parses are projections or proposals, not lossless round-trip state |
+
 ### Process & habits
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| workflow | 4 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence |
+| workflow | 5 | Branch from latest main; self-review before push; verify review claims; state local repo, hosting source and runtime artifact separately at handoff |
 | tooling-footguns | 2 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
 | process | 2 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit |

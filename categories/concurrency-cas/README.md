@@ -1,7 +1,9 @@
 # Concurrency & Compare-And-Swap
 
 **When this category bites**: two requests interleave; one silently overwrites the other.
-**Source incidents**: a single password-reset review went through 5 rounds, all in this category.
+**Source incidents**: a password-reset review went through 5 rounds, and an
+independent collaborative-document session reproduced the same last-writer risk
+through two live browser identities.
 
 ## The bedrock rule
 
@@ -38,6 +40,7 @@ They reduce the race window but never close it.
 | [monetary-decimal-symmetry](rules/monetary-decimal-symmetry.md) | MEDIUM | Money fields use `Prisma.Decimal` end-to-end; cross-path selects must align |
 | [async-event-revalidates-live-pointer](rules/async-event-revalidates-live-pointer.md) | CRITICAL | Async success event (webhook, job completion) for an entity whose funding/source pointer is mutable |
 | [webhook-claim-adopt-completedat](rules/webhook-claim-adopt-completedat.md) | CRITICAL | Designing dedupe for any at-least-once event feed with post-commit effects |
+| [immutable-revision-log-and-head-cas](rules/immutable-revision-log-and-head-cas.md) | CRITICAL | Multiple people can save complete snapshots of one shared document, workflow or diagram |
 
 ## Templates
 
@@ -53,6 +56,7 @@ They reduce the race window but never close it.
 - "I'll add a per-token gate" → doesn't help when N tokens lead to ONE write
 - "I'll use a transaction" → isolation alone doesn't add a CAS predicate
 - "It's behind a rate limit so the race is impossible" → rate limits gate request rate, not parallel concurrency
+- "Presence shows who is editing" → presence is advisory; shared-document saves still need a storage-level head CAS
 
 ## Historical incidents
 
@@ -63,3 +67,4 @@ They reduce the race window but never close it.
 | Round 3 | OTP consume race deleted freshly issued key | redis-lua-cas |
 | Round 4 | Cross-method password write race — link CAS + OTP CAS both → applyPasswordReset | postgres-optimistic-cas, sibling-resource-invariants |
 | Round 5 | Stale-state OTP consume — wrongAttempt counter swallowed by SET race | redis-lua-cas |
+| Collaborative document | Two browsers edited revision 1; first save advanced the head, stale save received 409 and preserved its working copy | immutable-revision-log-and-head-cas |
