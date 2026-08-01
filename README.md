@@ -1,8 +1,9 @@
 # Engineering Craft
 
-Distilled engineering craft from real production work — defensive patterns, workflow
-discipline, tooling footguns, library-choice reflexes, and process habits. Every rule
-cites a historical incident so readers can trace back to evidence, not opinion.
+Distilled engineering craft from real production work — defensive patterns,
+frontend state, portable data contracts, workflow discipline, tooling footguns,
+library-choice reflexes, and process habits. Every rule cites a historical
+incident so readers can trace back to evidence, not opinion.
 
 Public mirror: https://github.com/<org>/engineering-craft. Refresh cadence: a launchd
 job (`com.engineering-craft.consolidation-reminder`, every 2 days) counts pending
@@ -42,7 +43,10 @@ Or from inside Claude Code:
 /dev-pipeline:setup-machine
 ```
 
-## Two macro-groups
+## Quick category map
+
+See [INDEX.md](INDEX.md) for the complete category, maturity and trigger
+catalog.
 
 ### Defensive patterns
 
@@ -62,12 +66,26 @@ Or from inside Claude Code:
   flag is not enough); tag tenant unconditionally + guard against untagged leaks;
   identify/reset lifecycle + contained captures
 - [auth-identity](categories/auth-identity/README.md) — unauthenticated OAuth may only
-  sign in an already-linked subject; email_verified ≠ ownership; linking is a
-  privileged, authenticated action
+  sign in an already-linked subject; email_verified ≠ ownership; identity does
+  not imply paid provider API entitlement
 - [cross-file-seams](categories/cross-file-seams/README.md) ⟳ — **generated mirror** of the
   dev-pipeline plugin's `cross-file-reasoning` catalog: the 7-trace seam check (env-var
   fallback, route prefix, SDK option name, event tx semantics, mock drift, conditional
   coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit here.
+
+### Frontend & interchange patterns
+
+- [frontend-async-state](categories/frontend-async-state/README.md) — latest
+  user intent owns asynchronous state and navigation outcomes
+- [frontend-design-system-drift](categories/frontend-design-system-drift/README.md)
+  — typed tokens and explicit breakpoint bases prevent silent CSS drift
+- [e2e-test-resilience](categories/e2e-test-resilience/README.md) — resilient
+  selectors and harness-only identity for isolated multi-user tests
+- [accessibility-state-sync](categories/accessibility-state-sync/README.md) —
+  visible overlay state, ARIA references and viewport positioning stay aligned
+- [portable-artifacts](categories/portable-artifacts/README.md) — one
+  deterministic machine artifact for exact round-trip; documents, diagrams and
+  AI outputs are human projections or reviewed proposals
 
 ### Process & habits
 

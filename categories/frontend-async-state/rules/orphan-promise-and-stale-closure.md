@@ -1,19 +1,21 @@
 ---
 title: Frontend Async State — Orphan Promises, Stale Closures, Latched Init Effects
 type: pitfall
-maturity: verified
-last-referenced: 2026-05-12
+maturity: proven
+last-referenced: 2026-08-01
 impact: HIGH
 impact-description: |
   Async ops feeding component-local state across step/modal transitions don't carry
   their own request-id. Effects' dep arrays force a binary choice between "rerun on
   every change (lose user input)" and "never rerun (use stale data)." Fire-and-forget
-  promises orphan their error/loading state. Three real production incidents.
+  promises and route transitions can outlive the user intent that started them.
+  Four real incidents across independent projects.
 tags: react, async, hooks, useeffect, race-condition, fire-and-forget
 applies-to: |
   Any user-action mutation; any multi-step form; any modal that fires HTTP and then
   unmounts; any `useEffect(initFromServer, [serverData])` pattern; any slot/hold
-  state cached across step transitions.
+  state cached across step transitions; any UI where a second click can supersede
+  a still-loading route transition.
 related-rules:
   - race-test-contract
 historical-incidents:
@@ -22,17 +24,25 @@ historical-incidents:
   - service-form effect gated init on staffLoading; broke ALL form initialization on slow connections (typing into Service Name was wiped when query resolved)
   - fix — split into two latched effects (user-input fields run once; server-derived defaults run on data ready)
   - slot-hold drift; stale slot key cached in component state across step transitions; expired holds slipped through
+  - "private documentation site (2026-08-01): a slow client-side route click stayed in flight after the user chose a same-page reading path; the first route completed seconds later and overruled the newer intent; a native document navigation plus an explicit supersedes marker made the latest click authoritative"
 ---
 
 ## Why this matters
 
-React's mental model breaks down at three specific seams:
+React's mental model breaks down at four specific seams:
 
 1. **Promise lifetime vs component lifetime.** A user clicks "Open checkout" → fire HTTP → component unmounts (modal closes) before HTTP resolves. The promise has nowhere to surface its result/error. The spinner state (in the now-unmounted parent) stays "Opening…" because the cleanup path never ran.
 
 2. **Effect dep arrays force a binary choice.** `useEffect(initFromServer, [serverData])` runs every time `serverData` changes — wipes user input. Removing `serverData` from deps means the effect runs once with stale (initial) `serverData` — uses wrong values. Both options are wrong; the right answer is two effects with separate latches.
 
 3. **Action sequence A→B→A** with closure-based "is this still the latest?" check breaks when both A's reference the same identity. Tag-based deduplication (`if (currentTag === myTag)`) is fooled because A and A share a tag.
+
+4. **Navigation transitions outlive navigation intent.** A slow route transition
+   can remain pending while the user chooses a same-document anchor or another
+   route. Clearing a spinner only clears presentation; it does not cancel the
+   first transition. If two navigation authorities are involved, the earlier
+   transition can complete later and move the user somewhere they no longer
+   chose.
 
 ## Incorrect — three real patterns
 
@@ -79,6 +89,15 @@ useEffect(() => {
     });
   }
 }, [staffLoading, service]); // ← runs every time `service` changes
+```
+
+### A newer navigation does not supersede the pending route
+
+```tsx
+// ❌ A client-route transition may still be loading when the anchor is clicked.
+// Resetting pendingHref changes the UI but does not cancel the route transition.
+<Link href="/builder" onClick={() => setPendingHref("/builder")}>Build</Link>
+<Link href="#overview" onClick={() => setPendingHref(null)}>Read overview</Link>
 ```
 
 ## Correct
@@ -164,6 +183,32 @@ useEffect(() => {
 }, [step]); // ← re-runs on every step entry; releases on exit
 ```
 
+### Make the latest navigation use one authoritative transition
+
+When the second choice is meant to stay in the current document, a native
+document navigation can be the correct cancellation boundary: the browser makes
+that navigation authoritative instead of leaving an earlier client-router
+transition alive.
+
+```tsx
+// ✅ The newer document navigation supersedes the in-flight route transition.
+// Preserve modifier-click behavior on the route card; pending state is only UX.
+<Link href="/builder" onClick={markPendingRoute}>Build</Link>
+<a
+  href="/?reading=short#overview"
+  data-navigation-supersedes="true"
+  onClick={() => setPendingHref(null)}
+>
+  Read overview
+</a>
+```
+
+The exact mechanism depends on the router. The invariant is stable: **a newer
+user navigation must invalidate the earlier transition, not merely hide its
+loading state**. Use the router's cancellation/transition primitive when it has
+one; otherwise choose a single navigation authority that makes the browser own
+the final destination.
+
 ## Tests
 
 ```typescript
@@ -196,6 +241,16 @@ it('typing into name field is not wiped when server data resolves', async () => 
   rerender({ service: { name: 'Server name', description: 'Server desc' } });
   expect(result.current.form.name).toBe('My typed value'); // ← preserved
 });
+
+// Navigation supersession test
+it('latest navigation wins when the first route is still loading', async () => {
+  await delayRoute('/builder');
+  await page.getByRole('link', { name: 'Build' }).click();
+  await page.getByRole('link', { name: 'Read overview' }).click();
+  await releaseRoute('/builder');
+
+  await expect(page).toHaveURL(/\?reading=short#overview$/);
+});
 ```
 
 ## Anti-patterns
@@ -204,6 +259,8 @@ it('typing into name field is not wiped when server data resolves', async () => 
 - Tag-matching with planId / requestId-as-string — A→B→A breaks
 - Single `useEffect` for both user-input and server-derived state
 - Caching slot/hold/lock keys across step transitions
+- Clearing pending navigation UI without invalidating the underlying transition
+- Mixing client-router and same-page navigation without an explicit latest-intent rule
 - "I'll add a request-id later" — never happens; race ships
 
 ## References

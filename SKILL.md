@@ -1,21 +1,24 @@
 ---
 name: engineering-craft
 description: |
-  Distilled engineering craft from real production work — defensive patterns, workflow discipline,
-  tooling footguns, library-choice reflexes, and process habits. Auto-grows from a journal of
-  review-fix commits via /dev-pipeline:consolidate-lessons.
+  Distilled engineering craft from real production work — defensive patterns, frontend state,
+  portable artifacts, workflow discipline, tooling footguns, library-choice reflexes, and process
+  habits. Auto-grows from a journal of review-fix commits via /dev-pipeline:consolidate-lessons.
   USE THIS PROACTIVELY when designing or reviewing ANY of:
   authentication, password reset, OTP, single-use tokens, session invalidation, multi-tenant queries,
   endpoints that must not leak account existence, environment variables, third-party API integrations
   (Resend/Twilio/Stripe/OAuth), security secrets, anything that mutates shared state from >1 entry
   point, anything where two concurrent requests could interleave, branch creation, self-review before
   push, gh CLI usage with secrets, choosing between hand-rolling vs. library functions for parsing/
-  validation/dates/URLs, post-merge deploy verification, commit message style.
+  validation/dates/URLs, exact export/import, multi-user E2E identity, source provenance at
+  handoff, post-merge deploy verification, commit message style.
   Trigger keywords: forgot-password, reset-password, otp, jwt, token, hmac, single-use, consume,
   invalidate, race, cas, compare-and-swap, lua, updateMany, optimistic, lock, tenantId, findFirst,
   enumeration, timing-oracle, env.schema, deploy.yml, third-party API key, gh secret, branch from
   main, self-review, code-reviewer, regex, parseISO, hand-rolled, hand-write a, hex color, URL host,
-  webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification.
+  webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification,
+  headRevision, expectedRevision, exact round-trip, canonical artifact, identity header,
+  provider entitlement, where is the repo, saved vs deployed.
 license: MIT
 metadata:
   author: luxebook
@@ -24,11 +27,12 @@ metadata:
     Started as production-defensive-patterns (concurrency-cas, enumeration-safety, config-drift,
     silent-no-op-integrations, grep-for-siblings). Renamed to engineering-craft 2026-05-11 to
     cover all engineering lessons, not just defensive patterns. New category groups added:
-    workflow, tooling-footguns, library-choice, process.
-  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12)
-  rule-count: 36
-  category-count: 14
-  last-mined: 2026-05-12
+    workflow, tooling-footguns, library-choice, process, frontend, deploy-delivery,
+    observability, auth-identity, and portable-artifacts.
+  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12), private architecture-builder consolidation (2026-08-01)
+  rule-count: 71
+  category-count: 20
+  last-mined: 2026-08-01
 ---
 
 # Engineering Craft
@@ -39,11 +43,13 @@ itself — every commit matching review-fix patterns is journalled by a hook, an
 `/dev-pipeline:consolidate-lessons` folds journal entries into refined rules and pushes to the
 public mirror.
 
-Rules are organized into TWO macro-groups:
+Rules are organized into three practical groups:
 
 1. **Defensive patterns** — what to do (or not do) when writing code in security-, concurrency-,
    or config-sensitive paths. Pre-merge, before/during code review.
-2. **Process & habits** — workflow disciplines (branch from main, self-review, push-back),
+2. **Frontend & interchange patterns** — latest-intent ownership, resilient E2E identity,
+   accessible state and canonical portable artifacts.
+3. **Process & habits** — workflow disciplines (branch from main, self-review, push-back),
    tooling footguns (gh CLI gotchas), library choice reflexes (don't hand-roll), commit/PR style.
    Cross-cutting; applies to every PR.
 
@@ -54,6 +60,7 @@ Rules are organized into TWO macro-groups:
 | Auth, OTP, password reset, session, JWT | concurrency-cas, enumeration-safety, silent-no-op-integrations |
 | Endpoint that must not reveal account existence | enumeration-safety |
 | Mutating shared state from >1 entry point | concurrency-cas |
+| Multiple people save one shared document/diagram/workflow | **concurrency-cas (immutable-revision-log-and-head-cas)** |
 | Adding/changing env var or secret | config-drift, grep-for-siblings, tooling-footguns (gh secret) |
 | Integrating third-party API | silent-no-op-integrations, config-drift |
 | Multi-tenant query with email/phone/handle | concurrency-cas (fail-closed), enumeration-safety |
@@ -64,12 +71,16 @@ Rules are organized into TWO macro-groups:
 | Shareable / printable token (QR receipt, magic link) | **concurrency-cas (mint-once-vs-mint-on-demand)** |
 | Form submit with `{...formState}` spread, regex tightening on existing field | **grep-for-siblings (payload-shape-drift-against-strict-dto)** |
 | Tailwind class change, breakpoint stack, native input restyling | **frontend-design-system-drift (silent-css-class-vacuum)** |
-| React effect with server-data dep, A→B→A click sequence, fire-and-forget IIFE | **frontend-async-state (orphan-promise-and-stale-closure)** |
+| React effect with server-data dep, A→B→A sequence, fire-and-forget IIFE, superseded navigation | **frontend-async-state (orphan-promise-and-stale-closure)** |
 | Tooltip / popover with aria-describedby, viewport-edge clamp | **accessibility-state-sync (aria-lockstep-and-viewport-clamp)** |
 | Rename label/role/test-id/copy in code touching E2E | **e2e-test-resilience (selector-coupling-and-blast-radius)** |
+| Multi-user E2E behind a trusted identity-injecting proxy | **e2e-test-resilience (mock-edge-identity-at-trusted-boundary)** |
+| Exact export/import plus human documents/diagrams | **portable-artifacts (canonical-machine-artifact-human-projections)** |
+| Provider login expected to supply paid API quota | **auth-identity (identity-session-is-not-provider-entitlement)** |
 | ≥2 review rounds on same PR, deferred-P2 in earlier round | **review-discipline (round-cascade-and-deferred-p2)** |
 | Installing third-party middleware (multer/csurf/etc) | **silent-no-op-integrations (middleware-error-mapping)** |
 | Starting any new branch | workflow (pull-main-first, branch-naming) |
+| Handoff of generated or hosted source | workflow (source-provenance-before-handoff) |
 | Before pushing any branch | workflow (self-review-discipline), checklists/pre-merge-self-review.md |
 | Reviewing a Codex/PR-bot finding | workflow (push-back-on-reviews-when-verified) |
 | Writing parsing / regex / date math / URL handling | library-choice (libs-first) |
@@ -94,6 +105,9 @@ Before declaring "implementation done" on any feature, the implementer MUST be a
 9. ☐ **Self-review with code-reviewer agent** before push — see `categories/workflow/rules/self-review-before-push.md`
 10. ☐ **Library exists for what I'm about to hand-roll?** — see `categories/library-choice/rules/libs-first-no-reinventing.md`
 11. ☐ **Post-merge deploy watched to success** — see `categories/process/rules/post-merge-deploy-verification.md`
+12. ☐ **Shared-document head moves by storage CAS** and stale working copies remain recoverable — see `categories/concurrency-cas/rules/immutable-revision-log-and-head-cas.md`
+13. ☐ **Exact interchange has one canonical machine artifact**; documents and AI output are projections/proposals — see `categories/portable-artifacts/rules/canonical-machine-artifact-human-projections.md`
+14. ☐ **Source provenance states local repo, hosting source and runtime separately** — see `categories/workflow/rules/source-provenance-before-handoff.md`
 
 If any box is unchecked, do NOT mark the feature ready for review. Loop back.
 
@@ -110,18 +124,27 @@ the goal, knowledge is the moat", 2026-05).
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 8 | Two requests interleave; one silently overwrites the other |
+| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 15 | Two requests or shared-document saves interleave; one silently overwrites the other |
 | Enumeration safety | [categories/enumeration-safety/README.md](categories/enumeration-safety/README.md) | 4 | Attacker discovers which emails exist by status/timing diff |
-| Config drift | [categories/config-drift/README.md](categories/config-drift/README.md) | 4 | Env added in one consumer, missing in others → boot crash |
-| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 4 | Third-party wrapper "succeeds" while doing nothing |
-| Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 2 | Security literal removed in one file, lingers in two more |
+| Config drift | [categories/config-drift/README.md](categories/config-drift/README.md) | 5 | Env added in one consumer, missing in others → boot crash |
+| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 5 | Third-party wrapper "succeeds" while doing nothing |
+| Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 3 | Security literal removed in one file, lingers in two more |
+| Auth & identity | [categories/auth-identity/README.md](categories/auth-identity/README.md) | 3 | Login, linking, sensitive classification and paid provider entitlement are conflated |
+
+### Frontend & interchange patterns
+
+| Category | Index | Rule count | When it bites |
+|----------|-------|-----------|---------------|
+| Frontend async state | [categories/frontend-async-state/README.md](categories/frontend-async-state/README.md) | 2 | Async work or navigation outlives the user intent that started it |
+| E2E test resilience | [categories/e2e-test-resilience/README.md](categories/e2e-test-resilience/README.md) | 2 | Selectors drift or synthetic identity becomes an auth bypass |
+| Portable artifacts | [categories/portable-artifacts/README.md](categories/portable-artifacts/README.md) | 1 | A human document is treated as a lossless editable-state handoff |
 
 ### Process & habits
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Workflow | [categories/workflow/README.md](categories/workflow/README.md) | 4 | Branched from stale main, skipped self-review, accepted false-positive review feedback |
-| Tooling footguns | [categories/tooling-footguns/README.md](categories/tooling-footguns/README.md) | 1 | CLI behavior is different from what the docs imply (gh secret set --body -) |
+| Workflow | [categories/workflow/README.md](categories/workflow/README.md) | 5 | Branched from stale main, skipped self-review, or handed off ambiguous source ownership |
+| Tooling footguns | [categories/tooling-footguns/README.md](categories/tooling-footguns/README.md) | 2 | CLI behavior is different from what the docs imply (gh secret set --body -) |
 | Library choice | [categories/library-choice/README.md](categories/library-choice/README.md) | 1 | Hand-rolled regex/parsing for well-studied domains; library default was "almost right" |
 | Process | [categories/process/README.md](categories/process/README.md) | 2 | Tests pass + lint clean = floor; post-merge deploy not verified |
 
