@@ -30,7 +30,7 @@ import { join, extname, relative } from 'node:path';
 const args = process.argv.slice(2);
 const argOf = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
-const ROOT = argOf('--dir', 'src');
+const ROOTS = argOf('--dir', 'src').split(',').map((s) => s.trim()).filter(Boolean);
 const EXTS = argOf('--ext', '.astro,.html,.htm,.vue,.svelte,.erb,.php,.hbs,.ejs,.twig,.jsx,.tsx').split(',');
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.next', 'coverage', 'out']);
 
@@ -95,8 +95,9 @@ const attr = (attrs, name) => {
 const hasAttr = (attrs, name) => new RegExp(`\\b${name}\\b`, 'i').test(attrs);
 
 function main() {
-  if (!existsSync(ROOT)) { console.log(`NOT APPLICABLE — no directory at ${ROOT}; nothing to gate.`); process.exit(0); }
-  const files = walk(ROOT);
+  const present = ROOTS.filter((r) => existsSync(r));
+  if (!present.length) { console.log(`NOT APPLICABLE — no directory at ${ROOTS.join(', ')}; nothing to gate.`); process.exit(0); }
+  const files = present.flatMap((r) => walk(r));
   const failures = [];
   let checked = 0;
 

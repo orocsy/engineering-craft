@@ -33,7 +33,7 @@ import { join, extname, relative } from 'node:path';
 const args = process.argv.slice(2);
 const argOf = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
-const ROOT = argOf('--dir', 'tests');
+const ROOTS = argOf('--dir', 'tests').split(',').map((s) => s.trim()).filter(Boolean);
 const CONFIG_PATH = argOf('--config', '');
 const config = CONFIG_PATH && existsSync(CONFIG_PATH) ? JSON.parse(readFileSync(CONFIG_PATH, 'utf8')) : {};
 const CI_PROVIDED_ENV = config.ciProvidedEnv ?? [];
@@ -86,8 +86,9 @@ function firstArg(argsText) {
 const isStringLiteral = (s) => /^(['"`]).*\1$/s.test(s.trim());
 
 function main() {
-  if (!existsSync(ROOT)) { console.log(`NOT APPLICABLE — no directory at ${ROOT}; nothing to gate.`); process.exit(0); }
-  const files = walk(ROOT);
+  const present = ROOTS.filter((r) => existsSync(r));
+  if (!present.length) { console.log(`NOT APPLICABLE — no directory at ${ROOTS.join(', ')}; nothing to gate.`); process.exit(0); }
+  const files = present.flatMap((r) => walk(r));
   const failures = [];
   let total = 0;
 
