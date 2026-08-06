@@ -1,0 +1,479 @@
+{
+  "classes": [
+    {
+      "slug": "reachable-state-with-no-exit",
+      "title": "A state is reachable by construction but its exit was never implemented",
+      "mechanism": "Reachability and exit are authored in different artifacts and nobody enumerates their product. An enum member is selectable in the console, an outcome enum is persisted by a writer, a catch block renders an error branch, a fallback component mounts — and the corresponding exit (executor that sets executedAt, generation branch, retry affordance, consumer route for an emitted URL, control matching the imperative in the copy) lives in a different file that was never joined to it. The row is structurally valid, the screen renders, nothing throws; the user or the sweep simply has nowhere to go. Each round closes one cell and the neighbouring cell reappears at the same line with a different enum value.",
+      "recurrence": 43,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~9 P1 / ~32 P2 / ~2 P3",
+      "exemplars": [
+        "coachflow#1 apps/api/src/modules/booking/booking-lifecycle.service.ts — ACCOUNT_CREDIT then PACKAGE_CREDIT recorded with executedAt null; sweep ignores both forever",
+        "coachflow#1 apps/api/src/modules/booking/booking.service.ts — SEMI_PRIVATE slot is selectable and routed but the guard 400s every non-PRIVATE request",
+        "coachflow#4 apps/api/src/modules/auth/google/google-oauth.service.ts — COACH_STAFF with no memberships falls to '/', which the console layout bounces to /login",
+        "luxebook#109 apps/booking/src/app/[locale]/[tenantSlug]/tenant-unavailable-view.tsx — recovered tenant + 503 services seeds an empty list and tells the customer the salon has no services, with no retry",
+        "luxebook#1 apps/console/app/(console)/payments/page.tsx — copy directs coaches to a credit-note correction only the Stripe refund webhook can trigger",
+        "nutribuddy#113 tests/unit/desktop-discover.test.ts — state table stops at ready; creating-recipe and recipe-error states required by the handoff have no implementation or contract"
+      ],
+      "existing_rule": "concurrency-cas/status-set-creep-on-state-machine-evolution",
+      "why_it_did_not_fire": "trigger keywords too narrow — the rule fires on `status !== 'X'` predicates in backend guards, so it audits which values a GUARD admits, never whether each admitted value has a downstream executor, UI control, or route. The exits live in sweeps, TSX, and notification templates that the trigger never reaches.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Reflect the enum out of schema.prisma / the TS union and generate the cartesian product (outcome × funding-mode × visibility × payment-method). For each cell run create → list → fulfil → view and assert the row reaches a terminal executed state or the write is rejected at creation; a cell ending with executedAt === null after the sweep drains fails. Unimplemented cells must be listed in a committed UNSUPPORTED_VARIANTS file the spec reads, so holes are visible in review rather than latent. Pair with a reachability probe: grep every URL template emitted by notification templates and every pdfUrl/download key in API projections and assert each resolves to a registered route with a matching method; and a lint pairing user-facing strings containing an imperative ('sign in with another account', 'issue a credit note') with a rendered control or handler in the same subtree.",
+      "implementer_question": "For every enum member and error branch this diff makes reachable, name the file:line of the thing that gets the user or the row OUT of it — the executor that stamps executedAt, the route that consumes the URL you emit, the retry control in the same subtree as the failure copy. Which cell of the matrix has a writer but no exit?"
+    },
+    {
+      "slug": "name-resolves-differently-on-each-side",
+      "title": "A name is encoded twice with different resolution mechanisms",
+      "mechanism": "Producer and consumer each independently encode what a name refers to, and nothing forces them to agree — because the two sides resolve it through different machinery. vercel.json uses @secret syntax while the runbook creates Project Settings vars; Compose interpolates ${VAR} before service env_file applies; a volume key resolves to a different prefixed name under a second compose file with the same project; metadata-action publishes 7-char sha tags while the deploy input takes full sha-<commit>; env.schema hard-requires a key deploy.yml never passes with -e; a client is repointed cross-origin while the CORS allowlist and cookie Domain still assume same-origin; hostnames, base paths, media hosts and proxy-trust are literals in app code while the real topology lives in nginx and next.config.js. Every instance reads identically to a human and resolves to a different object at runtime — including one that silently boots Postgres on an empty volume.",
+      "recurrence": 38,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~14 P1 / ~23 P2 / ~1 P3",
+      "exemplars": [
+        "coachflow#7 infra/ec2-compose-interim.yml — same project name makes the interim key resolve to coachflow_pgdata and the target key to coachflow_coachflow_pg; cutover boots an empty database",
+        "coachflow#2 .github/workflows/api-image.yml — type=sha defaults to 7-char tags, deploy input takes full sha-<commit>, compose pull fails",
+        "luxebook#85 apps/api/src/config/env.schema.ts — CUSTOMER_CONTACT_HASH_SECRET hard-required in production but never passed into the container; next deploy exits during validateEnv",
+        "luxebook#88 apps/booking/src/lib/runtime-config.ts — API sets the manage-session cookie with no Domain, so the page on the apex origin cannot read it and recovered customers bounce",
+        "luxebook#78 apps/api/src/modules/booking/booking.service.ts — BOOKING_URL unset falls back to a hardcoded vercel.app host and still mints tokenized magic links to a foreign domain",
+        "nutribuddy config — placeholder D1 database IDs and per-environment Wrangler bindings shipped unvalidated; the binding the route reads is not the one the env declares"
+      ],
+      "existing_rule": "config-drift/four-consumer-rule (+ cross-file-seams env-fallback / route-prefix traces)",
+      "why_it_did_not_fire": "trigger keywords too narrow — the rule is keyed on `env.schema`, `deploy.yml`, `secrets.X`, so it fires only for environment VARIABLES. Volume keys, image tags, bind-mount sources, cookie Domain, CORS origin lists, basePath and registry identities are the same mechanism but match no trigger. And where it did fire, four-consumer counts how MANY consumers read a name, never whether producer and consumer resolve it through the same mechanism (shell env vs compose interpolation vs @secret vs build ARG).",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "One repo-wide contract script in CI: (1) parse vercel.json, compose files, workflows and runbook fenced commands for every referenced name and grep app source for readers — fail on any name with zero readers or any reader with zero writers; (2) `docker compose -f A config` vs `-f B config` and diff resolved volume names, image refs and bind sources, failing on any key that resolves differently; (3) resolve every bind `source:` against the git index and fail on untracked paths; (4) every production-required key in env.schema.ts must appear as `-e KEY=` in deploy.yml AND in docker-compose.production.yml; (5) fail on any `https?://` literal in apps/api/src outside an allowlist, and assert every path prefix the API hands to clients (/uploads, /media, /api) has a matching proxy rule or rewrite in each frontend.",
+      "implementer_question": "For every name this diff introduces or renames — env key, volume, image tag, bind path, secret reference, cookie Domain, CORS origin — cite the exact file:line on the CONSUMING side that reads it, and confirm the resolution mechanism is the same one the producer used. Does `docker compose -f interim config` and `-f target config` resolve your volume key to the same string?"
+    },
+    {
+      "slug": "rule-lives-in-call-sites-not-in-the-type",
+      "title": "A domain rule is enforced per call site, so new values and new writers escape it",
+      "mechanism": "An enum member, an authoritative field, or a business gate is duplicated across guards, `in:`/`notIn:` literals, badge maps, report filters and operator entry points instead of being carried by an exhaustive type or by the transition itself. Two failure directions, same root: a new status is written by one path while sibling guards, occupancy predicates, collection lists and UI mappers keep their old value set; and a new operator/bulk endpoint performs a transition with its own inline `update` while the canonical method's side effects (policy rows, counters, reminder cleanup, notifications) stay in the caller it bypassed. Nothing fails to compile because the old set is a valid subset and the old column still exists — the numbers just quietly disagree between screens and rows land in states no consumer handles.",
+      "recurrence": 38,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~8 P1 / ~30 P2",
+      "exemplars": [
+        "luxebook#79 apps/api/src/modules/booking/booking.service.ts — startService writes IN_PROGRESS while completeBooking's guard still accepts only CONFIRMED/CHECKED_IN, stranding every started booking (recurred across rounds)",
+        "luxebook#79 apps/api/src/modules/booking/booking.service.ts — applyLateDecision CANCEL flips status only, never writing cancellationOutcomeStatus or incrementing noShowCount the way cancelBooking/markNoShow do",
+        "coachflow#1 apps/api/src/modules/reporting/reporting.service.ts — weekly report loads only CONFIRMED/PENDING_APPROVAL, so marking attendance erases a paid seat from the collected total",
+        "coachflow#1 apps/api/src/modules/booking/booking.service.ts — booking lookup scopes by id/business only, so a known sessionId sells seats on a DRAFT/HIDDEN offering",
+        "luxebook#101 confirmation-view.tsx — QR gate newly admits CHECKED_IN/IN_PROGRESS while the badge map on the same page still renders anything non-CONFIRMED as Pending",
+        "nutribuddy — right-swipe recording does not re-check card safety that the card renderer already enforces"
+      ],
+      "existing_rule": "concurrency-cas/status-set-creep-on-state-machine-evolution + grep-for-siblings",
+      "why_it_did_not_fire": "rule scoped to NEW code so inherited/adjacent code was never checked — the diff adds the enum member and the writer, and both are reviewed; the sibling guards, report filters and badge maps that must change are unmodified files that never enter the diff. grep-for-siblings would have found them but only triggers on 'security literal removed', not on enum extension.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Make the enum exhaustive at the type level: express every status guard and label map as `Record<BookingStatus, T>` or a switch with a `never` default so adding a member fails tsc in EVERY consumer. Ban inline status arrays in query `where` clauses for money/inventory models — require importing a named set from a single status-sets.ts. Add an AST test asserting that `prisma.*.update*` writing `status: <VALUE>` occurs only inside one whitelisted transition function per status, so a parallel entry point fails CI; and a suite that drives every controller route reaching each status and asserts identical post-conditions (outcome fields set, counters incremented, pending-reminder count zero).",
+      "implementer_question": "For the enum member or authoritative field this diff adds: paste the grep output for every `in:`/`notIn:` literal, switch, and badge map over that type, and say what each does with the new value. If you wrote a new `prisma.booking.update` reaching a status an existing service method already reaches, why did you not call that method — and where do you reproduce its counter increments and reminder cleanup?"
+    },
+    {
+      "slug": "failure-path-decides-durability-without-classifying-the-failure",
+      "title": "The error path commits, acks, or terminalizes without knowing which failure occurred",
+      "mechanism": "An operation mutates a primary row plus at least one other store (object storage, cache, second table, remote provider, reminder rows) with no single unit of commit, and the catch block then makes a durability decision the error does not justify. Swallow-and-ack: a dependent step fails, the webhook is still marked completed, so the provider never redelivers and no retry source remains. Terminalize-the-ambiguous: a transport timeout — where the external effect MAY have happened — is recorded as a definite rejection, so the retry moves money twice. Structural variants: `set -e` aborts the script before the rollback it was written to invoke; `process.exit(1)` bypasses cleanup leaving a live trial subscription; an artifact is uploaded before the DB write with no compensating delete; PostHog/email/reminder calls run through the root client inside a serializable callback so they survive an abort; a catch-all `@Catch()` or a shared transaction helper maps an entire failure space onto one domain-specific message.",
+      "recurrence": 36,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~7 P1 / ~29 P2",
+      "exemplars": [
+        "coachflow#1 apps/api/src/modules/payments/connect/refunds.service.ts — a network timeout after Stripe created the refund marks the row FAILED; the retry mints a new key and issues a second real refund",
+        "coachflow#1 apps/api/src/modules/payments/connect/connect-webhook.service.ts — catch swallows a transient fetch failure and the event still takes the completedAt path, so Stripe will not redeliver",
+        "luxebook#107 .github/workflows/deploy.yml — `set -e` exits on the failing `systemctl restart` before verify_or_rollback runs, leaving the override installed and the production connector stopped",
+        "luxebook#70 apps/api/src/modules/service/service.service.ts — replacePhoto uploads to object storage before the Prisma write with no rollback path, orphaning objects on every failed save",
+        "luxebook#94 apps/api/src/common/telemetry/booking-event-bridge.ts — emitAsync awaited inside the serializable transaction, so booking_created flushes for a transaction that later aborts",
+        "channel#6 abandonUpload — storage bytes deleted while the metadata row stays active, so the catalog advertises an image whose bytes are gone"
+      ],
+      "existing_rule": "concurrency-cas/tx-rollback-contract-layers",
+      "why_it_did_not_fire": "the gate existed but asserted the wrong thing — the rule reasons about which LAYER owns rollback inside a transaction, and is satisfied by a correctly-layered tx. It has no notion of classifying a caught error as terminal vs ambiguous, no notion of a compensating delete for an artifact created before the write, and no reach at all into shell scripts where `set -e` is the thing that skips the compensation.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Lint: in webhook/payment directories, a `catch` whose body does not rethrow, write a row selected by a named sweep query, or carry an `// AMBIGUOUS-SAFE:` annotation is an error; forbid non-`tx` clients (this.prisma, storage, notificationService, emitAsync) inside any `$transaction` callback; forbid mutating arrays declared outside the callback from inside it. For shell: under `set -e`, any `systemctl restart|start`, `tee` into /etc/systemd, or `docker run` must be followed by `|| { rollback; exit 1; }` or be preceded by a `trap ... ERR`. Back both with fault injection: wrap the provider client and inject {terminal-rejection, timeout-after-success, timeout-before-send} at each mutating call site, asserting 'provider effect count === 1' after replaying to completion; and a chaos job that runs the deploy step with a deliberately invalid drop-in and asserts the unit-file set is byte-identical and the service is active at exit.",
+      "implementer_question": "For every catch and every early exit this diff adds around an external call: list the mutations already committed at that point (remote resources, uploaded objects, cookies, holds, rows) and name the compensating action. After this catch runs, what is the concrete retry source — provider redelivery, a persisted job row, or a sweep query that still selects this row? And if the error was a timeout rather than a rejection, is the effect count still exactly one?"
+    },
+    {
+      "slug": "verification-bound-to-a-proxy-not-to-the-behavior",
+      "title": "The probe asserts something adjacent to the claim, so it can only produce false PASS",
+      "mechanism": "A gate, probe, or test is written to produce a green signal about X but inspects X' — a cheap proxy for the property customers experience, or an artifact of the implementation rather than the behavior. `systemctl is-active` passes while the connector is deregistered; a 200 status line is read while `|| true` discards a transfer error on a stalled body; `curl -k` accepts any certificate; a contract probe greps for a string that occurs in a DIFFERENT request in the same file, so the assertion is satisfied by an unrelated match; a smoke test SKIPS when a precondition is unmet and reports green; an expectation is computed with the same helper the implementation uses, baking the timezone bug into both sides; the workflow's `paths` filter omits the very files the guarded behavior depends on; the suite mocks away the component whose constraint is under test. The failure mode is asymmetric — these checks can never go red — so nobody notices they are decorative.",
+      "recurrence": 35,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~11 P1 / ~23 P2 / ~1 P3",
+      "exemplars": [
+        "channel#6 SDK upload contract probe — grepped for a token that appears in a different request in the same file; the PUT-vs-POST mismatch passed the probe that existed to catch exactly it",
+        "channel#7 smoke tests — skip instead of fail when a precondition is unmet, so absent coverage reads as passing coverage",
+        "luxebook#107 .github/workflows/deploy.yml — cf-mitigated challenge assumed runner-specific, so a WAF rule 403ing every client still passes the gate (recurred three rounds)",
+        "luxebook#108 booking-flow-view.test.tsx — expectation computed with the same machine-local formatter the summary uses, so a New York customer seeing 23:00 for an 11:00 slot keeps the test green",
+        "luxebook#67 .github/workflows/branding-e2e.yml — paths filter omits tenant-resolution.middleware.ts, the file the guarded branding fix actually depends on",
+        "coachflow#9 apps/api/scripts/stripe-billing-probe.ts — a usage_type=metered price satisfies active/monthly/AUD/amount and is reported ready though the app creates flat subscriptions"
+      ],
+      "existing_rule": "process/post-merge-deploy-verification + e2e-test-resilience/selector-coupling-and-blast-radius",
+      "why_it_did_not_fire": "the gate existed but asserted the wrong thing — the craft rule mandates that you VERIFY after deploy and that selectors are brittle, both of which were honoured; neither requires the assertion to be bound to the specific call site or to the customer-observable property, and nothing requires a probe to be demonstrated failing against a broken fixture before it is trusted.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Every probe must ship with a negative fixture matrix it demonstrably fails: 200-then-hang, 403-for-all, TLS with wrong SAN, tunnel-up/origin-down, metered price, mismatched trialEndsAt, credentials only in process.env. A probe that still exits 0 fails the build. Shell/YAML lint over .github/workflows: fail on `curl` without --max-time, on `-k`, on `|| true` wrapping any command whose status is later used as health evidence, on `systemctl is-active` as sole readiness evidence, and on any test runner invoked with a skip-on-missing-precondition path. Mutation testing (Stryker) scoped to PR-changed files, failing when a changed line has zero killing tests. Lint: test files may not import the formatter/derivation under test — expectations must be literals. Compute each E2E workflow's transitive import graph and fail if any file in it is absent from `pull_request.paths`.",
+      "implementer_question": "Write the one sentence this probe licenses you to say, then name the assertion line that would fail if that sentence were false. Specifically: does the contract probe bind its assertion to the identity of the request under test, or merely to a token that also occurs elsewhere in the same file — and what single-line mutation of production code leaves it green?"
+    },
+    {
+      "slug": "precondition-read-outside-the-write-it-guards",
+      "title": "The condition is checked by a prior SELECT while the write matches on primary key alone",
+      "mechanism": "Authorization scope, a cap, a time bound, a status, or a policy snapshot is verified by a read before the lock or transaction opens (or held in application memory), and the mutation then matches by bare id. Nothing in the write predicate restates the condition, so any concurrent commit or elapsed wall-clock time between read and write is undetectable — the write still succeeds and persists a decision derived from state that no longer holds. Sub-shapes: a serializable transaction is trusted to protect a condition it only READS (Postgres SSI aborts on dangerous cycles, not one-way rw-dependencies, so two transactions writing disjoint rows both commit); a callback closes over an entity fetched before the transaction; a compare-and-swap omits the very column the selection was based on; and in multi-tenant code the tenant predicate is established by a scoped findFirst and then dropped from `where: { id }`, which is correct until the reference is stale or cross-tenant.",
+      "recurrence": 32,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~12 P1 / ~20 P2",
+      "exemplars": [
+        "coachflow#3 apps/api/src/modules/package/package.service.ts — grant only inserts credit rows while cancellation updates the booking: one-way rw-conflict, no cycle, both commit and double-compensate",
+        "coachflow#1 apps/api/src/modules/attendance/attendance.service.ts — status read before the tx and never reloaded, so NO_SHOW overwrites a just-cancelled booking without restoring bookedCount",
+        "luxebook#110 apps/api/src/modules/booking/booking.service.ts — MARK_NO_SHOW updates Customer by id only, so a stale/cross-tenant customerId mutates another tenant's customer",
+        "luxebook#50 apps/api/src/modules/service/service.service.ts — max-5 featured cap is a count() before update with no constraint; two concurrent updates both read 4",
+        "luxebook#25 apps/api/src/modules/booking/booking.service.ts — credit-vs-forfeiture outcome computed from a pre-transaction read; a concurrent reschedule changes startTime before the conditional update runs",
+        "luxebook#1 apps/api/src/modules/notification/reminder-scheduler.service.ts — CAS stamps reminderSentAt on id + reminderSentAt:null only, so a document renewed mid-sweep is marked reminded"
+      ],
+      "existing_rule": "concurrency-cas/cross-tx-cas-recompute (proven) + enumeration-safety/multi-tenant-fail-closed",
+      "why_it_did_not_fire": "trigger keywords too narrow — cross-tx-cas-recompute is keyed on `tx.commit` / `executeInSerializableTransaction` / 'multi-service mutation', so a handler that reads and then calls a plain `update({ where: { id } })` with no transaction keyword anywhere never triggers it. multi-tenant-fail-closed is keyed on `findFirst` + email lookup, so a tenant-scoped read followed by an id-only WRITE matches neither half of its trigger.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "ts-morph lint over apps/api/src: (a) flag any identifier bound from an `await prisma.*.find*` outside a `$transaction` callback that is later referenced inside the callback or used to build a write's data/where/cache key; (b) for every model carrying tenantId in schema.prisma, fail any update/updateMany/delete/findFirst whose `where` has no tenantId or tenantId_* compound key, absent an annotated exemption; (c) require state-machine writes to use `updateMany` with a status predicate plus an affected-count assertion; (d) a CAS in a sweep must include in its `where` every column that appeared in the preceding selection's `where` — compare the two key-sets mechanically. Back it with a barrier harness that injects a delay plus a competing mutation between pre-check and transaction body for each locked path, in BOTH orderings, asserting the write is rejected or the invariant holds.",
+      "implementer_question": "For every value this handler reads before the transaction and then uses to decide or shape the write — status, startTime, policySnapshot, tenantId, count, hold expiry — point at either the re-read inside the transaction or the key in the write's `where` that restates it. If your answer is 'the transaction is serializable', explain why a one-way rw-dependency between two disjoint row-writes would abort."
+    },
+    {
+      "slug": "session-identity-spread-across-carriers-with-no-authority",
+      "title": "Several carriers hold 'who is signed in' and none is authoritative",
+      "mechanism": "Browser session identity lives simultaneously in an httpOnly cookie (browser-wide, server-written), sessionStorage (tab-local), React state (component-local), a URL token, and a cached role — written by several independent actors: a background cookie probe, an explicit sign-in, an OAuth callback, another tab, a guest-to-user migration. No writer carries a generation token or asserts the SUBJECT of what it is persisting, so last-writer-wins mixes accounts. Compounding shapes: resolution is written `if (token) { validateOrThrow } else { session }`, so a stale URL token destroys a valid session; a lifecycle leg is missing per carrier (token accepted but never bound to its subject or checked for expiry, a failed verify rewriting the key with a fresh TTL, clearCookie omitting the attributes used at set time); and hardening added to one frontend's client is absent from the sibling app that reimplemented the same protocol.",
+      "recurrence": 31,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~7 P1 / ~24 P2",
+      "exemplars": [
+        "coachflow#4 apps/storefront/lib/auth/use-cookie-session-bootstrap.ts — sessionStorage is tab-local, so another tab keeps A while refreshAccessToken mints B's token onto A's record: requests run as B, UI says A",
+        "coachflow#4 apps/storefront/lib/api/client.ts — the bootstrap probe's /auth/refresh rotates and Set-Cookies A over B's freshly signed-in cookie even with persist:false",
+        "luxebook#78 apps/api/src/modules/booking/booking.service.ts — dual-auth validates the URL token first and throws, never consulting a valid 30-day customerSessionToken",
+        "luxebook#78 apps/api/src/modules/booking/customer-auth.controller.ts — clearCookie passes only { path } while the cookie was set with httpOnly/sameSite/secure, so logout may not revoke",
+        "coachflow#1 apps/api/src/modules/auth/auth.controller.ts — CORS does not stop a plain HTML form POST, so a cross-site login sets a SameSite=None refresh cookie in the victim's browser",
+        "nutribuddy — guest fallback runs before the authenticated actor is resolved, so an authed user is served (and writes) guest-owned records"
+      ],
+      "existing_rule": "checklists/auth-otp-feature.md + concurrency-cas + enumeration-safety",
+      "why_it_did_not_fire": "rule is prose in a doc nothing forces you to open — the auth checklist is a file you must choose to read, and its model is server-side token mechanics (consume-once CAS, TTL, equal-work enumeration), all of which these repos got RIGHT. It contains no model of multiple browser-side carriers, cross-tab propagation, carrier precedence, or already-mounted component state, so even a reader who opened it would find nothing that fires.",
+      "gate_feasibility": "executable-partial",
+      "gate_idea": "Playwright multi-context suite as a required check, scripting the enumerated interleavings: stale cookie + explicit sign-in; OAuth switch with a second tab open; failed logout then reload; expired URL token + valid session cookie on every handler in the family plus the SSR fetch. After each, assert cookie subject == storage subject == rendered user, and that success occurs whenever ANY credential is valid. Lint: any persist of a refreshed token must pass through a helper taking an expected-subject argument; any `if (guard)` followed by `await` must re-check `guard` before its terminal write; `if (token)` branches may not invoke the auth resolver with fewer arguments than its full credential signature; `fetch(` is banned outside each app's lib/api/http.ts. Cross-app parity: one shared conformance suite (send-credentials, refresh-and-retry on 401, logout calls the API) imported and run by BOTH apps against their own client module. Assert the logout Set-Cookie attribute set equals the set-cookie attribute set except expiry.",
+      "implementer_question": "Which store is authoritative for 'who is signed in' in this diff? When a token arrives from any writer, show the line that validates its SUBJECT against that store before persisting. If a request carries BOTH an expired URL token and a valid session cookie, which wins — and did you test that pair on every handler in the family plus the SSR fetch?"
+    },
+    {
+      "slug": "at-most-once-effect-with-no-single-winner-claim",
+      "title": "An effect that must happen once is guarded by a read, not by a claim",
+      "mechanism": "An invariant of the form 'at most one X' — one open checkout attempt, one credit per cancellation, one completed upload, one refund, one trial subscription, one QR token — is enforced by read-then-act with nothing that makes exactly one caller the winner: no unique index, no conditional update, no SET NX with an owner token, no GETDEL. Two concurrent callers both pass the check and both perform the effect. The dual failure is a mis-chosen identity rather than a missing one: too fine (a per-attempt random idempotency key, so a retry after a lost response moves money twice) or too coarse (a key derived from a value that does not change per logical event, so a legitimately-needed second send is suppressed). Related: a lock released by bare `del(key)` with no ownership token, and two writers to the same resource computing different lock keys.",
+      "recurrence": 30,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~9 P1 / ~21 P2",
+      "exemplars": [
+        "channel#6 completeUpload — no atomic single-winner claim; the sibling OEM finalizeClaim path already had a CAS and this shipped without one",
+        "luxebook#85 apps/api/src/modules/auth/auth.service.ts — two concurrent OTP submissions both pass timingSafeEqual before the unconditional del, so both apply a password reset",
+        "coachflow#1 apps/api/src/modules/payments/connect/refunds.service.ts — a per-call random idempotency key means a crash between Stripe acceptance and recordRefundRequest lets a retry move money twice",
+        "coachflow#1 apps/api/src/modules/package/package.service.ts — always inserts a fresh MakeupCredit for the same grantedForBookingId, so a reload mints multiple redeemable credits",
+        "luxebook#105 docs/business-knowledge/booking-consistency.md — createHold and reschedule build different Redis slot-lock keys, so neither excludes the other",
+        "luxebook#79 apps/api/src/modules/booking/booking.service.ts — two ensureQrToken calls both read null and both updateMany succeed; the later mint invalidates the token already returned"
+      ],
+      "existing_rule": "concurrency-cas/storage-gate-not-js + mint-once-vs-mint-on-demand",
+      "why_it_did_not_fire": "trigger keywords too narrow — mint-once is keyed on `qrToken`, `magic link`, 'printable receipt', so it fired for token minting and nowhere else. storage-gate-not-js states the correct principle (the gate must be in the storage primitive) but is loaded from the concurrency-cas category, which the by-phase table marks mandatory only at G4 for diffs already recognised as concurrency work; an upload-completion endpoint or a credit grant is not recognised as such.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Lint: any provider mutation (stripe.*.create) whose idempotencyKey is not read from a persisted DB column, or which contains randomUUID()/Date.now(), fails. Any `prisma.<model>.create` in a controller-reachable path for models in a declared IDEMPOTENT_MODELS list must be an upsert or be backed by a `@@unique` on the natural key in schema.prisma. Flag `redis.get(k)` followed by `del(k)|set(k)` in the same function without Lua/GETDEL; flag any releaseLock/del whose acquire stored no owner token; flag two different key-builder expressions producing a lock key for the same resource type. CI double-fire harness: replay every controller POST twice with the same payload and assert row counts and provider-call counts are unchanged; and a cancel→reactivate→cancel run asserting the derived external key DIFFERS between lives.",
+      "implementer_question": "For each externally-visible effect this diff creates — provider call, credit grant, row insert, upload completion, email — name the single storage operation that makes one caller the winner (unique index, `UPDATE ... WHERE status = expected`, SET NX with owner token, GETDEL). If the answer is a prior read, say what stops the second caller. And is the idempotency key persisted BEFORE the effect is attempted?"
+    },
+    {
+      "slug": "new-generation-introduced-without-retiring-or-backfilling-the-old",
+      "title": "The predecessor generation still exists, still wins, or still cannot satisfy the new rule",
+      "mechanism": "A change introduces a new generation — a new canonical column, a new cookie scope, a rotated token, a new hostname, a stricter DTO, a freshly installed unit — while the previous generation's artifacts and rows persist and nobody enumerated them. Two directions: the old artifact silently WINS, because lookup and precedence favour whatever already exists (a surviving systemd drop-in carrying the revoked token, an older host-only cookie sent first, a hand-written checklist that replaces rather than dual-accepts an origin so the interim window is broken); or existing rows silently CANNOT satisfy the new constraint, because the migration added the column without backfilling, the validator rejects data shapes still in the database, or a gate is enforced before any actor has a write path to satisfy it. The inventory is drawn from memory rather than enumerated, and externally-owned registrations (Stripe webhook endpoints, OAuth redirect URIs, DNS, Vercel domains) are the entries most reliably forgotten.",
+      "recurrence": 28,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~10 P1 / ~18 P2",
+      "exemplars": [
+        "coachflow#6 docs/deploy/deploy-runbook.md — retiring the sslip edge kills the host Stripe posts to; no checklist step moves the webhook endpoints, so payments and dunning stop",
+        "luxebook#107 infra/ec2-bootstrap.sh — the 10-metrics.conf drop-in survives `cloudflared service uninstall` and carries the old --token, so rotation leaves the revoked token in use",
+        "luxebook#83 apps/api/src/modules/booking/booking.service.ts — retrieval matches only phoneHash/phoneE164, so customers created before canonicalization are never found and silently receive no OTP",
+        "luxebook#78 apps/api/src/modules/booking/booking.service.ts — retrieval matches only emailNormalized while the migration added the column without backfilling Customer.email",
+        "coachflow#6 docs/deploy/deploy-runbook.md — one-value replacement of STOREFRONT_URL removes still-live vercel.app hosts from resolveAllowedOrigins()",
+        "luxebook#88 apps/api/src/modules/booking/customer-auth.controller.ts — a parent-domain cookie is added without expiring the old host-only one, so a stale prior-customer value can win"
+      ],
+      "existing_rule": "config-drift/tighten-validators-with-migration-audits",
+      "why_it_did_not_fire": "rule scoped to NEW code so inherited/adjacent code was never checked — the rule fires when you TIGHTEN a validator and asks you to audit existing data, which is exactly one of the several shapes here. It says nothing about artifacts that survive a reinstall, about precedence between an old and new cookie, or about registrations held in third-party dashboards that are not in the repo at all and therefore cannot be reached by any repo-scoped audit.",
+      "gate_feasibility": "executable-partial",
+      "gate_idea": "An executable cutover preflight (also runnable as a CI dry-run) that greps the whole repo plus `vercel env ls`, `stripe webhook_endpoints list`, and the OAuth client's redirect URIs for the OLD value and prints every hit as an unchecked item — the runbook's step list is GENERATED from that output rather than hand-maintained; plus a `compose -f interim config` vs `-f target config` diff failing on any service, mem_limit, port or volume present in interim and absent in target. Provisioning scripts run twice in CI with a different token the second time, asserting exit 0 both times and that no file under /etc/systemd/system/*.d/ contains the first token; kill the first run midway and assert the third converges. Migration CI check: any migration adding a *Normalized/*Hash/*E164 column or a NOT NULL must contain a backfill UPDATE or ship a test that seeds a pre-migration-shaped row and exercises the new read path. Keep a checked-in legacy fixture dataset (unformatted phone, external-CDN logoUrl, host-only cookie, depositPaid>0) that E2E runs against on every PR.",
+      "implementer_question": "Enumerate what the previous generation leaves behind after this change and after a rerun: surviving drop-ins, keyrings, cookies without Domain, rows still in the pre-canonical format, endpoints registered in the Stripe and Google dashboards. For each, does this diff delete it, overwrite it, dual-accept it, or inherit it silently — and which existing rows cannot satisfy the constraint you just added?"
+    },
+    {
+      "slug": "boundary-contract-assumed-instead-of-derived",
+      "title": "Each side of a boundary re-encodes the contract; nothing verifies the wire",
+      "mechanism": "Two sides of an interface independently encode the same rule or shape, and nothing joins them, so the divergence is invisible at build time. The client computes whether an action is available while the server enforces its own version — the client's copy is always simpler (status-only, ignoring expiry, eligibility, DST, falsy-vs-absent), producing buttons that always 4xx, limits that pass client validation and fail on upload, orderings that disagree between screens. The same mechanism inverts at the validator: class-validator's @IsOptional() skips BOTH undefined and null while the service branches on `!== undefined`, so an explicit JSON null passes the DTO and reaches a non-null sink (`new Date(null)` writing 1970 over a real date). And at the response boundary, `await res.json() as T` asserts a shape nothing verified, while client DTOs declare fields the server never sends and an SDK is called with the wrong verb because the contract was read from memory.",
+      "recurrence": 27,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "channel"
+      ],
+      "severity_mix": "~5 P1 / ~22 P2",
+      "exemplars": [
+        "channel#6 SDK upload — PUT issued where the SDK contract required POST; the contract was assumed rather than derived from the SDK's own types",
+        "channel#7 unvalidated JSON casts — `await res.json() as T` at trust boundaries with no runtime validation",
+        "channel#7 DTO fields the server withholds — client types declare fields that are always undefined at runtime",
+        "coachflow#1 apps/api/src/modules/compliance/compliance.service.ts — expiresAt:null passes @IsOptional and becomes new Date(null) = 1970-01-01, silently expiring a current WWCC document",
+        "coachflow#1 apps/storefront/components/checkout/pay-step.tsx — checkout keeps any unexpired balance while server funding rejects balances whose eligibility snapshot omits this offering",
+        "luxebook#79 apps/api/src/modules/booking/booking.service.ts — getBookingByQrToken sets canConfirmArrival from status alone while recordCustomerArrival rejects arrivedAt > endTime, so the button always 400s"
+      ],
+      "existing_rule": "grep-for-siblings/payload-shape-drift-against-strict-dto + cross-file-seams (SDK-option trace) + /dev-pipeline:verify-contract",
+      "why_it_did_not_fire": "trigger keywords too narrow — payload-shape-drift is keyed on 'form state spread → API' and 'regex tightening on existing field', i.e. the request direction only. Client-side eligibility predicates, @IsOptional null semantics, response-shape casts and HTTP-verb selection are all the same seam but match no trigger; verify-contract runs only when a diff touches both client and server, and several of these diffs touch one side.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Move each shared rule into one exported predicate in packages/utils consumed by both apps, then lint: fail any TSX comparing a date field matching /expiresAt|startsAt|regClosesAt/ or testing a status enum inline instead of calling it; assert each numeric limit literal (upload size, min-notice hours) appears exactly once in the repo. AST lint: a property decorated @IsOptional() whose TS type excludes `| null` must carry a null-rejecting decorator; `if (dto.x !== undefined)` guarding a Prisma write of a non-nullable column is an error; ban `new Date(expr)` where expr's type includes null. Ban `as T` on a `res.json()` result outside a module that runs a schema parse. Contract fuzz in CI: enumerate every route from Nest metadata, send each optional field as explicit null and each string field as syntactically-valid-but-impossible, assert 400 — never 500, never 2xx-with-mutation. Playwright matrix asserting 'if the action button is enabled then the API call returns 2xx'.",
+      "implementer_question": "For every button, badge, limit, and response cast in this diff: name the server function or SDK type that is its counterpart, and show both sides deriving from ONE exported predicate/schema rather than two hand-written copies. For each optional DTO field, is explicit `null` a documented clear-the-value operation — and if not, which decorator rejects it before it reaches a non-nullable column?"
+    },
+    {
+      "slug": "deferred-effect-re-derives-its-subject-instead-of-anchoring-it",
+      "title": "Work executed later re-queries a mutable parent instead of the id it was created for",
+      "mechanism": "An intent is recorded now and executed later (webhook, sweep, retried email, refund), but the executor re-resolves the object to act on by querying a MUTABLE parent key and taking the newest match, rather than persisting the specific child id at intent-creation time. The same mechanism appears wherever identity is re-derived rather than captured: an entity row recycled across lifecycles (cancel → re-book reuses Booking.id) so append-only children and creation timestamps mix a dead generation into the current one; a connected-account id read from the tenant's CURRENT config so refunds target the wrong Stripe account and account-scoped idempotency keys resolve to a different object; seller-editable config read live at fulfilment so editing an offering retroactively changes what a customer already bought; and a composite identity (start time + staff) compared on one component. Single-generation happy paths always resolve to the only row, so tests never see it.",
+      "recurrence": 25,
+      "repos": [
+        "coachflow",
+        "luxebook"
+      ],
+      "severity_mix": "~6 P1 / ~19 P2",
+      "exemplars": [
+        "coachflow#1 apps/api/src/modules/payments/connect/refunds.service.ts — picks the newest refundable Payment for the booking, so a stale AUTO_REFUND refunds the NEW charge; recurred after the first back-ref fix",
+        "coachflow#1 apps/api/src/modules/payments/connect/refunds.service.ts — cancellation refunds sent to the business's CURRENT stripeAccountId, so charges taken on the old account can never be refunded",
+        "coachflow#1 apps/api/src/modules/booking/booking-funding-summary.ts — any historical MAKEUP REDEEM ledger row is read as the current funding source after a reactivation",
+        "coachflow#1 apps/api/src/modules/booking/funding.ts — redemption parses the package offering's CURRENT config, so editing a PACKAGE strands already-purchased credits",
+        "coachflow#1 apps/api/src/modules/notification/connect-webhook.service.ts — package email re-derives the balance from family+offering and takes the newest, so a repeat purchase makes the first email show the wrong expiry",
+        "luxebook#79 packages/ui/src/components/booking-slot-picker.tsx — current slot matched on startAt alone, so an alternate-staff slot at the same time is disabled"
+      ],
+      "existing_rule": "none",
+      "why_it_did_not_fire": "no rule existed — the catalog has mint-once-vs-mint-on-demand for token issuance and status-set-creep for state machines, but nothing in any category models the difference between anchoring an effect to a captured id and re-deriving it from a mutable parent at execution time, nor the notion of a row having multiple logical lives.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "AST rule over the async-executor directories (refunds/*, *webhook*, notification*, *sweep*): flag any findFirst/findMany whose `where` contains only a parent FK (bookingId, familyId+offeringId) AND whose orderBy is createdAt desc, when the result feeds a provider call, a status transition, or an email template; require an explicit `// ANCHORED:` suppression naming the persisted anchor column. Any provider call carrying a `stripeAccount` option must source it from the loaded record row, never from `business.stripeAccountId`, outside the onboarding module. If a model carries an activation-boundary column (lastActivatedAt/generation), require EVERY query reading that model's ledger children or createdAt to include the boundary in its where. Reading `offering.config.*` inside fulfilment/issuance/ledger files is an error — they must consume a PurchaseSnapshot, with a type-level test asserting the snapshot's keys are a superset of the config keys fulfilment uses. Contract test: create → cancel (pending intent) → reactivate → pay → run executor → assert the ORIGINAL charge id was refunded on the ORIGINAL account.",
+      "implementer_question": "For every row this diff writes that a webhook, sweep, or retried email will act on later: does the row store the exact id of the external object and the account that created it, or does the executor re-query by parent id and take `orderBy createdAt desc`? And if this entity can be cancelled and reactivated, which column marks the boundary — and does every reader of its ledger children filter by it?"
+    },
+    {
+      "slug": "third-party-and-framework-semantics-assumed-not-probed",
+      "title": "A vendor or framework behavior is taken from expectation rather than from its docs, types, or a probe",
+      "mechanism": "Code maps a value or behavior produced by an external system onto exactly one internal meaning, when the producer emits it for several causes or composes it differently than assumed. Vendor values: window.open with 'noopener' returns null BY DESIGN and is read as 'popup blocked'; Charge.refunds is absent unless expanded so refunds never confirm; embedded lists are consumed via `.data` without honouring has_more while the cumulative total is still applied; at-least-once unordered webhook delivery is applied verbatim so a stale event overwrites newer state; a $0 trial invoice.paid is counted as revenue. Framework composition: Next's basePath AND the SDK each prepend the prefix so the ingest route 404s; vercel.json rewrites are written as if they ran before middleware; @OnEvent defaults to suppressErrors and emit() does not await, so a documented 'listener failure rolls back the transaction' contract does not exist; request-scoped DI is used where no request context exists; a component branches during render on localStorage or the local clock, so SSR and hydration disagree.",
+      "recurrence": 24,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~7 P1 / ~16 P2 / ~1 P3",
+      "exemplars": [
+        "coachflow#1 apps/api/src/modules/payments/connect/connect-webhook.service.ts — unexpanded Charge.refunds yields an empty list, so PaymentRefund rows stay REQUESTED forever and no credit note is issued",
+        "coachflow#3 apps/storefront/components/portal/portal.tsx — window.open(url,'_blank','noopener') returns null on SUCCESS, so normal invoice downloads report a blocked pop-up",
+        "luxebook#94 apps/admin/src/app/admin/posthog/[...path]/route.ts — with basePath '/admin' the handler mounts at /admin/admin/posthog, so all ingestion 404s",
+        "luxebook#66 apps/api/src/app.module.ts — ignoreErrors:false does not establish the documented rollback contract: @OnEvent defaults to suppressErrors and emit() does not await async listeners",
+        "luxebook#86 apps/booking/vercel.json — Vercel runs middleware and file-system routes BEFORE vercel.json rewrites, so /admin/login is handled as a booking locale path",
+        "coachflow#1 apps/storefront/components/checkout/card-payment.tsx — direct-charge PaymentIntents require the connected account in Stripe.js; every connected-account card checkout fails to confirm"
+      ],
+      "existing_rule": "silent-no-op-integrations + cross-file-seams (SDK-option / event-tx-semantics traces) + /dev-pipeline:verify-sdk-surface",
+      "why_it_did_not_fire": "the gate existed but asserted the wrong thing — verify-sdk-surface checks that a called method EXISTS in the installed .d.ts and that its signature matches, which every one of these calls satisfied. Nothing checks the SEMANTICS of the value it returns (null-on-success, absent-unless-expanded, truncated-unless-paged) or the framework's composition order, and silent-no-op-integrations is scoped to the missing-API-key no-op failure mode only.",
+      "gate_feasibility": "executable-partial",
+      "gate_idea": "Require a recorded SDK/spec probe artifact in the PR for every third-party field or return value newly branched on (installed .d.ts excerpt or docs URL + line), enforced by a CI check that any diff touching a vendor SDK call adds or updates a probe record. AST rule: accessing `.data` on a provider type whose declaration also has `has_more` is an error unless the enclosing function loops on has_more, or the access is inside the designated paginating gateway — and callers of that gateway may not condition the call on `list.length === 0`. Any assignment to a period/timestamp column inside a webhook handler must go through monotonicMax(). Contract tests replaying real vendor fixtures — unexpanded charge, $0 trial invoice, post-deauthorization event, truncated refund page — plus a replay harness firing each recorded event twice and in reverse timestamp order asserting identical terminal state. For frameworks: a route-topology test against the BUILT apps asserting each declared client target resolves to the intended handler; an ESLint ban on localStorage/`new Date()`/getToken() in the render body of server-rendered components; a hydration test under TZ=Pacific/Kiritimati with a frozen New-Year clock; and `prisma validate` over every fenced Prisma block extracted from docs/**/*.md.",
+      "implementer_question": "For each external value this diff branches on, quote the vendor sentence or the .d.ts line that says it means what your branch assumes, and list the OTHER causes that produce the same value. For each URL you introduce, write the fully-resolved path AFTER framework composition — does Next AND the SDK each prepend basePath, and does this rewrite run before or after middleware?"
+    },
+    {
+      "slug": "redaction-control-narrower-than-the-egress-surface",
+      "title": "The scrubber is enumerated by hand while the egress surface is defined by the vendor or the browser",
+      "mechanism": "What may leave the system is decided by a hand-written denylist of key names and a couple of value regexes, or by a single before-send hook, while the actual egress surface is defined elsewhere — by the vendor's payload schema, by the set of transports the SDK can open, or by the browser's degraded behaviour. Each review round names one more carrier the list forgot (auth headers, cookies, forwarded-IP headers, token/code/state query keys, PII-named keys, tuple/object query shapes, double-encoded nested URLs, DOM aria-label text, a recipient address travelling under `to`, an email used as `entityId`), and the fix adds exactly that one name. In parallel, the hook that demonstrably works is simply not on the path the data takes: Session Replay uploads its own network/URL stream, autocapture fires before any before_send and ships clicked-element text, a shallow spread clones sub-objects the field walk never revisits, and a form with JavaScript disabled degrades to a native GET that puts every entered field into the URL, browser history, Referer and access logs.",
+      "recurrence": 22,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "channel"
+      ],
+      "severity_mix": "~5 P1 / ~17 P2",
+      "exemplars": [
+        "channel#6 no-JS form GET — with JavaScript disabled the form degrades to a native GET submission, putting user-entered PII into the query string, history and Referer",
+        "coachflow#13 packages/utils/src/pii/scrub-sentry-event.ts — isSensitiveKey never classifies authorization/cookie/set-cookie, so bearer tokens egress unchanged",
+        "coachflow#13 apps/console/lib/telemetry/posthog-provider.tsx — masks inputs and text but omits maskCapturedNetworkRequestFn, the documented URL-redaction hook for replay",
+        "coachflow#13 apps/console/instrumentation-client.ts — replaysOnErrorSampleRate 1.0 captures request URLs on a channel where beforeSend scrubbing does not apply",
+        "luxebook#94 apps/admin/src/lib/telemetry/posthog-provider.tsx — session_recording masks only form inputs while customer phone numbers render as ordinary text",
+        "coachflow#1 apps/api/src/modules/notification/email-transport.ts — every delivery logs message.to; scrubPii is key-based and does not match, so customer addresses land in persistent logs"
+      ],
+      "existing_rule": "observability/pii-scrubbing-defense-in-depth (KEY+VALUE, all event surfaces, immutable, shared)",
+      "why_it_did_not_fire": "the gate existed but asserted the wrong thing — the rule already says KEY+VALUE and 'all event surfaces', and reviewers read the presence of a shared, immutable scrubber with value regexes as satisfying it. What it cannot express is that 'all surfaces' must be enumerated FROM the vendor's transport list and payload schema rather than from memory, so a scrubber that is correct on the tested path reads as compliant while replay, autocapture, and the no-JS GET channel were never named.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Invert the rule and drive it off the schema: a property-based CI test that generates events from the vendor's documented event/request schema with a unique canary planted at EVERY leaf — headers, cookies, env, data, query_string in string/object/tuple form, breadcrumb.data and .message, double-URL-encoded values — and asserts the canary appears nowhere in JSON.stringify(sanitized); any newly added schema field fails by default until allowlisted. Then an integration probe that boots the app under a Playwright route handler, visits a route seeded with a canary token, forces an error, and asserts the canary appears in ZERO outbound bodies to any telemetry host — not just in the beforeSend return value. AST lint: enabling replay/recording config keys requires a sibling redaction-callback key in the same options object; autocapture must be false or route-allowlisted. Make log redaction value-based: a logger middleware that regex-scans serialized output for email/JWT/PAN shapes and throws in CI. And render every form with JS disabled in a test, asserting method=POST on any form whose fields carry user data.",
+      "implementer_question": "Enumerate every transport this SDK can open (replay, autocapture, breadcrumbs, profiling, network capture) and every channel this form can submit through INCLUDING the no-JS native default, and name the specific hook that redacts each. Are you pointing at the vendor's documented transport list and payload schema, or at the field names you remembered?"
+    },
+    {
+      "slug": "pipeline-guarantees-declared-by-hand",
+      "title": "CI/CD safety properties are hand-declared topology, each narrower or looser than reality",
+      "mechanism": "The pipeline's guarantees — this ran after tests, this commit was verified, this secret is visible only here, this host is who we think it is — are expressed as hand-maintained declarations that are each narrower or looser than the build's real input set. workflow_run triggers make a deploy a descendant of an image-only workflow that runs no lint/type-check/tests, so deploy and green CI can refer to different commits; a must-always-run step (migrations) is a `needs:` dependent of a best-effort or externally-probing job, so new code runs on the old schema exactly when it matters; path filters and turbo `env` lists omit real build inputs so a cached artifact ships the wrong value; a Dockerfile COPY set misses the base tsconfig. The same hand-declaration failure covers credentials: the whole production env file is attached to a container needing one variable, the registry user comes from github.actor while the token is a specific PAT, SSH steps carry the env file with no host fingerprint, preflight validates two of five secrets so failures land after remote side effects, and dispatch inputs and ExecStart read-backs are interpolated straight into shell strings and logs.",
+      "recurrence": 21,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~7 P1 / ~13 P2 / ~1 P3",
+      "exemplars": [
+        "channel#7 deploy not causally gated on CI — the deploy job is not a causal descendant of the CI job, so green CI and the deploy can refer to different commits",
+        "coachflow#10 .github/workflows/deploy-api.yml — deploy triggers on the image-only workflow, which runs no lint/type-check/tests, while CI may still be running or failing",
+        "luxebook#107 .github/workflows/deploy.yml — optional cloudflared metrics setup runs inside deploy-api, so any failure skips migrate-database and runs new code on the old schema",
+        "luxebook#107 .github/workflows/deploy.yml — NEWEXEC includes the connector's --token and is echoed unmasked into the Actions log",
+        "luxebook#86 .github/workflows/install-caddy-tls.yml — domain/upstream dispatch inputs are interpolated into the SSH script, so $(...) executes on the EC2 host",
+        "coachflow#2 .github/workflows/deploy-api.yml — preflight validates only 2 of the 5 secrets used, so deploys fail after the env file is already written to the host"
+      ],
+      "existing_rule": "process/post-merge-deploy-verification + tooling-footguns",
+      "why_it_did_not_fire": "rule lives in a category never loaded for this diff's phase — the process category is indexed under 'Post-merge' in the by-phase table and its content is a habit ('watch the deploy after every merge'). The decision that creates these defects — writing `needs:`, path filters, `env:` lists, fingerprints and preflight order — is made during implementation, a phase for which no workflow-topology category is mandatory.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Parse .github/workflows/*.yml and build the needs DAG in CI: fail if any workflow deploying to production is triggered by workflow_run of a workflow whose job graph excludes the test job, or lacks an explicit `check-runs for head_sha == success` step; fail if a job annotated `# required-invariant: true` (migrations) is reachable only via a job containing an external network probe. Diff `process.env.NEXT_PUBLIC_*` reads in source against turbo.json `env` plus Dockerfile ARG/ENV plus compose build args, failing on asymmetry, and build the Docker image on every PR so a missing COPY cannot reach main. For credentials: fail if any step referencing `secrets.*` occurs before a preflight asserting every reachable secret name is non-empty; fail any ssh/scp action lacking `fingerprint:`; fail any `${{ inputs.* }}` or `${{ github.event.* }}` inside a `run:` body (require quoted `env:` indirection); fail `echo` of any variable assigned from `systemctl cat|show` or matching /TOKEN|SECRET|KEY/; and post-job, grep the run log for known credential prefixes.",
+      "implementer_question": "Draw this workflow's needs DAG: is the deploy job a causal descendant of the job that ran lint/type-check/tests for THIS head_sha, and is any correctness-required step (migrations) reachable only through an optional or externally-probing job? Then for each secret: is it validated before the first remote side effect, scoped to the one container that needs it, and is the receiving host authenticated by a pinned fingerprint?"
+    },
+    {
+      "slug": "a11y-contract-dropped-by-a-transition-or-an-adapter",
+      "title": "Focus, live regions, and control state are carried by DOM identity that a swap or a wrapper silently drops",
+      "mechanism": "The elements assistive technology depends on are held by node identity and by prop forwarding, and both are destroyed silently. An async state machine swaps whole subtrees, so the retry button that had focus unmounts and focus falls to document.body; a live region is mounted already populated (never announced) or removed and recreated between phases; the settled error shell carries no role=status; a modal declares itself a dialog but never traps focus or inerts the page; outline-none ships with no focus-visible replacement. In parallel a shared adapter renders a control but forwards only the props it was authored for, dropping state the underlying library owns (field.disabled, field.ref), the linkage between the control and the ids the wrapper itself generates (aria-describedby, htmlFor), and the localization of its ARIA strings. Nothing throws and it looks correct, so it is invisible to snapshot tests and sighted mouse QA — and it recurs component-by-component because each fix is applied to one component rather than to a shared phase wrapper.",
+      "recurrence": 21,
+      "repos": [
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~4 P1 / ~16 P2 / ~1 P3",
+      "exemplars": [
+        "channel#7 focus loss on async branch replacement — replacing a subtree after an async resolution unmounts the focused node with no restoration target",
+        "luxebook#109 tenant-unavailable-view.tsx then services-content.tsx — the identical focus-after-retry defect reappears in the second component of the SAME PR because the fix was per-component, not a shared phase wrapper",
+        "luxebook#109 tenant-unavailable-view.tsx — the live region mounts already containing 'Loading this salon…', which screen readers do not reliably announce",
+        "luxebook#71 packages/ui/src/components/form/form-input.tsx — renders `disabled` from props instead of the controller value, so under useForm({disabled:true}) the input stays editable while RHF drops the field from submitted values (same in textarea/select/toggle/chip-group)",
+        "luxebook#71 packages/ui/src/components/form/form-toggle.tsx — error text rendered with ids the switch never references, so validation failure is never announced",
+        "luxebook#100 wechat-open-in-browser-guide.tsx — declares a modal dialog but never moves focus in, traps Tab, or inerts the page behind it"
+      ],
+      "existing_rule": "accessibility-state-sync/aria-lockstep-and-viewport-clamp",
+      "why_it_did_not_fire": "trigger keywords too narrow — the rule is keyed on `aria-describedby` and 'tooltip position math', so it fires for tooltips and popovers only. Focus restoration after a subtree swap, live-region mount timing, dialog focus trapping, and a form adapter dropping field.disabled/field.ref are the same class of dropped contract but contain none of its trigger tokens.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "One shared RTL assertion helper required for every component with an async state machine: after userEvent.click(retry) assert document.activeElement !== document.body and that the focused element resolves a :focus-visible style; assert a [role=status] node exists in the DOM BEFORE the transition and that only its textContent changes; run axe-core on every state of the machine; for dialogs assert focus is inside on open, Tab cycles within, and background nodes are inert. A jest-axe contract suite over every export of packages/ui/src/components/form: render inside useForm({ disabled: true }) and assert the control is disabled AND absent from submitted values; assert setFocus(name) focuses it; assert every rendered helper/error id appears in the control's aria-describedby. Lint: fail `outline-none` without a sibling focus-visible utility, and ban literal strings in aria-* props inside packages/ui.",
+      "implementer_question": "For each state transition this diff adds (idle→loading→error→retry, dialog open/close), which element receives focus after the trigger unmounts, and was the live region mounted and EMPTY before its message arrived? For each form adapter, does it forward every value the controller exposes — field.disabled, field.ref — and is every id it generates referenced by the focusable element rather than by a sibling?"
+    },
+    {
+      "slug": "authoritative-doc-asserts-state-no-code-enforces",
+      "title": "Prose promoted to source of truth states an invariant nothing re-validates",
+      "mechanism": "A document is designated authoritative — business-knowledge docs, DESIGN.md, a technical-design spec, a deploy runbook, a design handoff — and states an invariant, a maturity level ('proven', 'fixed in PR #N'), an API shape, or a route name that no code enforces, that the same document contradicts elsewhere, or that would not compile if implemented as written. Nothing re-validates prose against the tree, so the claim is consumed by later audits, agents, and implementers as evidence the work is done, converting a live defect into an invisible one. The tell is recurrence: the same document is re-flagged round after round because each fix edits wording rather than code. The same mechanism produces specs that define two route names for one operation, letting client, controller and fixtures each pick a different URL.",
+      "recurrence": 20,
+      "repos": [
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~3 P1 / ~17 P2",
+      "exemplars": [
+        "channel#7 stale canonical docs — documents declared canonical had drifted from the shipped behaviour",
+        "luxebook#105 docs/business-knowledge/README.md — marks the tenant rule `proven` for all backend ops while CustomerService.update() still writes with bare `where: { id }`",
+        "luxebook#105 docs/business-knowledge/booking-consistency.md — documents an owner-token acquireLock as the reference pattern while redis.service.ts still returns boolean and releaseLock does a bare del(key)",
+        "luxebook#80 DESIGN.md — tells implementers not to gate motion because Framer handles prefers-reduced-motion globally; no MotionConfig policy exists in the repo",
+        "luxebook#79 docs/booking-operations-hardening/ws2-technical-design.md — one spec defines two route sets for the same operations (/reschedule-preview vs /preview-reschedule)",
+        "nutribuddy — deployment runbook not updated for auto-staging; handoff map uses non-canonical matrix state IDs"
+      ],
+      "existing_rule": "knowledge-management + review-discipline/round-cascade-and-deferred-p2",
+      "why_it_did_not_fire": "rule is prose in a doc nothing forces you to open — knowledge-management describes how the SKILL's own rules are matured and decayed, and is explicitly a 'read once, apply forever' file. There is no gate anywhere that binds a claim in a project document to a file:line at the current SHA, so a doc edit is the cheapest possible way to close a finding and nothing detects that the code did not move.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "CI script that parses every tracked doc for maturity keywords (proven|enforced|fixed in PR|always), backticked symbol names, and route literals, and requires each such line to carry an inline `<!-- verified: path:line@sha -->` anchor. Fail when the anchor is missing, when ripgrep cannot find the named symbol at that path, when the anchored SHA is not an ancestor of HEAD, or when two distinct route literals in one document map to the same operation id. Generate signature assertions from the doc's own code fences and type-check them against the real module (e.g. acquireLock returning Promise<string|null>, not Promise<boolean>), and run `prisma validate` over every fenced Prisma block in docs/**/*.md so design-doc snippets face the same syntax check as source.",
+      "implementer_question": "For every claim this diff adds to a source-of-truth document of the form 'X is enforced / proven / fixed', paste the file:line that enforces it at THIS commit. If the previous round's finding was closed by editing this document rather than the code, say which line of code moved — and does the document name exactly one route and one symbol per operation?"
+    },
+    {
+      "slug": "not-yet-settled-value-read-as-authoritative",
+      "title": "A decision is made from state that is still loading, transiently null, or cached stale",
+      "mechanism": "A value is consumed at a lifecycle moment when it is not yet (or no longer) authoritative, and nothing revises the decision when it settles. Telemetry identity is established on one lifecycle while events emit on an earlier one, so the initial pageview is ungrouped, a transient `user: null` during /auth/me resets identity on every hard refresh, and the tenant tag survives into the next workspace because the clearing branch exists only for full logout. On the client, a modal seeds local state in an effect whose dependency list deliberately excludes the query result (to avoid clobbering user edits), or latches on a value computed before the query resolved, or from a raw list the render layer later filters differently — so on a slow load the seed is derived from empty input and the recovery behaviour the feature exists to provide never fires. A value captured at render (`now`, a cached role) is likewise never recomputed, so an action stays disabled after its time passes and entitlement UI disagrees with the server's current authorization answer.",
+      "recurrence": 18,
+      "repos": [
+        "coachflow",
+        "luxebook",
+        "nutribuddy",
+        "channel"
+      ],
+      "severity_mix": "~3 P1 / ~15 P2",
+      "exemplars": [
+        "channel#7 cached-role entitlement presentation — entitlement UI rendered from a cached/stale role rather than the server's current authorization answer",
+        "coachflow#13 apps/console/lib/telemetry/posthog-provider.tsx — the SDK emits the initial pageview before identify()/group('business') runs, so direct-entry views are ungrouped",
+        "coachflow#13 apps/console/lib/telemetry/posthog-provider.tsx — posthog.reset() only runs when there is no user, so group association survives a workspace change",
+        "luxebook#94 apps/admin/src/lib/telemetry/posthog-provider.tsx — AuthProvider exposes user:null while /auth/me loads, so a hard refresh resets identity and emits the initial pageview anonymously",
+        "luxebook#56 apps/admin/src/app/(dashboard)/services/page.tsx — modal opened before useStaffMembers() resolves runs setStaffIds([]) and never re-runs, creating the exact unbookable service the change was meant to prevent",
+        "luxebook#63 apps/admin/src/app/(dashboard)/bookings/page.tsx — canMarkComplete derived from a render-time `now` with no time-based refetch, so Complete stays disabled after the end time passes"
+      ],
+      "existing_rule": "frontend-async-state/orphan-promise-and-stale-closure (names 'latched init effects: user-input vs server-derived')",
+      "why_it_did_not_fire": "trigger keywords too narrow — the rule's triggers are `useEffect` with a server-data dep, an A→B→A click sequence, and fire-and-forget IIFEs. It names latched init effects explicitly, so the content was right, but a PostHog identify/reset ordering problem, an entitlement render from a cached role, and a render-time `now` are none of those three shapes and never load the rule.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "Turn react-hooks/exhaustive-deps into an error and require, for every suppression, a justification comment plus a paired test. Required test pattern for any modal-seeding effect: mount with the query `isLoading: true`, flush data afterwards, and assert the seeded state equals the loaded-first case AND that text typed during loading survives. A telemetry contract test driving the provider through {user:null,loading:true} → {user} asserting exactly one identify and zero resets, and through [anon] → [user A + tenant X] → [user A + tenant null] → [user B] asserting the tag/group setter is called with null at the third step — asserting on call ORDER, not just presence, so no capture() is observed with a tenant id before the corresponding group(). Lint: ban bare `new Date()`/`Date.now()` in the render body of list/menu components (force a useNow(intervalMs) hook), and ban rendering entitlement/permission UI from any value not obtained in the same render pass as the server's authorization response.",
+      "implementer_question": "What does this effect or predicate compute if the query it reads is still loading, if auth is in its transient null, or if the page stays open past a boundary of a value captured at render — and what specifically re-runs it once the data settles, without discarding user edits? For the entitlement UI: is it rendered from the server's current authorization answer or from a cached role?"
+    },
+    {
+      "slug": "ambient-default-used-where-an-explicit-authority-exists",
+      "title": "A call site uses the host default or a raw literal instead of the domain's designated authority",
+      "mechanism": "The domain designates an authority for a value — the tenant's salon timezone, the design foundation's tokens — but individual call sites reach for the ambient or raw equivalent instead. Time: `format(date,'yyyy-MM-dd')`, `getHours()`, `setHours(0,0,0,0)`, server-side `parseISO`, `startOfDay/endOfDay` are each locally correct in the developer's timezone and in a UTC CI runner, so drift manifests only for cross-timezone staff or a non-UTC host — shifted labels, availability queried over the wrong day bounds, a slot booked at a different instant than the one displayed. Design: literal hex/rgba, arbitrary rounded-[32px] and shadow values, non-canonical tracking for a composition-locked pattern, or a hand-built card duplicating the shared shell. Neither kind propagates: a later palette, radius, per-tenant theme, or timezone-handling change silently skips these surfaces, and each new screen widens the divergence.",
+      "recurrence": 17,
+      "repos": [
+        "luxebook",
+        "nutribuddy"
+      ],
+      "severity_mix": "~6 P1 / ~11 P2",
+      "exemplars": [
+        "luxebook#59 apps/api/src/modules/scheduling/availability.service.ts — dayStart/dayEnd moved to tenant-local while getBlocksForDate still uses server-local startOfDay/endOfDay, so blocked times return as available",
+        "luxebook#79 packages/ui/src/components/booking-slot-picker.tsx — slot labels built from getHours()/getMinutes() in browser TZ, so a 17:00 salon slot can display as 09:00 while the backend books the original instant",
+        "luxebook#79 apps/admin/src/lib/hooks/use-booking-reschedule.ts — dateIso derived with browser-local format(), so the modal fetches the wrong calendar day's inventory",
+        "luxebook#109 tenant-unavailable-view.tsx — hand-built card with raw bg-white and inline rgba() invents a palette value outside the foundation, so theme/token changes never reach this state",
+        "luxebook#109 tenant-unavailable-view.tsx — font-semibold tracking-[0.24em] diverges from the composition-locked DESIGN.md eyebrow (font-medium tracking-[0.22em])",
+        "nutribuddy — hardcoded colors on new surfaces instead of the shared tokens"
+      ],
+      "existing_rule": "time-and-timezone/server-local-trap + frontend-design-system-drift/silent-css-class-vacuum",
+      "why_it_did_not_fire": "trigger keywords too narrow — two separate rules each cover one instance of the same mechanism, and both are keyed on a narrow token list: server-local-trap on `parseISO`/`startOfDay`/`getHours`/'scheduling', design-system-drift on 'Tailwind class change, breakpoint stack, native input restyling'. A plain `format()` in an admin hook and an `rgba()` literal in a new error-state component match neither list, so a diff that drifts from BOTH authorities loads neither rule.",
+      "gate_feasibility": "executable-strong",
+      "gate_idea": "ESLint no-restricted-syntax banning date-fns `format|startOfDay|endOfDay|parseISO` and `Date.prototype.getHours|getMinutes|getDay` inside scheduling/booking modules and calendar UI unless the call is date-fns-tz (formatInTimeZone/toZonedTime) or carries an allowlist comment; plus a CI matrix running unit and E2E twice (TZ=UTC and TZ=Asia/Hong_Kong) and requiring byte-identical results. In parallel, an AST/regex lint over apps/*/src/**/*.tsx failing on #rrggbb, rgb(/rgba( literals, rounded-[, shadow-[, tracking-[, and non-token palette utilities outside an explicit allowlist — resolving tracking/weight pairs for eyebrow/heading classes against values extracted from DESIGN.md so drift from a composition-locked pattern fails; a Tailwind-config-driven test that every utility used exists in the tenant-token preset; and a CI check that any PR adding a new route- or state-level component also references a file under design/.",
+      "implementer_question": "For each new date computation in this diff, name the timezone it is evaluated in and show the tenant timezone being passed explicitly; for each color, radius, shadow and tracking value, name the DESIGN.md token alias it resolves to. Did you run this suite under both TZ=UTC and TZ=Asia/Hong_Kong, and does any value in the diff come from the host default or a raw literal rather than the designated authority?"
+    }
+  ],
+  "dropped": [
+    "INPUT TRUNCATION DISCLOSURE — the supplied mining JSON was cut off mid-stream inside the 5th mining (at class `non-atomic-claim-then-irreversible-effect`); minings 5-7 were only partially or not visible. I reconstructed the missing slices from the corpus on disk (scratchpad/corpus/*.codex.md: coachflow 219 findings PRs 1-13, luxebook 259 PRs 2-110, nutribuddy 318 PRs 49-113, channel 12 PRs 6-7) plus scratchpad/corpus/channel.external-review-2026-08-06.md. Recurrence counts for luxebook PRs 20-25 and for all nutribuddy contributions are therefore reconstructed from corpus finding titles rather than from a miner's own class assignment, and should be treated as conservative lower bounds. coachflow and luxebook counts sum across miners that partitioned their repos by PR range, so they are not double-counted.",
+    "MERGED: coachflow-1 `sanitizer-bypassed-by-parallel-egress-path` (6) + coachflow-2 `key-name-based-pii-redaction` (3) + the PII half of luxebook-1 `telemetry-wired-without-modeling-capture-or-lifecycle` → `redaction-control-narrower-than-the-egress-surface`. Same mechanism: the control's domain is hand-enumerated while the egress surface is defined by the vendor's transport list / payload schema / the browser's degraded submission. Kept the enumeration framing because that is what makes it non-closable by patching instances.",
+    "MERGED: the lifecycle half of luxebook-1 `telemetry-wired-without-modeling-capture-or-lifecycle` + coachflow-1 `attribution-context-lifecycle-mismatch` (4) + luxebook-2 `state-initialized-once-against-not-yet-loaded-async-data` (5) + channel #10 cached-role → `not-yet-settled-value-read-as-authoritative`. Splitting telemetry into 'what it captures' and 'when it fires' put each half with its true mechanism-mates; 'telemetry' alone is a topic, not a class.",
+    "MERGED: coachflow-1 `cross-artifact-name-resolution-drift` (13) + luxebook-1 `cross-artifact-contract-drift` (8) + luxebook-2 `deployment-topology-encoded-in-app-code` (9) → `name-resolves-differently-on-each-side`. All three are one mechanism (a name encoded twice, resolved by different machinery); the third is the special case where one of the two encodings is a literal in app code.",
+    "MERGED: coachflow-2 `client-predicate-diverges-from-server-predicate` (8) + luxebook-2 `affordance-and-guard-derived-independently` (7) + coachflow-2 `isoptional-null-passthrough-to-nonnull-sink` (9) + channel #1/#8/#9 → `boundary-contract-assumed-instead-of-derived`. The validator case is the same mechanism at the DTO seam: the validator's admitted set and the sink's accepted set are authored independently.",
+    "MERGED: coachflow-1 `in-transaction-recheck-without-write-conflict` (7) + coachflow-2 `precondition-not-revalidated-inside-lock-or-transaction` (6) + luxebook-2 `invariant-checked-by-read-not-carried-by-the-write` (7) + luxebook-1 `tenant-scope-omitted-on-write-or-contract` (4) + luxebook-3 `stale-preflight-decision-outside-atomic-boundary` (6) → `precondition-read-outside-the-write-it-guards`. Tenant scope is not a separate mechanism: it is the same 'condition established by a prior read, absent from the write predicate', with authorization as the condition. Kept its P1 severity visible in the mix.",
+    "MERGED: coachflow-2 `idempotency-identity-mismatch` (6) + luxebook-1 `operation-escapes-its-atomic-boundary` (8) + coachflow-1 `retry-and-lifecycle-identity-collision` (4) + luxebook-3 `non-atomic-claim-then-irreversible-effect` + channel #5 → `at-most-once-effect-with-no-single-winner-claim`. Deliberately kept SEPARATE from the precondition class: 'the condition is missing from the write predicate' and 'there is no unique claim for the effect' need different gates (CAS predicate vs unique index / SET NX / persisted key).",
+    "MERGED: coachflow-1 `failure-path-skips-compensation` (5) + coachflow-2 `error-path-commits-or-terminalizes-wrongly` (6) + luxebook-2 `secondary-store-not-reconciled-with-primary-write` (10) + luxebook-1 `mutation-without-compensation-on-failure-path` (4) + luxebook-2 `error-boundary-scoped-by-convenience-not-by-failure-class` (6) + channel #2 → `failure-path-decides-durability-without-classifying-the-failure`. The catch-all-filter and shared-tx-message findings are the same defect as terminalize-the-ambiguous: a whole failure space collapsed onto one meaning before a durability decision is taken.",
+    "MERGED: luxebook-2 `model-extension-not-propagated-to-readers` (10) + coachflow-2 `downstream-filter-not-updated-for-new-status-or-variant` (7) + luxebook-1 `state-machine-extended-without-updating-its-consumers` (4) + coachflow-2 `invariant-gate-enforced-on-one-path-only` (8) + luxebook-2 `parallel-write-path-skips-canonical-side-effects` (5) → `rule-lives-in-call-sites-not-in-the-type`. New-value-not-propagated and new-writer-skips-side-effects are the two directions of one root cause (the rule is duplicated across call sites instead of carried by an exhaustive type or by the transition), and one gate — exhaustive Record/never plus a single-writer-per-status AST assertion — closes both.",
+    "MERGED: coachflow-2 `advertised-capability-with-no-completion-path` (11) + coachflow-1 `derived-state-branch-uncovered-or-unimplemented` (9) + coachflow-2 `outcome-recorded-without-executor` (5) + luxebook-1 `recovery-path-dead-ends` (8) → `reachable-state-with-no-exit`. Variant holes, uncovered truth-table rows, outcomes with no executor and fallbacks whose own failures are unhandled are all 'reachability authored in one artifact, exit authored in another'.",
+    "MERGED: coachflow-1 `verification-probe-validates-the-wrong-subject` (4) + luxebook-1 `verification-gate-cannot-fail` (11) + luxebook-1 `test-green-regardless-of-the-behavior-it-guards` (4) + luxebook-2 `protection-that-cannot-observe-the-regression` (5) + channel #1 (probe half) and #7 → `verification-bound-to-a-proxy-not-to-the-behavior`. Deploy gates, unit tests, and workflow path filters differ only in medium; the mechanism (the assertion is bound to an artifact adjacent to the claim, so it can only false-PASS) and the gate (negative-fixture matrix / mutation testing) are identical. Note channel #1 is split deliberately: the PUT-vs-POST mismatch itself is a boundary-contract defect, the probe that could not see it is this class.",
+    "MERGED: coachflow-1 `coordinated-cutover-without-inventory-or-dual-run` (9) + luxebook-1 `predecessor-artifact-survives-migration-or-rerun` (8) + luxebook-2 `constraint-lands-before-the-population-or-path-that-satisfies-it` (7) → `new-generation-introduced-without-retiring-or-backfilling-the-old`. Old-artifact-wins and old-rows-cannot-comply are the two halves of introducing a generation without enumerating the predecessor's inventory.",
+    "MERGED: coachflow-2 `deferred-effect-binds-to-mutable-parent` (7) + `reactivated-row-without-generation-scope` (5) + `terms-read-live-instead-of-snapshotted-at-sale` (5) + `external-account-identity-from-live-tenant-config` (4) + luxebook-2 `composite-identity-compared-on-a-partial-key` (5) → `deferred-effect-re-derives-its-subject-instead-of-anchoring-it`. Mutable parent, recycled row, live config and current account id are all 'the subject/terms of the effect are re-derived at execution time rather than captured at intent time'; partial-key comparison is the same failure with the tuple as subject.",
+    "MERGED: coachflow-1 `external-signal-semantics-assumed` (7) + coachflow-2 `external-provider-delivery-assumptions` (4) + luxebook-1 `framework-execution-model-assumption` (6) + luxebook-2 `framework-semantics-assumed-rather-than-verified` (5) → `third-party-and-framework-semantics-assumed-not-probed`. Vendor value semantics, delivery guarantees, and framework composition rules are one mechanism (belief substituted for the producer's documented contract) with one gate (a recorded probe artifact).",
+    "MERGED: coachflow-1 `multi-writer-identity-state-no-single-source-of-truth` (9) + coachflow-2 `session-protocol-split-across-apps-and-auth-concurrency` (6) + luxebook-2 `credential-precedence-short-circuit` (4) + luxebook-2 `credential-lifecycle-leg-missing` (5) → `session-identity-spread-across-carriers-with-no-authority`. Precedence short-circuit and missing lifecycle legs are consequences of the same root: no carrier is designated authoritative, so each is validated and expired on its own terms.",
+    "MERGED: coachflow-1 `pipeline-dependency-graph-narrower-than-real-deps` (7) + `deploy-credential-least-privilege-and-preflight` (4) + luxebook-1 `required-step-gated-behind-optional-step` (2) + `secret-or-untrusted-input-flows-into-a-shell-string` (2) + channel #6 → `pipeline-guarantees-declared-by-hand`. Causality edges, path filters, secret scope, host fingerprints and preflight ordering are all hand-written declarations of a property the platform does not enforce, and one workflow-lint job covers them.",
+    "MERGED: luxebook-1 `async-state-transition-drops-a11y-anchor` (8) + luxebook-2 `wrapper-drops-part-of-the-control-contract` (11) + channel #11 → `a11y-contract-dropped-by-a-transition-or-an-adapter`. A subtree swap and a prop-forwarding adapter drop the same thing (the contract carried by DOM identity and id linkage) and are caught by the same RTL/axe assertion helper.",
+    "MERGED: luxebook-2 `timezone-authority-drift` (7) + luxebook-1 `design-foundation-drift` (7) → `ambient-default-used-where-an-explicit-authority-exists`. Both are 'the domain designates an authority (tenant TZ, token) and the call site reaches for the ambient/raw equivalent', both fail to propagate on a later change, and both are closed by the same shape of lint (ban the raw API/literal, force the authority-carrying helper).",
+    "REJECTED as a topic, not a mechanism: a candidate 'multi-tenant / auth bugs' grouping that would have pulled together tenant-scope omission, session carriers, credential lifecycle and enumeration timing. Split across `precondition-read-outside-the-write-it-guards` and `session-identity-spread-across-carriers-with-no-authority` by actual mechanism.",
+    "REJECTED as recurrence-1 with no general mechanism: luxebook#78 send-code response-timing enumeration oracle (a real P2, but a single instance of a mechanism the existing enumeration-safety category already covers correctly and which did fire); coachflow#3 `packages/ui/src/google-sign-in-button.tsx` pointer-events-none busy state (folded into the a11y class as an exemplar rather than kept as its own control-registration class); coachflow-1 `control-registered-but-not-in-execution-path` (3) — the guard-missing-from-providers P1 is genuinely its own mechanism but at recurrence 3 across one repo it was folded into `rule-lives-in-call-sites-not-in-the-type`, whose gate (a class referenced in @UseGuards must appear in a module's providers array in the same import graph) catches it directly."
+  ]
+}

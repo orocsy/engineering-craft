@@ -20,6 +20,7 @@ irreversible step, and make every failure loud and every success verified.**
 
 | Rule | One-line | Risk |
 |---|---|---|
+| [deploy-must-be-causal-descendant-not-concurrent-sibling](rules/deploy-must-be-causal-descendant-not-concurrent-sibling.md) | A deploy on the same trigger as CI is CORRELATED with green, not caused by it — chain via `needs:` or `workflow_run` + a success guard | P0 |
 | [runner-brokered-artifact-transport](rules/runner-brokered-artifact-transport.md) | Before minting any long-lived machine credential, let the CI runner's per-run token broker the artifact | P1 |
 | [deploy-touches-only-owned-services](rules/deploy-touches-only-owned-services.md) | Compose recreates ANY service whose config hash differs — scope deploys to the service you own | P0 |
 | [env-write-guard](rules/env-write-guard.md) | An env-delivery step must never replace real secrets with nothing | P0 |
