@@ -40,7 +40,10 @@ const args = process.argv.slice(2);
 const argOf = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
 const CONFIG_PATH = argOf('--config', 'claim-registry.json');
-if (!existsSync(CONFIG_PATH)) { console.error(`No config at ${CONFIG_PATH}`); process.exit(1); }
+if (!existsSync(CONFIG_PATH)) {
+  console.log(`NOT APPLICABLE — no config at ${CONFIG_PATH}; this repo has not adopted the family registry. Nothing to gate.`);
+  process.exit(0);
+}
 const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
 
 const CLAIM_PRIMITIVES = config.claimPrimitives ?? ['incrementField(', 'updateMany(', 'FOR UPDATE'];

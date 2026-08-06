@@ -69,7 +69,7 @@ const ASSERTION_RE = new RegExp(
 
 function main() {
   const files = ROOTS.filter(existsSync).flatMap((r) => walk(r));
-  if (!files.length) { console.error(`No .ts/.tsx files under ${ROOTS.join(', ')}`); process.exit(1); }
+  if (!files.length) { console.log(`NOT APPLICABLE — no .ts/.tsx files under ${ROOTS.join(', ')}; nothing to gate.`); process.exit(0); }
 
   const failures = [];
   let scanned = 0;

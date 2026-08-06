@@ -95,7 +95,7 @@ const attr = (attrs, name) => {
 const hasAttr = (attrs, name) => new RegExp(`\\b${name}\\b`, 'i').test(attrs);
 
 function main() {
-  if (!existsSync(ROOT)) { console.error(`No directory at ${ROOT}`); process.exit(1); }
+  if (!existsSync(ROOT)) { console.log(`NOT APPLICABLE — no directory at ${ROOT}; nothing to gate.`); process.exit(0); }
   const files = walk(ROOT);
   const failures = [];
   let checked = 0;

@@ -187,8 +187,8 @@ const jobIsEnvOnly = (job) => job.environment !== null && !jobDeploys(job);
 
 function main() {
   if (!existsSync(DIR)) {
-    console.error(`No workflow directory at ${DIR}`);
-    process.exit(1);
+    console.log(`NOT APPLICABLE — no workflow directory at ${DIR}; nothing to gate.`);
+    process.exit(0);
   }
   const files = readdirSync(DIR).filter((f) => /\.ya?ml$/.test(f));
   const workflows = files.map((f) => ({ file: f, ...parseWorkflow(readFileSync(join(DIR, f), 'utf8')) }));

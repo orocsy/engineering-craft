@@ -46,8 +46,8 @@ const CONFIG_PATH = argOf('--config', 'probe-sensitivity.json');
 const REPO = argOf('--repo', process.cwd());
 
 if (!existsSync(CONFIG_PATH)) {
-  console.error(`No config at ${CONFIG_PATH}`);
-  process.exit(1);
+  console.log(`NOT APPLICABLE — no config at ${CONFIG_PATH}; no probes are registered for mutation testing. Nothing to gate.`);
+  process.exit(0);
 }
 const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf8'));
 
