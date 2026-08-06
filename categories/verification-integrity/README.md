@@ -34,6 +34,7 @@ fail, you do not know that it can. Before trusting any green:
 | [exhaustive-registry-beats-diff-review](rules/exhaustive-registry-beats-diff-review.md) | CRITICAL | Adding a new member to a family that already carries an invariant (a new action behind an existing router, a new route serving an existing data class) |
 | [skip-is-a-decision-not-a-default](rules/skip-is-a-decision-not-a-default.md) | HIGH | `test.skip`/`describe.skip`/`xit`, and any CI step behind an `if:` that can be false on the shipping trigger |
 | [parse-dont-cast-at-trust-boundaries](rules/parse-dont-cast-at-trust-boundaries.md) | HIGH | `as T` on `res.json()`, `JSON.parse`, `localStorage`, webhook bodies, or an untyped SDK return |
+| [run-the-composed-gate-not-your-own](rules/run-the-composed-gate-not-your-own.md) | CRITICAL | Running `typecheck && test && lint` by hand instead of the project's composed validate/review command |
 
 ## Templates
 
