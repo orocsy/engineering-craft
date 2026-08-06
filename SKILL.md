@@ -11,11 +11,20 @@ description: |
   point, anything where two concurrent requests could interleave, branch creation, self-review before
   push, gh CLI usage with secrets, choosing between hand-rolling vs. library functions for parsing/
   validation/dates/URLs, post-merge deploy verification, commit message style.
+  ALSO use whenever you ADD a member to an existing family (a new case in a dispatcher, a new route
+  serving an existing data class), whenever you write or rely on a CHECK (contract probe, grep-based
+  scan, skipped test, `as T` on remote data), whenever a deploy job's relationship to the test job
+  matters, whenever a form or interactive surface has a no-JS state, and whenever a collected value
+  must constrain later behaviour.
   Trigger keywords: forgot-password, reset-password, otp, jwt, token, hmac, single-use, consume,
   invalidate, race, cas, compare-and-swap, lua, updateMany, optimistic, lock, tenantId, findFirst,
   enumeration, timing-oracle, env.schema, deploy.yml, third-party API key, gh secret, branch from
   main, self-review, code-reviewer, regex, parseISO, hand-rolled, hand-write a, hex color, URL host,
-  webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification.
+  webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification,
+  finalize, completeUpload, activate, settle, publish, claim, status transition, new case in switch,
+  contract probe, verify- script, containsAll, test.skip, describe.skip, xit, as T, res.json(),
+  JSON.parse, localStorage, workflow_run, needs:, deploy gating, <form> method, noscript,
+  progressive enhancement, allergy, dietary restriction, consent flag, entitlement, quiet hours.
 license: MIT
 metadata:
   author: luxebook
