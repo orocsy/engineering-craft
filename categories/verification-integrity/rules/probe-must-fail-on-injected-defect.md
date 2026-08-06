@@ -113,6 +113,29 @@ it('the contract probe fails even when the needle survives elsewhere in the file
 });
 ```
 
+## Counter-case — a flake fix can neutralise a probe that used to work
+
+The dangerous edit is not always to the code under test. A browser assertion proved that
+pointer movement never rescales an image: it sampled the element, moved the pointer across
+it, sampled again, and compared. It caught a real hover-zoom.
+
+To fix an unrelated scroll-timing flake, the pointer-entry call was moved BEFORE the
+baseline sample. Both snapshots now carried the hover state, so a live hover-zoom appeared
+in both and cancelled itself out. The suite went green, the flake disappeared, and a
+working regression detector had become a no-op — with no line of production code touched.
+
+Two consequences worth internalising:
+
+- **Any edit to a test file, including moving one line within it, must re-run the original
+  mutation.** "The test still passes" is the failure signal here, not the success signal.
+- **Snapshot every property the effect could plausibly write.** The same assertion recorded
+  CSS `transform`, but the utility framework in use writes the separate `scale` property —
+  so even before the reordering, that particular zoom was invisible to it.
+
+The general form: a probe's sensitivity is a property of the probe AND its surroundings,
+and both drift. Record the mutation that proves the probe fails, next to the probe, and
+re-run it whenever either side changes.
+
 ## Executable gate
 
 [`probe-sensitivity.template.mjs`](../../../templates/probe-sensitivity.template.mjs) — runs

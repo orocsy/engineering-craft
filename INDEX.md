@@ -73,6 +73,8 @@ and both fixes are now part of the doctrine:
 | **You added a new member to an existing family** — a new `case` in a router, a new route serving an existing data class, a new handler for an existing token class | **verification-integrity/exhaustive-registry-beats-diff-review** (the highest-recurrence class; fires on ADDITION, which every other sibling rule misses) |
 | `finalize`, `complete`, `activate`, `settle`, `claim`, `publish`, or ANY `status: A → B` that may happen at most once | **concurrency-cas/single-use-token-consumption** (shape trigger — do not wait for `consumedAt` vocabulary) |
 | `verify-*.mjs`, `containsAll(`, `text.includes(` in a check, grep-based scan, snapshot over serialised text | **verification-integrity/probe-must-fail-on-injected-defect** |
+| A diff changes ONLY dependency versions in `package.json`/lockfile; or a `fetch`/`XMLHttpRequest` sends values an SDK minted (presigned upload, signed URL, STS token) | **silent-no-op-integrations/forked-sdk-transport** |
+| You are about to run `typecheck && test && lint` by hand instead of the project's composed validate/review command | **verification-integrity/run-the-composed-gate-not-your-own** |
 | `test.skip(`, `describe.skip`, `xit(`, or a workflow step behind `if: inputs.*` | **verification-integrity/skip-is-a-decision-not-a-default** |
 | `as ` applied to `res.json()`, `JSON.parse`, `localStorage.getItem`, a webhook body | **verification-integrity/parse-dont-cast-at-trust-boundaries** |
 | `<form` with no `method`, `noscript`, hydration, `client:load`, SSR'd form markup | **progressive-degradation/form-without-method-submits-get** |
