@@ -99,6 +99,12 @@ and both fixes are now part of the doctrine:
 | ≥2 review rounds on same PR | **review-discipline/round-cascade-and-deferred-p2** |
 | `gh workflow run`, post-merge | process/post-merge-deploy-verification |
 | `data-testid`, `getByRole`, label rename touching E2E | **e2e-test-resilience/selector-coupling-and-blast-radius** |
+| `.filter(` over server results in a component; `?slug=`/`?handle=` only routes | **historical-data-compatibility/optional-field-gates-the-record** |
+| New optional field the UI reads; new fixture set for a content contract | **historical-data-compatibility/fixtures-must-include-the-oldest-shape** |
+| Deployed smoke that counts rows or requires non-empty collections | **historical-data-compatibility/smoke-asserts-contract-not-inventory** |
+| `client:only`, `client:visible`, `justify-between` header, JS width measurement | **layout-stability/first-paint-must-equal-settled-layout** |
+| `window.innerWidth` alongside an `@media` breakpoint | **layout-stability/css-and-js-must-share-the-media-query** |
+| `gap-px` over `bg-*` on a grid container; ragged card rows | **layout-stability/container-must-not-paint-item-borders** |
 | Tailwind class change, breakpoint stack, native input restyling | **frontend-design-system-drift/silent-css-class-vacuum** |
 | `useEffect` with server data dep, A→B→A click sequence, fire-and-forget IIFE | **frontend-async-state/orphan-promise-and-stale-closure** |
 | `aria-describedby`, tooltip position math | **accessibility-state-sync/aria-lockstep-and-viewport-clamp** |
