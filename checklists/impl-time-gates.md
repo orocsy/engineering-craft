@@ -155,6 +155,15 @@ Rules: [probe-must-fail-on-injected-defect](../categories/verification-integrity
       nothing asserts it exists.
 - [ ] Is there a preflight that FAILS when it is absent, rather than code that degrades
       quietly?
+- [ ] **Third-party host/path/credential pairing: has a request to it ever SUCCEEDED, or
+      is the value inherited from a doc, a support reply, or a comment?** A retired
+      vendor host usually still answers and redirects to a login page, so every
+      unauthenticated check passes and the failure appears only after a real user
+      authenticates — then blames YOUR provisioning. Run the control probe (real
+      credential vs fabricated credential, same malformed signature): two different
+      errors means the host knows your key.
+
+> Rule: [third-party-endpoint-control-probe](../categories/verification-integrity/rules/third-party-endpoint-control-probe.md)
 
 ## 11. Canonical docs — did the change make one of them false?
 
