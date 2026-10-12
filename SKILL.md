@@ -24,7 +24,9 @@ description: |
   finalize, completeUpload, activate, settle, publish, claim, status transition, new case in switch,
   contract probe, verify- script, containsAll, test.skip, describe.skip, xit, as T, res.json(),
   JSON.parse, localStorage, workflow_run, needs:, deploy gating, <form> method, noscript,
-  progressive enhancement, allergy, dietary restriction, consent flag, entitlement, quiet hours.
+  progressive enhancement, allergy, dietary restriction, consent flag, entitlement, quiet hours,
+  ingest, import job, media copy, half-ready record, resumable, retry later, time budget, cursor,
+  gateway latency, round trip, slow batch, the SDK can't batch.
 license: MIT
 metadata:
   author: luxebook
@@ -77,6 +79,9 @@ Rules are organized into TWO macro-groups:
 | Tooltip / popover with aria-describedby, viewport-edge clamp | **accessibility-state-sync (aria-lockstep-and-viewport-clamp)** |
 | Rename label/role/test-id/copy in code touching E2E | **e2e-test-resilience (selector-coupling-and-blast-radius)** |
 | Filtering a server-returned list in the UI; a journey routed through a field added after launch | **historical-data-compatibility (optional-field-gates-the-record)** |
+| A job builds one user-visible record from several external fetches (sync, import, media copy); "can't use a transaction" | **data-pipeline-atomicity (prepare-off-to-the-side-flip-one-flag)** |
+| Long job in time-limited calls: retries, failure notes, a "try again" button, a time budget, a cursor | **data-pipeline-atomicity (failure-classes-and-resumable-retries)** |
+| A slow action or batch, "the SDK can't batch", a browser-driven multi-request protocol | **performance-latency (measure-the-request-chain-before-blaming-the-sdk)** |
 | `client:only`/lazy island in a shared shell; responsive lane chosen by measuring width in JS | **layout-stability (first-paint-must-equal-settled-layout)** |
 | A breakpoint enforced in BOTH a stylesheet and a script | **layout-stability (css-and-js-must-share-the-media-query)** |
 | ≥2 review rounds on same PR, deferred-P2 in earlier round | **review-discipline (round-cascade-and-deferred-p2)** |

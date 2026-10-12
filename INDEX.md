@@ -17,7 +17,8 @@
 | Deploy & delivery (CI/CD) | 1 | 13 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **74** |
+| Data pipelines & performance | 2 | 3 |
+| **Total (hand-authored)** | **23** | **77** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -102,6 +103,9 @@ and both fixes are now part of the doctrine:
 | `.filter(` over server results in a component; `?slug=`/`?handle=` only routes | **historical-data-compatibility/optional-field-gates-the-record** |
 | New optional field the UI reads; new fixture set for a content contract | **historical-data-compatibility/fixtures-must-include-the-oldest-shape** |
 | Deployed smoke that counts rows or requires non-empty collections | **historical-data-compatibility/smoke-asserts-contract-not-inventory** |
+| import, sync, ingest, copy media, enrich, half-ready record, "can't use a transaction" | **data-pipeline-atomicity/prepare-off-to-the-side-flip-one-flag** |
+| retry, give up, failure note, cursor, resumable, time budget, "try again" button, 403/404 from a source | **data-pipeline-atomicity/failure-classes-and-resumable-retries** |
+| slow, latency, seconds per item, batch is slow, gateway, "the SDK can't batch" | **performance-latency/measure-the-request-chain-before-blaming-the-sdk** |
 | `client:only`, `client:visible`, `justify-between` header, JS width measurement | **layout-stability/first-paint-must-equal-settled-layout** |
 | `window.innerWidth` alongside an `@media` breakpoint | **layout-stability/css-and-js-must-share-the-media-query** |
 | `gap-px` over `bg-*` on a grid container; ragged card rows | **layout-stability/container-must-not-paint-item-borders** |
@@ -136,6 +140,13 @@ and both fixes are now part of the doctrine:
 | grep-for-siblings | 4 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO; a collected constraint must be threaded to every decision that must honour it |
 | auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
 | cross-file-seams ⟳ | 13 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle, claimed-but-unlanded fix, untested side effect, workspace build context). Canonical source is the plugin; do not hand-edit. |
+
+### Data pipelines and performance
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| data-pipeline-atomicity | 2 | Without a transaction across network calls, prepare everything off to the side and make one guarded write that completes and reveals the record; classify failures by who failed, remember them, resume at a unit boundary |
+| performance-latency | 1 | Measure before explaining: split server from end-to-end time, count serial round trips, move client-driven chains server-side with a budget and an idempotent hand-back |
 
 ### Verification integrity (a green signal that is not checking)
 

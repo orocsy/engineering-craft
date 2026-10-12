@@ -69,6 +69,14 @@ Or from inside Claude Code:
   fallback, route prefix, SDK option name, event tx semantics, mock drift, conditional
   coupling, wrapper lifecycle). Canonical source is the plugin; do not hand-edit here.
 
+### Data pipelines & performance
+
+- [data-pipeline-atomicity](categories/data-pipeline-atomicity/README.md) — one guarded
+  write completes and reveals a record built from external fetches; failure classes,
+  resumable retries, time budgets
+- [performance-latency](categories/performance-latency/README.md) — measure the request
+  chain before blaming the SDK; collapse serial round trips; bounded batch concurrency
+
 ### Process & habits
 
 - [workflow](categories/workflow/README.md) — pull main before branching, branch
