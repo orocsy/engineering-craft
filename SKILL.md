@@ -11,6 +11,9 @@ description: |
   point, anything where two concurrent requests could interleave, branch creation, self-review before
   push, gh CLI usage with secrets, choosing between hand-rolling vs. library functions for parsing/
   validation/dates/URLs, post-merge deploy verification, commit message style.
+  ALSO for FastAPI/Python services: app factory, exception handlers and error envelopes, request
+  IDs, health checks, blocking calls in async routes, uv workspace test environments, and validating
+  responses against an OpenAPI/JSON Schema contract.
   ALSO use whenever you ADD a member to an existing family (a new case in a dispatcher, a new route
   serving an existing data class), whenever you write or rely on a CHECK (contract probe, grep-based
   scan, skipped test, `as T` on remote data), whenever a deploy job's relationship to the test job
@@ -127,6 +130,7 @@ the goal, knowledge is the moat", 2026-05).
 | Config drift | [categories/config-drift/README.md](categories/config-drift/README.md) | 4 | Env added in one consumer, missing in others → boot crash |
 | Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 4 | Third-party wrapper "succeeds" while doing nothing |
 | Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 2 | Security literal removed in one file, lingers in two more |
+| Python & FastAPI | [categories/python-fastapi/README.md](categories/python-fastapi/README.md) | 7 | Default `{"detail"}`/plain-text errors reach clients; a test-mode flag injects identities; one blocking call stalls every request; CI installs a different env than tests import |
 
 ### Process & habits
 

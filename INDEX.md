@@ -9,7 +9,7 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 34 |
+| Defensive patterns (backend correctness) | 7 | 41 |
 | Verification integrity (checks that aren't checking) | 1 | 4 |
 | Observability (errors, analytics, health) | 1 | 3 |
 | Frontend patterns | 5 | 7 |
@@ -17,7 +17,7 @@
 | Deploy & delivery (CI/CD) | 1 | 13 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **74** |
+| **Total (hand-authored)** | **22** | **81** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -30,7 +30,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 Hand-authored rules only (after fix-history mining + consolidations through
 2026-08-06, incl. the deploy-delivery and verification-integrity categories — every rule
-incident-cited): 23 proven · 42 verified · 0 draft.
+incident-cited): 23 proven · 42 verified · 7 draft (python-fastapi, 2026-10-22).
 
 ## Reports
 
@@ -113,6 +113,13 @@ and both fixes are now part of the doctrine:
 | `Sentry`, `PostHog`, `beforeSend`, telemetry, `setTag`, error tracking, analytics | **observability** (tenant tagging + cross-tenant guard) |
 | PII in telemetry, `sendDefaultPii`, scrub, redact, exception message with user data | **observability/pii-scrubbing-defense-in-depth** |
 | `identify(`, `reset(`, analytics on logout / shared device, capture inside a tx | **observability/analytics-lifecycle-and-containment** |
+| `FastAPI(` at module level, `uvicorn module:app`, a "test mode" flag, `dependency_overrides` | **python-fastapi/app-factory-not-import-time-app** |
+| `/health`, `/healthz`, liveness/readiness probe | **python-fastapi/liveness-check-stays-closed** |
+| `time.sleep`, `requests.`, sync ORM session inside `async def` | **python-fastapi/never-block-inside-async-def** |
+| `[tool.uv.workspace]`, `dependency-groups`, `uv sync` in CI, pytest in a monorepo | **python-fastapi/test-env-must-match-ci-install** |
+| `add_exception_handler`, `HTTPException`, `RequestValidationError`, `{"detail"`, error envelope | **python-fastapi/override-every-default-error-path** |
+| `X-Request-ID`, correlation ID, request ID middleware | **python-fastapi/server-generated-request-id** |
+| `response_model`, Pydantic DTO, OpenAPI contract in repo, SDK generated from schema | **python-fastapi/validate-responses-against-the-contract-file** |
 | "Sign in with Google", OAuth login, `email_verified`, account linking, SSO | **auth-identity/federated-identity-linking** |
 | `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
 | `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
@@ -135,6 +142,7 @@ and both fixes are now part of the doctrine:
 | silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
 | grep-for-siblings | 4 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO; a collected constraint must be threaded to every decision that must honour it |
 | auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
+| python-fastapi | 7 | App factory, never an import-time app; liveness stays closed; never block in `async def`; tests run in the env CI installs (uv workspaces); override all four default error paths; server-generated request IDs on every response; validate responses against the contract file plus a schema parity test |
 | cross-file-seams ⟳ | 13 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle, claimed-but-unlanded fix, untested side effect, workspace build context). Canonical source is the plugin; do not hand-edit. |
 
 ### Verification integrity (a green signal that is not checking)
