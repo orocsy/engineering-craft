@@ -82,6 +82,7 @@ and both fixes are now part of the doctrine:
 | You COLLECT a value that must constrain later behaviour — allergy, consent, tenant scope, age gate, quiet hours, entitlement | **grep-for-siblings/collected-constraint-must-reach-every-consumer** (the largest single cluster in the corpus; the dropped value was an allergy) |
 | `.github/workflows/deploy*`, `docker compose up`, `docker save`, `workflow_run`, `GHCR`/registry pull, `ssh-action`/`scp-action`, `.dockerignore`, deploy-time `npx` | **deploy-delivery** (+ tooling-footguns for the CLI scars) |
 | A job with `environment:` or a deploy step, in a workflow that is a SIBLING of the test workflow rather than its descendant | **deploy-delivery/deploy-must-be-causal-descendant-not-concurrent-sibling** |
+| A slow deploy, upload batch size/parallelism, "skip unchanged", verify-after-write loops, cleanup polling, deploy runner location | **deploy-performance** (never at the cost of any **deploy-delivery** rule) |
 | `forgot-password`, `reset-password`, `otp`, `jwt`, `session`, `tokenVersion` | concurrency-cas + enumeration-safety + auth-otp checklist |
 | `findFirst`, `email` lookup, multi-tenant | enumeration-safety/multi-tenant-fail-closed |
 | `env.schema`, `deploy.yml`, `secrets.X`, `gh secret set` | config-drift + tooling-footguns |
@@ -164,6 +165,7 @@ and both fixes are now part of the doctrine:
 | Category | Rules | One-line |
 |----------|-------|----------|
 | deploy-delivery | 13 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
+| deploy-performance | 8 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation (draft). Born from channel's 79→26.7-min deploy job (2026-11-05). |
 
 ### Process & habits
 
