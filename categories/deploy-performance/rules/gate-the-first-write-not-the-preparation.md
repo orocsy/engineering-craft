@@ -36,3 +36,5 @@ cannot be added to it unnoticed.
 
 - 2026-11-06 (`channel` #76) — hosted-site backup and contract tests moved beside CI;
   the deploy job re-checks inventory and configuration before its first write.
+  The next run took 27.9 min instead of 37–40; the deploy job 15 min instead of 26.7.
+  The backup job finished inside CI, and the pre-write check took 8 s.

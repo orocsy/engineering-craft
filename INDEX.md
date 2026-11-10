@@ -165,7 +165,12 @@ and both fixes are now part of the doctrine:
 | Category | Rules | One-line |
 |----------|-------|----------|
 | deploy-delivery | 13 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
-| deploy-performance | 8 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation (draft). Born from channel's 79→26.7-min deploy job (2026-11-05). |
+
+### Deploy performance
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| deploy-performance | 8 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
 
 ### Process & habits
 

@@ -28,3 +28,5 @@ needs two measurements and is rarely taken.
 
 - 2026-11-05 (`channel` #73) — 12 files per journaled batch moved from 4-way to one
   12-way SDK call; 83 MB archives measured 325 KB/s at 8 parts and 364 KB/s at 32.
+  Measured on a 533-page deploy (2026-11-09): median batch 37 → 20 s, upload window
+  ~31 → 14.8 min.

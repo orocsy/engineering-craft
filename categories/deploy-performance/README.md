@@ -4,9 +4,10 @@
 changes, skip deploys, or "speed it up" by deleting the checks that make rollback
 possible. A faster pipeline is only a win if every recovery guarantee still holds.
 
-**Source project**: channel (2026-11-05) — a CloudBase deploy from US GitHub runners to
-ap-shanghai. The deploy job went from 79 to 26.7 minutes in one day, with the same
-journal, backups and A/B recovery, by finding where the wall time went first.
+**Source project**: channel (2026-11-05/06) — a CloudBase deploy from US GitHub runners
+to ap-shanghai. The deploy job went from 79 to 15 minutes, and a 533-page site delivery
+from 43.7 to 24.5 minutes, with the same journal, backups and A/B recovery, by finding
+where the wall time went first.
 
 ## The bedrock rule
 
@@ -25,7 +26,7 @@ falls back to the old path.**
 | [skip-unchanged-by-exact-proof](rules/skip-unchanged-by-exact-proof.md) | Skip an upload only when the running artifact is byte-equal after normalizing the stamp; any doubt uploads | verified |
 | [keep-the-recovery-unit-when-raising-parallelism](rules/keep-the-recovery-unit-when-raising-parallelism.md) | More concurrency inside a journaled step is safe only if the step stays the unit of unknown outcome | verified |
 | [bounded-wait-for-eventual-consistency](rules/bounded-wait-for-eventual-consistency.md) | "Deleted" is not "unlisted": poll with backoff to a stated bound before calling cleanup unconfirmed | verified |
-| [gate-the-first-write-not-the-preparation](rules/gate-the-first-write-not-the-preparation.md) | Read-only preparation can run beside CI; only the first mutation must wait for green | draft |
+| [gate-the-first-write-not-the-preparation](rules/gate-the-first-write-not-the-preparation.md) | Read-only preparation can run beside CI; only the first mutation must wait for green | verified |
 
 ## Cross-links
 
@@ -35,4 +36,4 @@ falls back to the old path.**
 - Stack-specific measurements (SDK internals, gateway latency, regional link speed) live in
   the stack's own skill, not here.
 
-*Last updated: 2026-11-05 (category created — channel deploy speed-up session).*
+*Last updated: 2026-11-10 (measured results added; first-write gating verified).*
