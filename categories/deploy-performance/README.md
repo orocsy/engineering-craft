@@ -30,6 +30,7 @@ falls back to the old path.**
 | [remeasure-after-each-lever](rules/remeasure-after-each-lever.md) | After every change, break the time down again: the slowest part moves | verified |
 | [serial-ci-jobs-need-a-data-dependency](rules/serial-ci-jobs-need-a-data-dependency.md) | A `needs:` that carries nothing only adds the jobs' times together; gate at the join | draft |
 | [measure-your-change-from-the-deployed-base](rules/measure-your-change-from-the-deployed-base.md) | Branch a measured change from what is deployed; a release head ships others' work too | draft |
+| [ci-fan-out-stays-under-the-runner-limit](rules/ci-fan-out-stays-under-the-runner-limit.md) | More parallel jobs help only below the account's concurrent-runner limit; another run's jobs share it | draft |
 
 ## Cross-links
 
