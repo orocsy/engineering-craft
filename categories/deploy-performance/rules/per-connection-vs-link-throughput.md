@@ -23,6 +23,9 @@ needs two measurements and is rarely taken.
 - Raise concurrency until throughput stops rising; stop there.
 - If the cap itself is the problem, no client change helps: move the work next to the
   target (see `gate-the-first-write-not-the-preparation` for the related layout idea).
+- When several objects upload at once, budget the parts in flight across all of them,
+  near the count that reached the cap. Each multipart part keeps its own deadline; three
+  videos sent as 40 parallel parts would leave each at a few KB/s, past that deadline.
 
 ## Examples
 
@@ -30,3 +33,6 @@ needs two measurements and is rarely taken.
   12-way SDK call; 83 MB archives measured 325 KB/s at 8 parts and 364 KB/s at 32.
   Measured on a 533-page deploy (2026-11-09): median batch 37 → 20 s, upload window
   ~31 → 14.8 min.
+- 2026-11-12 (`channel` #84) — 42 recovery objects (83 MB) with about 8 parts in flight
+  moved at ~850 KB/s (98 s); the same bytes as one 32-part object took 143–255 s.
+  Median object upload 5.3 s, longest 9.3 s, inside the 60 s part deadline.
