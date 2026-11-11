@@ -86,6 +86,7 @@ Rules are organized into TWO macro-groups:
 | Reviewing a Codex/PR-bot finding | workflow (push-back-on-reviews-when-verified) |
 | Writing parsing / regex / date math / URL handling | library-choice (libs-first) |
 | After merging a PR with auto-deploy | process (post-merge-deploy-verification) |
+| Making a deploy faster (batching, parallel uploads, skipping unchanged artifacts) | deploy-performance (time-the-real-run-first, skip-unchanged-by-exact-proof) |
 | Setting a GitHub Secret via CLI | tooling-footguns (gh-secret-set-stdin) |
 
 If you skip this skill while working on the above, you are signing up for a multi-round post-merge
