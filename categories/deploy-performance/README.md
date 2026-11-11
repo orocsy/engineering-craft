@@ -27,6 +27,9 @@ falls back to the old path.**
 | [keep-the-recovery-unit-when-raising-parallelism](rules/keep-the-recovery-unit-when-raising-parallelism.md) | More concurrency inside a journaled step is safe only if the step stays the unit of unknown outcome | verified |
 | [bounded-wait-for-eventual-consistency](rules/bounded-wait-for-eventual-consistency.md) | "Deleted" is not "unlisted": poll with backoff to a stated bound before calling cleanup unconfirmed | verified |
 | [gate-the-first-write-not-the-preparation](rules/gate-the-first-write-not-the-preparation.md) | Read-only preparation can run beside CI; only the first mutation must wait for green | verified |
+| [remeasure-after-each-lever](rules/remeasure-after-each-lever.md) | After every change, break the time down again: the slowest part moves | verified |
+| [serial-ci-jobs-need-a-data-dependency](rules/serial-ci-jobs-need-a-data-dependency.md) | A `needs:` that carries nothing only adds the jobs' times together; gate at the join | draft |
+| [measure-your-change-from-the-deployed-base](rules/measure-your-change-from-the-deployed-base.md) | Branch a measured change from what is deployed; a release head ships others' work too | draft |
 
 ## Cross-links
 
@@ -36,4 +39,4 @@ falls back to the old path.**
 - Stack-specific measurements (SDK internals, gateway latency, regional link speed) live in
   the stack's own skill, not here.
 
-*Last updated: 2026-11-10 (measured results added; first-write gating verified).*
+*Last updated: 2026-11-11 (round 2: re-measuring, CI job edges, measuring from the deployed base).*
