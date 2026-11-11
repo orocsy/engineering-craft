@@ -9,15 +9,15 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 34 |
-| Verification integrity (checks that aren't checking) | 1 | 4 |
+| Defensive patterns (backend correctness) | 6 | 35 |
+| Verification integrity (checks that aren't checking) | 1 | 5 |
 | Observability (errors, analytics, health) | 1 | 3 |
-| Frontend patterns | 5 | 7 |
-| Process & habits | 5 | 10 |
+| Frontend patterns | 5 | 8 |
+| Process & habits | 5 | 11 |
 | Deploy & delivery (CI/CD) | 1 | 13 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **74** |
+| **Total (hand-authored)** | **21** | **78** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -30,7 +30,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 Hand-authored rules only (after fix-history mining + consolidations through
 2026-08-06, incl. the deploy-delivery and verification-integrity categories — every rule
-incident-cited): 23 proven · 42 verified · 0 draft.
+incident-cited): 23 proven · 43 verified · 3 draft (consolidation of 2026-11-12 added 4 rules).
 
 ## Reports
 
@@ -116,6 +116,11 @@ and both fixes are now part of the doctrine:
 | `identify(`, `reset(`, analytics on logout / shared device, capture inside a tx | **observability/analytics-lifecycle-and-containment** |
 | "Sign in with Google", OAuth login, `email_verified`, account linking, SSO | **auth-identity/federated-identity-linking** |
 | `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
+| A check reads a sibling token / intent row / marker row as PROOF a transition was legitimate | **concurrency-cas/publish-transition-with-its-evidence** |
+| zsh `for x in $var`, a variable named `path`, a check that reports "not found" | **tooling-footguns/zsh-loops-and-special-variables** + verification-integrity (positive control) |
+| bundle size, first-load JS, Lighthouse budget, `noModule`, prefetch | **verification-integrity/budget-against-the-measured-floor** |
+| Inputs shown/hidden from client state; server `fieldErrors`; a form after an in-page save | **frontend-async-state/server-field-errors-reach-a-visible-input** |
+| A shared API contract (OpenAPI) changes; generated client types with a drift test | **grep-for-siblings/payload-shape-drift-against-strict-dto** (regenerate every consumer in the producer's PR) |
 | `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
@@ -130,7 +135,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| concurrency-cas | 14 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
+| concurrency-cas | 15 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
 | enumeration-safety | 4 | Two responses on a sensitive condition must be indistinguishable on every observable channel |
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
 | silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
@@ -142,7 +147,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| verification-integrity | 4 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
+| verification-integrity | 5 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
 
 ### Observability
 
@@ -156,7 +161,7 @@ and both fixes are now part of the doctrine:
 |----------|-------|----------|
 | e2e-test-resilience | 1 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes |
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
-| frontend-async-state | 3 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
+| frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 | progressive-degradation | 1 | Name the state your surface is in when the script has not run, and DECLARE it — a `<form>` with no `method` natively submits GET, putting every field in the URL, history, `Referer` and access logs |
 
@@ -177,7 +182,7 @@ and both fixes are now part of the doctrine:
 | Category | Rules | One-line |
 |----------|-------|----------|
 | workflow | 4 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence |
-| tooling-footguns | 2 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
+| tooling-footguns | 3 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
 | process | 2 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit |
 | review-discipline | 1 | Automated-review rounds cascade; treat deferred P2 as scheduled; self-review BEFORE the automated reviewer; explicit careful flow review post-E2E green |

@@ -38,6 +38,7 @@ They reduce the race window but never close it.
 | [monetary-decimal-symmetry](rules/monetary-decimal-symmetry.md) | MEDIUM | Money fields use `Prisma.Decimal` end-to-end; cross-path selects must align |
 | [async-event-revalidates-live-pointer](rules/async-event-revalidates-live-pointer.md) | CRITICAL | Async success event (webhook, job completion) for an entity whose funding/source pointer is mutable |
 | [webhook-claim-adopt-completedat](rules/webhook-claim-adopt-completedat.md) | CRITICAL | Designing dedupe for any at-least-once event feed with post-commit effects |
+| [publish-transition-with-its-evidence](rules/publish-transition-with-its-evidence.md) | HIGH | A check reads state as EVIDENCE that a transition was legitimate (live sibling token, intent row, marker row) |
 
 ## Templates
 

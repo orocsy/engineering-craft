@@ -35,6 +35,7 @@ fail, you do not know that it can. Before trusting any green:
 | [skip-is-a-decision-not-a-default](rules/skip-is-a-decision-not-a-default.md) | HIGH | `test.skip`/`describe.skip`/`xit`, and any CI step behind an `if:` that can be false on the shipping trigger |
 | [parse-dont-cast-at-trust-boundaries](rules/parse-dont-cast-at-trust-boundaries.md) | HIGH | `as T` on `res.json()`, `JSON.parse`, `localStorage`, webhook bodies, or an untyped SDK return |
 | [run-the-composed-gate-not-your-own](rules/run-the-composed-gate-not-your-own.md) | CRITICAL | Running `typecheck && test && lint` by hand instead of the project's composed validate/review command |
+| [budget-against-the-measured-floor](rules/budget-against-the-measured-floor.md) | MEDIUM | Setting, chasing or enforcing a bundle/size budget; a budget test that counts every script before network idle |
 
 ## Templates
 
