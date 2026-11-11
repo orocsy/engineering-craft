@@ -14,10 +14,10 @@
 | Observability (errors, analytics, health) | 1 | 3 |
 | Frontend patterns | 5 | 7 |
 | Process & habits | 5 | 10 |
-| Deploy & delivery (CI/CD) | 1 | 13 |
+| Deploy & delivery (CI/CD) | 1 | 15 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **74** |
+| **Total (hand-authored)** | **21** | **76** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -164,7 +164,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-delivery | 13 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
+| deploy-delivery | 15 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Step limits sized from measured runs, with elapsed time in redacted errors; rerun-safe pre-mutation backup names. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
 
 ### Deploy performance
 
