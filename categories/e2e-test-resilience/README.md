@@ -13,6 +13,7 @@
 | Rule | Impact | Trigger |
 |------|--------|---------|
 | [selector-coupling-and-blast-radius](rules/selector-coupling-and-blast-radius.md) | HIGH | Any rename of a label/role/test-id; any new dual-lane (responsive desktop/mobile) component |
+| [ci-only-flake-measure-on-ci-then-ab](rules/ci-only-flake-measure-on-ci-then-ab.md) | HIGH | A test fails intermittently on CI and passes on rerun and locally; any fix for such a failure |
 
 ## Anti-patterns
 
@@ -21,6 +22,8 @@
 - `getByRole('button', { name: 'X' })` defaulting (waits 0ms) when CI is slow → use `findByRole`
 - Dual-lane DOM rendering BOTH desktop + mobile (CSS-toggled) without a layout-lane test-id wrapping each → strict-mode ambiguity
 - Asserting transient copy ("Opening checkout…") that React 18 batching can finish-and-clear before assertion runs
+- Looping a CI-only flake locally for hours, or shipping a fix for it that never ran beside an unfixed control
+- Reading `… access control checks` in WebKit as CORS — it is any fetch cancelled by a navigation
 
 ## Related
 

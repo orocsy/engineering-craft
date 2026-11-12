@@ -12,12 +12,12 @@
 | Defensive patterns (backend correctness) | 6 | 35 |
 | Verification integrity (checks that aren't checking) | 1 | 5 |
 | Observability (errors, analytics, health) | 1 | 3 |
-| Frontend patterns | 5 | 8 |
+| Frontend patterns | 5 | 9 |
 | Process & habits | 5 | 11 |
 | Deploy & delivery (CI/CD) | 1 | 13 |
 | Other (time, review-discipline) | — | (counted under process) |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **78** |
+| **Total (hand-authored)** | **21** | **79** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -30,7 +30,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 Hand-authored rules only (after fix-history mining + consolidations through
 2026-08-06, incl. the deploy-delivery and verification-integrity categories — every rule
-incident-cited): 23 proven · 43 verified · 3 draft (consolidation of 2026-11-12 added 4 rules).
+incident-cited): 24 proven · 43 verified · 3 draft (consolidations of 2026-11-12 added 5 rules).
 
 ## Reports
 
@@ -100,6 +100,7 @@ and both fixes are now part of the doctrine:
 | ≥2 review rounds on same PR | **review-discipline/round-cascade-and-deferred-p2** |
 | `gh workflow run`, post-merge | process/post-merge-deploy-verification |
 | `data-testid`, `getByRole`, label rename touching E2E | **e2e-test-resilience/selector-coupling-and-blast-radius** |
+| Test fails only on CI / passes on rerun; `flaky`, intermittent timeout; fix for a flake | **e2e-test-resilience/ci-only-flake-measure-on-ci-then-ab** |
 | `.filter(` over server results in a component; `?slug=`/`?handle=` only routes | **historical-data-compatibility/optional-field-gates-the-record** |
 | New optional field the UI reads; new fixture set for a content contract | **historical-data-compatibility/fixtures-must-include-the-oldest-shape** |
 | Deployed smoke that counts rows or requires non-empty collections | **historical-data-compatibility/smoke-asserts-contract-not-inventory** |
@@ -159,7 +160,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| e2e-test-resilience | 1 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes |
+| e2e-test-resilience | 2 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes. A CI-only flake is measured on CI with probes, and its fix is A/B'd there |
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
 | frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |

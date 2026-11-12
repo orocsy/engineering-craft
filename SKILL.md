@@ -76,6 +76,7 @@ Rules are organized into TWO macro-groups:
 | React effect with server-data dep, A→B→A click sequence, fire-and-forget IIFE | **frontend-async-state (orphan-promise-and-stale-closure)** |
 | Tooltip / popover with aria-describedby, viewport-edge clamp | **accessibility-state-sync (aria-lockstep-and-viewport-clamp)** |
 | Rename label/role/test-id/copy in code touching E2E | **e2e-test-resilience (selector-coupling-and-blast-radius)** |
+| Test fails intermittently on CI only, or you are about to fix such a flake | **e2e-test-resilience (ci-only-flake-measure-on-ci-then-ab)** |
 | Filtering a server-returned list in the UI; a journey routed through a field added after launch | **historical-data-compatibility (optional-field-gates-the-record)** |
 | `client:only`/lazy island in a shared shell; responsive lane chosen by measuring width in JS | **layout-stability (first-paint-must-equal-settled-layout)** |
 | A breakpoint enforced in BOTH a stylesheet and a script | **layout-stability (css-and-js-must-share-the-media-query)** |
