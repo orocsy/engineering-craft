@@ -25,11 +25,15 @@ look harmless because they are small, and nobody diffs two consecutive copies.
 - Put the run's identity in a small head. Plan the rest deterministically from the
   manifest: large files alone, the rest in packs by a hash of the path (a bounded object
   count keeps restores and checks cheap; one object per file costs a call each).
-- Key reuse on a hash of each part's member list, not on archive bytes, so a compressor
-  update does not invalidate everything.
+- Key reuse on a content id: the hash of the part's sorted member list where every member
+  is `[path, size, content hash]`, not on archive bytes, so a compressor update does not
+  invalidate everything. Names alone are not enough: a file whose content changed at the
+  same path would reuse the old, stale part.
 - Reuse a stored part only with proof: its size and version tag (ETag) equal those
   recorded when it was last fully read back; otherwise read it in full, and upload it again
-  if absent. Restore checks every part holds exactly its planned members.
+  if absent. That proves the stored part is intact; the content id is what proves it holds
+  this release's bytes. Restore checks every part holds exactly its planned members, sizes
+  and hashes.
 - Shared parts make deletion dangerous: any cleanup must count references across every
   record first. Store new-format records under a key that old code cannot misread, so a
   revert falls back instead of failing.
