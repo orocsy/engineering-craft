@@ -31,6 +31,7 @@ falls back to the old path.**
 | [serial-ci-jobs-need-a-data-dependency](rules/serial-ci-jobs-need-a-data-dependency.md) | A `needs:` that carries nothing only adds the jobs' times together; gate at the join | draft |
 | [measure-your-change-from-the-deployed-base](rules/measure-your-change-from-the-deployed-base.md) | Branch a measured change from what is deployed; a release head ships others' work too | draft |
 | [keep-run-identity-out-of-durable-copies](rules/keep-run-identity-out-of-durable-copies.md) | A copy carrying the run's identity is new every run: split a small head off, reuse stable parts by content with version proof | verified |
+| [start-deadlines-when-work-starts](rules/start-deadlines-when-work-starts.md) | Concurrency above a hidden queue expires deadlines; test limits through the real layer, not a fake | verified |
 | [ci-fan-out-stays-under-the-runner-limit](rules/ci-fan-out-stays-under-the-runner-limit.md) | More parallel jobs help only below the account's concurrent-runner limit; another run's jobs share it | draft |
 
 ## Cross-links
