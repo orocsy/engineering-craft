@@ -176,7 +176,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-performance | 8 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
+| deploy-performance | 12 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation; re-measure after every lever; drop `needs:` edges that carry nothing; measure from the deployed base; keep CI fan-out below the runner limit. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
 
 ### Process & habits
 

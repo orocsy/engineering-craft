@@ -25,8 +25,13 @@ falls back to the old path.**
 | [bounded-concurrency-for-independent-checks](rules/bounded-concurrency-for-independent-checks.md) | Independent idempotent checks run N at a time; stop scheduling on failure, drain in-flight work | verified |
 | [skip-unchanged-by-exact-proof](rules/skip-unchanged-by-exact-proof.md) | Skip an upload only when the running artifact is byte-equal after normalizing the stamp; any doubt uploads | verified |
 | [keep-the-recovery-unit-when-raising-parallelism](rules/keep-the-recovery-unit-when-raising-parallelism.md) | More concurrency inside a journaled step is safe only if the step stays the unit of unknown outcome | verified |
-| [bounded-wait-for-eventual-consistency](rules/bounded-wait-for-eventual-consistency.md) | "Deleted" is not "unlisted": poll with backoff to a stated bound before calling cleanup unconfirmed | verified |
+| [bounded-wait-for-eventual-consistency](rules/bounded-wait-for-eventual-consistency.md) | "Deleted" is not "unlisted": resend a refused delete while it is still listed, wait to a stated bound | verified |
 | [gate-the-first-write-not-the-preparation](rules/gate-the-first-write-not-the-preparation.md) | Read-only preparation can run beside CI; only the first mutation must wait for green | verified |
+| [remeasure-after-each-lever](rules/remeasure-after-each-lever.md) | After every change, break the time down again: the slowest part moves | verified |
+| [serial-ci-jobs-need-a-data-dependency](rules/serial-ci-jobs-need-a-data-dependency.md) | A `needs:` that carries nothing only adds the jobs' times together; gate at the join | draft |
+| [measure-your-change-from-the-deployed-base](rules/measure-your-change-from-the-deployed-base.md) | Branch a measured change from what is deployed; a release head ships others' work too | draft |
+| [keep-run-identity-out-of-durable-copies](rules/keep-run-identity-out-of-durable-copies.md) | A copy carrying the run's identity is new every run: split a small head off, reuse stable parts by content with version proof | verified |
+| [ci-fan-out-stays-under-the-runner-limit](rules/ci-fan-out-stays-under-the-runner-limit.md) | More parallel jobs help only below the account's concurrent-runner limit; another run's jobs share it | draft |
 
 ## Cross-links
 
@@ -36,4 +41,4 @@ falls back to the old path.**
 - Stack-specific measurements (SDK internals, gateway latency, regional link speed) live in
   the stack's own skill, not here.
 
-*Last updated: 2026-11-10 (measured results added; first-write gating verified).*
+*Last updated: 2026-11-11 (round 2: re-measuring, CI job edges, measuring from the deployed base).*
