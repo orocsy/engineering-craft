@@ -136,6 +136,7 @@ and both fixes are now part of the doctrine:
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
+| designing how agent sessions feed this catalog; a capture hook or "consolidate at task end" step | **knowledge-management/capture-from-transcripts-on-a-schedule** |
 | async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
 | sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
 | terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |
@@ -219,7 +220,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| knowledge-management | 2 | How the skill itself is structured, matured, decayed, and lint'd. Read once, apply forever. |
+| knowledge-management | 3 | How the skill itself is structured, matured, decayed, lint'd and fed (capture from transcripts on a schedule). Read once, apply forever. |
 
 ## Maturity legend
 

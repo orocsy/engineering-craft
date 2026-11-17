@@ -24,6 +24,7 @@ fresh, and queryable.
 |------|--------|---------|
 | [skill-as-knowledge-base](rules/skill-as-knowledge-base.md) | HIGH | Anytime you're tempted to add a new rule, retire one, or reorganize |
 | [payment-domain-routing-tripwire](rules/payment-domain-routing-tripwire.md) | MEDIUM | Consolidating a payment-flavored lesson; editing any file that imports a payment SDK |
+| [capture-from-transcripts-on-a-schedule](rules/capture-from-transcripts-on-a-schedule.md) | HIGH | Designing or repairing how lessons enter the catalog; choosing where capture or consolidation runs |
 
 ## The 5-layer storage model (where rules live)
 
