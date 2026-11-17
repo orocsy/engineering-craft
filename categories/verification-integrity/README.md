@@ -36,6 +36,7 @@ fail, you do not know that it can. Before trusting any green:
 | [parse-dont-cast-at-trust-boundaries](rules/parse-dont-cast-at-trust-boundaries.md) | HIGH | `as T` on `res.json()`, `JSON.parse`, `localStorage`, webhook bodies, or an untyped SDK return |
 | [run-the-composed-gate-not-your-own](rules/run-the-composed-gate-not-your-own.md) | CRITICAL | Running `typecheck && test && lint` by hand instead of the project's composed validate/review command |
 | [budget-against-the-measured-floor](rules/budget-against-the-measured-floor.md) | MEDIUM | Setting, chasing or enforcing a bundle/size budget; a budget test that counts every script before network idle |
+| [act-on-the-record-not-its-rendering](rules/act-on-the-record-not-its-rendering.md) | HIGH | A later step reads a report, PDF or summary to decide what to do; a person approves a document and a job then acts |
 
 ## Templates
 

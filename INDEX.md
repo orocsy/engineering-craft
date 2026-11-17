@@ -120,6 +120,7 @@ and both fixes are now part of the doctrine:
 | A check reads a sibling token / intent row / marker row as PROOF a transition was legitimate | **concurrency-cas/publish-transition-with-its-evidence** |
 | zsh `for x in $var`, a variable named `path`, a check that reports "not found" | **tooling-footguns/zsh-loops-and-special-variables** + verification-integrity (positive control) |
 | bundle size, first-load JS, Lighthouse budget, `noModule`, prefetch | **verification-integrity/budget-against-the-measured-floor** |
+| A person approves a report/PDF/preview and a later step acts on it; an agent told to "follow the report" | **verification-integrity/act-on-the-record-not-its-rendering** |
 | Inputs shown/hidden from client state; server `fieldErrors`; a form after an in-page save | **frontend-async-state/server-field-errors-reach-a-visible-input** |
 | A shared API contract (OpenAPI) changes; generated client types with a drift test | **grep-for-siblings/payload-shape-drift-against-strict-dto** (regenerate every consumer in the producer's PR) |
 | `sessionStorage`, `localStorage`, in-app webview (WeChat/Instagram) | **frontend-async-state/web-storage-is-fallible** |
@@ -148,7 +149,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| verification-integrity | 5 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
+| verification-integrity | 6 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
 
 ### Observability
 
