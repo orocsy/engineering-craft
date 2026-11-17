@@ -20,7 +20,7 @@
 | **Total (hand-authored)** | **26** | **116** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
-Templates: 15 · Checklists: 5
+Templates: 15 · Checklists: 6
 
 ⟳ = generated, read-only mirror. The `cross-file-seams` category is published from the
 dev-pipeline plugin's `cross-file-reasoning` catalog by `/dev-pipeline:consolidate-lessons`;
@@ -137,6 +137,7 @@ and both fixes are now part of the doctrine:
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
 | designing how agent sessions feed this catalog; a capture hook or "consolidate at task end" step | **knowledge-management/capture-from-transcripts-on-a-schedule** |
+| `SwiftUI`, `View`, `@Observable`, `@MainActor`, `Sendable`, `ScaledMetric`, `dynamicTypeSize`, `accessibilityLabel`, `XCUIApplication`, `@Test` | **checklists/ios-swiftui-surface** (iOS counterpart of the web-only accessibility and design-system categories) |
 | async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
 | sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
 | terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |

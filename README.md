@@ -111,6 +111,7 @@ boot-mode log.
 - [New env var](checklists/new-env-var.md)
 - [New third-party integration](checklists/new-third-party-integration.md)
 - [Auth/OTP/password feature](checklists/auth-otp-feature.md)
+- [iOS / SwiftUI surface](checklists/ios-swiftui-surface.md) — design-system components, Dynamic Type, VoiceOver, Reduce Motion, Swift 6 concurrency, tests
 
 ## How this stays alive
 
