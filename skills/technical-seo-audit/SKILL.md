@@ -1,0 +1,15 @@
+---
+name: technical-seo-audit
+description: Use when launching or auditing a public site, investigating search indexing, or checking discovery, canonical URLs, sitemaps, robots, page metadata, structured data, or Google Search Console.
+---
+# Technical SEO audit
+
+Start with the website's public purpose and choose representative URLs for each page type. Record the preferred domain, deploy/version, what should be publicly searchable, and which URLs are private, duplicates, legacy redirects or intentionally absent.
+
+1. **Audit the actual website.** Use a full GET and inspect the first HTML without running JS. Record final status and hop chain, index directives, canonical target, H1/title/description, main content, links that crawlers can follow, and relevant structured data. Verify robots, sitemap index and child maps; sample URLs from each map, and check public resources needed to render them. An application route that exists in the repo might not exist at the deployed host.
+2. **Read the search platform separately.** Use the correct property and report dates. Read Page Indexing, individual URLs, sitemaps, video, enhancements, HTTPS, Core Web Vitals, manual actions, security, search performance and links when available. For each issue, export or inspect examples and match the exact requested URL, including query and host. Classify the underlying resource type before labeling a count as failed pages. Use the [indexing and report guide](references/search-console.md).
+3. **Choose the change from the evidence.** For an unintended blocker, reproduce it, inspect the layer that rejected the request, fix it, and check the exact examples again. Preserve business content and intended private access. Keep one canonical identity. Use truthful structured data that matches the public page. Delegate slow loads and interactions to `web-performance-audit`.
+4. **Verify acceptance.** Re-run the affected public requests against the deployed version. Check the Google indexed record and, where useful, one live inspection separately. For fixed unintended platform issues request validation once when supported. Record pending, passed or failed and the platform's date. A live fetch or successful validation submission proves a narrower outcome than indexing.
+5. **Report results people can understand.** For every finding capture intended behavior, observed example, cause or unknown, fix, live result and external result. Compare complete matched date windows with the same filter. Report indexed pages, impressions, clicks and business outcomes separately. Preserve original reports privately; commit sanitized totals and reproducible checks.
+
+Start with [Google Search Central](https://developers.google.com/search/docs) and [Search Console Help](https://support.google.com/webmasters/). Use [Web Quality Skills](https://github.com/addyosmani/web-quality-skills) for technical coverage and [Marketing Skills](https://github.com/coreyhaines31/marketingskills) for search intent, titles, internal links and content checks. Check the current vendor contract before acting on a recommendation; popularity alone does not establish applicability.

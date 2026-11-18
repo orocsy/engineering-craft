@@ -1,0 +1,15 @@
+---
+name: web-performance-audit
+description: Use when diagnosing a slow public page, Core Web Vitals, network or rendering bottlenecks, a frontend bundle, backend response times, or browser uploads.
+---
+# Web performance audit
+
+Record the user journey, metric and target. Separate public page navigation, web interactions, admin upload and deployment time. Each has a different clock and owner.
+
+1. Check field p75 per URL/device when available, then origin as context. Record absent sample data as unknown. Capture a Chrome DevTools Performance trace and Network timings under explicit conditions. Use Lighthouse for a repeatable lab comparison and retain JSON. On a loading issue record navigation, LCP element and four phases; for INP record real interactions and main-thread timing. Use TBT as a lab signal and preserve CLS and FCP alongside LCP.
+2. Follow the largest delay. For an image, identify which request the browser sent, why it started when it did, the bytes that actually arrived, and the time from complete bytes to paint. For server waits, capture safe numeric spans for request handling, database and storage, plus connection and gateway time where available. Nesting matters: a storage span can contain signing plus download. Treat unmeasured portions as unknown. Inspect bundle and React render traces when the browser timeline points there.
+3. Isolate one hypothesis. Fix viewport, CPU/network profile, auth, cache, browser, route, code/content version and region. Alternate baseline and candidate with at least three repeats for an initial check. Use more matched samples when the effect overlaps normal variation or determines a launch decision. Report individual values, median/range and failures. A controlled replay can isolate bytes or priority from the backend; verify it actually applies the intended network conditions. See [evidence patterns](references/evidence-patterns.md).
+4. Apply the smallest material fix. Preserve text/image quality, accessible dimensions, normal business actions, cache correctness and private access. Re-run the affected journey in browser, verify the deployed artifact, and repeat the same measurement before claiming improvement. Distinguish simulated lab data, observed browser timing and real-user results; never count retries, added timeouts, or test passes as a speedup.
+5. Brief the reader by user impact, before/after with conditions, causal evidence and gaps. Include elapsed CI/deploy waiting separately from work with no measured duration. Attach raw trace/run IDs and leave reproducible steps rather than repeatedly exporting large reports.
+
+Reference [Chrome DevTools](https://developer.chrome.com/docs/devtools/performance/reference/), [Google LCP phases](https://web.dev/articles/optimize-lcp), [Web Vitals](https://web.dev/articles/vitals) and [Node.js diagnostics](https://nodejs.org/en/learn/diagnostics/poor-performance). Use [Web Quality Skills](https://github.com/addyosmani/web-quality-skills) for general probes and [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills) only for relevant React/framework findings.
