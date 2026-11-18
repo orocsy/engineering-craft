@@ -138,6 +138,8 @@ and both fixes are now part of the doctrine:
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
 | designing how agent sessions feed this catalog; a capture hook or "consolidate at task end" step | **knowledge-management/capture-from-transcripts-on-a-schedule** |
 | owner steps, dashboard instructions, "go to Settings and…", sandbox vs live, restricted key, OAuth client ID | **process/owner-steps-from-the-live-dashboard** |
+| `cat .env`, `printenv`, `sed` mask, "show the config", masking secrets | **tooling-footguns/mask-secrets-by-key-name** |
+| zsh, `(eval):1:`, `== not found`, `no matches found` | **tooling-footguns/zsh-loops-and-special-variables** |
 | `SwiftUI`, `View`, `@Observable`, `@MainActor`, `Sendable`, `ScaledMetric`, `dynamicTypeSize`, `accessibilityLabel`, `XCUIApplication`, `@Test` | **checklists/ios-swiftui-surface** (iOS counterpart of the web-only accessibility and design-system categories) |
 | async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
 | sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
@@ -212,7 +214,7 @@ and both fixes are now part of the doctrine:
 | Category | Rules | One-line |
 |----------|-------|----------|
 | workflow | 5 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence; at handoff, state the local repo, hosting source and deployed artifact separately |
-| tooling-footguns | 3 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
+| tooling-footguns | 4 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only; zsh `==`, `=word` and no-match globs abort; mask secrets by key name, not value shape) |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
 | process | 3 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit; owner dashboard steps come from the live dashboard, click by click, per environment |
 | review-discipline | 1 | Automated-review rounds cascade; treat deferred P2 as scheduled; self-review BEFORE the automated reviewer; explicit careful flow review post-E2E green |
