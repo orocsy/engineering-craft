@@ -161,7 +161,8 @@ Rules: [probe-must-fail-on-injected-defect](../categories/verification-integrity
       unauthenticated check passes and the failure appears only after a real user
       authenticates — then blames YOUR provisioning. Run the control probe (real
       credential vs fabricated credential, same malformed signature): two different
-      errors means the host knows your key.
+      errors means the host knows your key; the same error twice is inconclusive until
+      you have seen the probe give two errors on a host that works.
 
 > Rule: [third-party-endpoint-control-probe](../categories/verification-integrity/rules/third-party-endpoint-control-probe.md)
 

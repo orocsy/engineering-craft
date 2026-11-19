@@ -1,12 +1,12 @@
 ---
 title: Instrument the Redirect Handoff Before You Tune Its Parameters
 last-referenced: 2026-09-02
-maturity: proven
+maturity: draft
 type: guideline
 impact: HIGH
 impact-description: |
   An OAuth integration looped between the vendor's authorize endpoint and its login page.
-  Four parameter experiments were run over three weeks — each one a fresh merchant test,
+  Four parameter experiments were run over three weeks — each one a fresh test with a real account,
   a fresh wait, and a guess — because nothing recorded whether the vendor had EVER
   redirected back to our callback. That single fact decides whether the bug is yours or
   theirs, and it was unrecoverable: the state row was swept by the next attempt, so each
@@ -22,11 +22,12 @@ related-rules:
   - analytics-lifecycle-and-containment
   - pii-scrubbing-defense-in-depth
 historical-incidents:
-  - Alibaba.com ICBU OAuth, 2026-08/09. `startOAuth()` swept expired state rows BEFORE
-    minting a new one, so clicking Connect a second time deleted the only record of the
-    first failure. After each failed merchant test the team could not answer "did the
-    browser ever reach our callback?", and defaulted to changing URL parameters — the one
-    thing they could change — rather than localising the failure.
+  - a real incident (2026-08/09), OAuth with a large B2B marketplace's open platform.
+    `startOAuth()` swept expired state rows BEFORE minting a new one, so clicking Connect a
+    second time deleted the only record of the first failure. After each failed test with
+    a real seller account the team could not answer "did the browser ever reach our
+    callback?", and defaulted to changing URL parameters — the one thing they could
+    change — rather than localising the failure.
 ---
 
 ## The pattern
@@ -71,7 +72,8 @@ a different job:
 export const ATTEMPT_RETENTION_MS = 7 * 24 * 60 * 60_000
 
 const attemptId = await startAttempt({
-  requestedByUserId, now,
+  tenantId, requestedByUserId, now,        // tenant on every signal (see tenant-tagging rule)
+  stateHash,                               // the HASH, so a late callback can still be matched
   authorizationVariant: 'force_auth-only-2026-08-31',   // WHICH experiment produced this
   authorizationHost: new URL(authorizeUrl).host,
   authorizationParameterNames: [...new URL(authorizeUrl).searchParams.keys()],  // NAMES only
@@ -79,6 +81,20 @@ const attemptId = await startAttempt({
 // Carry it on the state row so the callback can advance the right attempt
 // from the state HASH — never from the raw state value.
 await createDocWithId('oauthStates', stateHash, { ..., attemptId })
+```
+
+The callback must be able to find the attempt even when the security row is gone —
+those are exactly the failures you need to see. Look the attempt up by the state hash on
+the ATTEMPT record, not through the short-lived state row. A callback whose hash matches
+no attempt at all is recorded as its own `unmatched_callback` event (hash, tenant if
+known, time), so it is visible rather than silently dropped:
+
+```ts
+const stateHash = sha256(params.state)
+const attempt = await findAttemptByStateHash(stateHash)          // survives the state sweep
+if (!attempt) return recordUnmatchedCallback({ stateHash, now })  // still evidence
+const stateRow = await getDoc('oauthStates', stateHash)
+if (!stateRow) return advance(attempt, 'rejected_expired_state')  // row swept, attempt known
 ```
 
 Then record the boundary at every exit, not just the failure:
@@ -94,7 +110,7 @@ The diagnostic power is in the **stuck** state, not the error text:
 
 | Last status | Meaning | Action |
 |---|---|---|
-| `started`, never advanced | The vendor never returned the browser | Escalate to the vendor. Stop editing your code. |
+| `started`, never advanced | No callback reached you. The vendor did not redirect back, OR the user closed the tab or lost the network, OR your redirect URL never loaded | Inconclusive for real users. Repeat it as a deliberate test you watch end to end. If a completed vendor login still produces no `callback_received`, escalate to the vendor and stop editing your code. |
 | `callback_received` + `rejected_*` | They returned; you refused it | Debug your state/session boundary |
 | `exchange_started` + failure | They issued a code; your exchange broke | Debug the token layer |
 | `connected` | Works | — |
@@ -110,7 +126,8 @@ default:
 ```ts
 // Redaction by construction: only these fields can ever be returned.
 return docs.map((doc) => ({
-  attemptId: doc._id, status: doc.status, failureCategory: doc.failureCategory,
+  attemptId: doc._id, tenantId: doc.tenantId, status: doc.status,
+  failureCategory: doc.failureCategory, authorizationVariant: doc.authorizationVariant,
   authorizationHost: doc.authorizationHost,
   authorizationParameterNames: doc.authorizationParameterNames,
   startedAt: doc.startedAt, callbackReceivedAt: doc.callbackReceivedAt,
@@ -138,7 +155,11 @@ Observability that can take down the feature is a new failure mode, not a safety
 - [ ] Can you answer, an hour after a failed attempt, whether the third party came back?
 - [ ] Does your security record get swept by the NEXT attempt? Then it is not your trail.
 - [ ] Is retention a diagnostic decision (days), separate from the security TTL (minutes)?
-- [ ] Does the trail name the VARIANT, so an attempt says which experiment produced it?
+- [ ] Does the trail name the VARIANT, so an attempt says which experiment produced it —
+      and does the operator view return it?
+- [ ] Does every attempt carry the tenant, so one tenant's failures can be read alone?
+- [ ] Can a callback with an unknown or expired state still be tied to its attempt after
+      the security row is swept? Unmatched callbacks recorded, not dropped?
 - [ ] Parameter names only — no values, no full URLs?
 - [ ] Is the admin projection an explicit allowlist of fields?
 - [ ] Is there a test that breaks diagnostics and asserts the flow still works?
@@ -153,3 +174,9 @@ information: **did they come back?**
 **When a flow hands control to a third party, instrument the handoff before you tune it.
 Otherwise every experiment costs a human round trip and still cannot tell you whose bug
 it is.**
+
+## See also
+
+- [third-party-endpoint-control-probe](../../verification-integrity/rules/third-party-endpoint-control-probe.md)
+  — the companion rule from the same incident: confirm the host before tuning parameters
+- [tenant-tagging-and-cross-tenant-guard](tenant-tagging-and-cross-tenant-guard.md)

@@ -176,3 +176,19 @@ describe('logoUrl validator (after tightening)', () => {
 - Regex with optional capture groups for URLs — accepts attacker hosts
 - Tightening validator without migration plan — most active users break first
 - Hand-rolled URL regex when `new URL()` exists
+
+## Example — 2026-11-12: a shared contract change must regenerate every consumer
+
+Two web apps keep TypeScript types generated from one shared OpenAPI contract, each with a test
+that fails when its generated file is stale. A backend PR changed the contract and its only
+failing CI check was a consumer's drift test, so it couldn't merge. The fix belongs on the
+producer's branch: a PR that changes a shared contract runs every consumer's generator and
+commits the results. Verify a cross-branch fix by overlaying the new contract in a scratch copy
+of the consumer, never by pushing to another team's branch.
+
+## Example — 2026-07-18: a build-time env var is also a build-cache input
+
+A console inlined `NEXT_PUBLIC_STOREFRONT_URL` at build time, but `turbo.json` didn't list it as
+a build env input, so a cache hit could serve a build made with a different value. Every value a
+build inlines belongs in the build tool's cache key, alongside the other consumers in
+config-drift's four-consumer rule.
