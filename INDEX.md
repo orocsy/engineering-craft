@@ -9,15 +9,14 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 35 |
-| Verification integrity (checks that aren't checking) | 1 | 5 |
+| Defensive patterns (backend correctness) | 6 | 36 |
+| Verification integrity (checks that aren't checking) | 1 | 6 |
 | Observability (errors, analytics, health) | 1 | 3 |
-| Frontend patterns | 5 | 9 |
-| Process & habits | 5 | 11 |
-| Deploy & delivery (CI/CD) | 1 | 13 |
-| Other (time, review-discipline) | — | (counted under process) |
+| Frontend patterns | 7 | 15 |
+| Process & habits (incl. time-and-timezone, review-discipline) | 6 | 12 |
+| Deploy & delivery (CI/CD) + deploy performance | 2 | 27 |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **79** |
+| **Total (hand-authored)** | **24** | **101** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -28,9 +27,10 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 ## Maturity distribution
 
-Hand-authored rules only (after fix-history mining + consolidations through
-2026-08-06, incl. the deploy-delivery and verification-integrity categories — every rule
-incident-cited): 24 proven · 43 verified · 3 draft (consolidations of 2026-11-12 added 5 rules).
+Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
+every rule incident-cited): 39 proven · 32 verified · 4 draft. The 26 `deploy-delivery` and
+`deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
+maturity, so they are not in this count.
 
 ## Reports
 
@@ -90,7 +90,7 @@ and both fixes are now part of the doctrine:
 | `dev-secret-change-in-production` removal, security literal change | grep-for-siblings/security-literal-grep |
 | `regex`, `parseISO`, `new RegExp`, hand-rolled parser | library-choice/libs-first-no-reinventing |
 | `parseISO`, `startOfDay`, `getHours`, `Date#`, scheduling | **time-and-timezone/server-local-trap** |
-| `tx.commit`, `executeInSerializableTransaction`, multi-service mutation | **concurrency-cas/cross-tx-cas-recompute** + tx-rollback-contract-layers |
+| `tx.commit`, `executeInSerializableTransaction`, multi-service mutation | **concurrency-cas/cross-tx-cas-recompute-inside-tx** + tx-rollback-contract-layers |
 | `status !== 'X'`, status enum predicates | **concurrency-cas/status-set-creep-on-state-machine-evolution** |
 | `Decimal`, `as unknown as number`, money fields | **concurrency-cas/monetary-decimal-symmetry** |
 | `qrToken`, `magic link`, printable receipt | **concurrency-cas/mint-once-vs-mint-on-demand** |
@@ -139,7 +139,7 @@ and both fixes are now part of the doctrine:
 | concurrency-cas | 15 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
 | enumeration-safety | 4 | Two responses on a sensitive condition must be indistinguishable on every observable channel |
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
-| silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
+| silent-no-op-integrations | 6 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status; a forked SDK transport drops what the SDK signed; a vendor's terminal event must be consumed |
 | grep-for-siblings | 4 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO; a collected constraint must be threaded to every decision that must honour it |
 | auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
 | cross-file-seams ⟳ | 13 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle, claimed-but-unlanded fix, untested side effect, workspace build context). Canonical source is the plugin; do not hand-edit. |
@@ -148,7 +148,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| verification-integrity | 5 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
+| verification-integrity | 6 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined; a size budget is set against the measured floor |
 
 ### Observability
 
@@ -165,6 +165,8 @@ and both fixes are now part of the doctrine:
 | frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 | progressive-degradation | 1 | Name the state your surface is in when the script has not run, and DECLARE it — a `<form>` with no `method` natively submits GET, putting every field in the URL, history, `Referer` and access logs |
+| historical-data-compatibility | 3 | Production records are older than the schema you write against: a client-side filter must never drop a published record; fixtures include the oldest shape; a smoke asserts the contract, not the inventory |
+| layout-stability | 3 | The first paint must already equal the settled layout; CSS and JS share one media query; a container never paints its items' borders |
 
 ### Deploy & delivery (CI/CD)
 
@@ -176,7 +178,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-performance | 12 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation; re-measure after every lever; drop `needs:` edges that carry nothing; measure from the deployed base; keep CI fan-out below the runner limit. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
+| deploy-performance | 14 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation; re-measure after every lever; drop `needs:` edges that carry nothing; measure from the deployed base; keep CI fan-out below the runner limit; keep run identity out of durable copies; start deadlines when the work starts, not when it is queued. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
 
 ### Process & habits
 
