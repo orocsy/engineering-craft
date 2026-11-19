@@ -8,17 +8,25 @@ impact-description: |
   Reconstructing a graph or workflow from prose, especially through AI, changes
   IDs, positions, links, custom definitions and defaults while still looking
   plausible. That creates a silent handoff error rather than a visible import
-  failure.
-tags: export, import, interchange, canonical-json, checksum, ai, documents, diagrams
+  failure. The same gap opens when a person approves a report or PDF and a later
+  step re-reads that document to act: what was approved and what is executed can
+  differ by a parse error or a paraphrase, and nothing detects it.
+tags: export, import, interchange, canonical-json, checksum, ai, documents, diagrams, approval, reports, pdf, agents
 applies-to: |
   Any product that exports and re-imports editable workflows, diagrams,
   low-code designs, configurations or structured documents; any feature that
-  publishes the same source into both machine and human-friendly formats.
+  publishes the same source into both machine and human-friendly formats; any
+  flow where an agent or job produces a result, a person reviews a document made
+  from it, and a later step acts on the approval (outreach copy, quotes, drafts,
+  change plans, migration plans).
 related-rules:
   - server-rederives-sensitive-classification
+  - parse-dont-cast-at-trust-boundaries
+  - immutable-revision-log-and-head-cas
 historical-incidents:
   - "Private architecture-builder session (2026-08-01): a DOCX/AI handoff was proposed, then rejected for exact re-import after stable IDs, layout, relationships, custom definitions and viewport state proved lossy; deterministic versioned JSON plus SHA-256 and preflight passed byte-identical round-trip tests"
-last-referenced: 2026-08-01
+  - "a prospecting report (2026-11): the agent's result was first stored as rendered HTML next to the record it came from; in review the owner asked how the later sending step would stay consistent with what the reviewer saw, and the design changed to store the record once, render on demand, and have approval name the record's identifier"
+last-referenced: 2026-11-17
 ---
 
 ## The incident progression
@@ -92,6 +100,33 @@ const diagram = renderMermaid(artifact.payload);
 const professionalDoc = await renderDocument(artifact.payload);
 ```
 
+## Approval acts on the record, not on its rendering
+
+The same split applies when a person approves a document and a later step acts on it.
+A report, PDF, email preview or chat summary is a rendering of a stored result:
+
+1. **Persist the structured result first.** The agent's work product is a record with
+   fields, stored where the next step can load it. It is written once and not edited.
+2. **Render documents from the record, on demand.** Do not store the rendering as a
+   second source; a stored rendering goes stale when the layout or a label changes.
+3. **Give each record an identifier derived from its content** and print it in the
+   document next to the part a person approves.
+4. **Approval names the identifier.** The executing step loads that record and acts on
+   its fields. It never opens the document.
+5. **A new run makes a new record.** Re-doing the work does not overwrite the old
+   result, so the two can be compared and an approval of the old one does not silently
+   carry over to the new one. Keep both with their times and let the person choose.
+
+Re-reading the document fails silently: PDF text extraction loses table structure,
+reading order and non-Latin glyphs; a model told to "do what the report says"
+paraphrases, so the sent text is close to, not equal to, the approved text; and the
+document usually shows less than the record holds. The mismatch is found by the
+recipient.
+
+In review, ask: does any later step take a rendered artifact as input? If the stored
+record is deleted, can the document still be produced (then the document has become a
+source)? Does changing one word of the approved content change the identifier?
+
 ## Integrity is not authenticity
 
 A checksum detects accidental changes or a payload edited without recomputing
@@ -128,7 +163,9 @@ Also test:
 - a one-field payload edit fails integrity validation;
 - custom definitions travel with the instances that use them;
 - workspace/profile boundaries cannot be silently converted;
-- AI-generated proposals require human selection before canonical mutation.
+- AI-generated proposals require human selection before canonical mutation;
+- the step that acts on an approval loads the record by the approved identifier, and
+  fails when the identifier does not match a stored record.
 
 ## Anti-patterns
 
@@ -138,3 +175,4 @@ Also test:
 - “Include `exportedAt` for traceability” — keep volatile metadata outside the
   canonical equality boundary.
 - “Checksum means trusted” — integrity and authenticity are separate claims.
+- “The agent will follow the approved report” — it will paraphrase it; hand it the record.

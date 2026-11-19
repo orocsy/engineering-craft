@@ -141,6 +141,7 @@ and both fixes are now part of the doctrine:
 | terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |
 | `headRevision`, `expectedRevision`, shared diagram/document save, fork, presence | **concurrency-cas/immutable-revision-log-and-head-cas** |
 | export/import of a workflow or diagram, exact round-trip, DOCX/PDF/Mermaid projection, checksum | **portable-artifacts/canonical-machine-artifact-human-projections** |
+| A person approves a report/PDF/preview and a later step acts on it; an agent told to "follow the report" | **portable-artifacts/canonical-machine-artifact-human-projections** (approval acts on the record) |
 | trusted-proxy identity headers, synthetic users, multi-user Playwright | **e2e-test-resilience/mock-edge-identity-at-trusted-boundary** |
 | a provider login is expected to pay for or authorize paid API calls | **auth-identity/identity-session-is-not-provider-entitlement** |
 | hosted preview handoff, "where is the repo/source?", saved vs deployed version | **workflow/source-provenance-before-handoff** |
@@ -201,7 +202,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| portable-artifacts | 1 | Exact editable handoff uses one deterministic, versioned machine artifact; documents, diagrams and AI parses are projections or proposals, never lossless round-trip state |
+| portable-artifacts | 1 | Exact editable handoff uses one deterministic, versioned machine artifact; documents, diagrams and AI parses are projections or proposals, never lossless round-trip state, and an approval acts on the stored record, never on its rendering |
 
 ### Process & habits
 
