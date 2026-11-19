@@ -173,7 +173,7 @@ test('the defaults are the CURRENT platform, not a retired or look-alike host', 
 - [ ] Did the probe call the same path you are pinning? A token-path probe does not
       verify the authorization page.
 - [ ] Read the hostnames character by character. `open-api` and `openapi-api` are
-      different hosts; so are `api.x.com` and `api-x.com`.
+      different hosts; so are `api.vendor.example` and `api-vendor.example`.
 - [ ] Does the vendor have a legacy platform generation whose host still answers?
 - [ ] When a post-authentication error blames YOUR provisioning, re-run the control probe
       before believing it.
