@@ -15,9 +15,9 @@
 | Frontend patterns | 7 | 16 |
 | Data & interchange | 1 | 1 |
 | Process & habits (incl. time-and-timezone, review-discipline) | 6 | 13 |
-| Deploy & delivery (CI/CD) + deploy performance | 2 | 27 |
+| Deploy & delivery (CI/CD) + deploy performance | 2 | 29 |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **26** | **114** |
+| **Total (hand-authored)** | **26** | **116** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -29,7 +29,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 ## Maturity distribution
 
 Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
-every rule incident-cited): 40 proven · 31 verified · 17 draft. The 26 `deploy-delivery` and
+every rule incident-cited): 40 proven · 31 verified · 17 draft. The 28 `deploy-delivery` and
 `deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
 maturity, so they are not in this count.
 
@@ -84,6 +84,7 @@ and both fixes are now part of the doctrine:
 | `.github/workflows/deploy*`, `docker compose up`, `docker save`, `workflow_run`, `GHCR`/registry pull, `ssh-action`/`scp-action`, `.dockerignore`, deploy-time `npx` | **deploy-delivery** (+ tooling-footguns for the CLI scars) |
 | A job with `environment:` or a deploy step, in a workflow that is a SIBLING of the test workflow rather than its descendant | **deploy-delivery/deploy-must-be-causal-descendant-not-concurrent-sibling** |
 | A slow deploy, upload batch size/parallelism, "skip unchanged", verify-after-write loops, cleanup polling, deploy runner location | **deploy-performance** (never at the cost of any **deploy-delivery** rule) |
+| `timeout-minutes`, an SDK/upload timeout constant, a deploy step that failed with a redacted error; "Re-run failed jobs" on a job that backs up state before mutating it | **deploy-delivery/timeout-above-measured-duration** + **deploy-delivery/rerun-must-not-overwrite-the-before-backup** |
 | `forgot-password`, `reset-password`, `otp`, `jwt`, `session`, `tokenVersion` | concurrency-cas + enumeration-safety + auth-otp checklist |
 | `findFirst`, `email` lookup, multi-tenant | enumeration-safety/multi-tenant-fail-closed |
 | `env.schema`, `deploy.yml`, `secrets.X`, `gh secret set` | config-drift + tooling-footguns |
@@ -188,7 +189,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-delivery | 13 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
+| deploy-delivery | 15 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline; step limits sized from measured runs, with elapsed time kept in redacted errors; rerun-safe pre-mutation backup names. Born from two production apps' deploy scars (2026-08-01). |
 
 ### Deploy performance
 
