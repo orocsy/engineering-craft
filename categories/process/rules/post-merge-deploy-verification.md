@@ -105,3 +105,11 @@ If the deploy fails:
 - "The CI badge is green" — CI badge reflects last build, not last deploy
 - "I'll check tomorrow" — production might be down for hours
 - "Someone else will notice" — your PR, your watch
+
+## Example — 2026-11-12: verifying without the platform CLI
+
+The hosting CLI's saved token had expired and the per-deploy URL sat behind the platform's
+login. The forge still knew: `gh api repos/<owner>/<repo>/deployments?sha=<merge-sha>` and its
+`/statuses` showed the production deployment's state, and a content check against the live
+site (new strings present, removed strings gone, plus a positive control) confirmed which build
+was serving. Prefer verification paths that don't depend on a long-lived personal CLI token.

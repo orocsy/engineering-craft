@@ -66,3 +66,14 @@ Both storage-blocked paths deserve explicit cases:
   read of "user consented?" must default to NOT consented; a blocked read of
   "guide dismissed?" must default to NOT dismissed. Same helper shape,
   opposite defaults, chosen per feature.
+
+## Example — 2026-11-12: storage read during render breaks hydration
+
+A remembered filter was read from `localStorage` in the render body. The server render has no
+storage, so it rendered "Everywhere" while the client's first render rendered "Around Carlton":
+a hydration mismatch and a visible flip. Read storage after hydration with an explicit server
+snapshot, and keep the try/catch:
+
+```tsx
+const remembered = useSyncExternalStore(() => () => {}, () => { try { return localStorage.getItem(KEY) ?? ""; } catch { return ""; } }, () => "");
+```

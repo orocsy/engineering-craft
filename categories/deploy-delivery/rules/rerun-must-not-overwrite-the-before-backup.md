@@ -41,3 +41,9 @@ attempt it captures whatever the earlier attempt left behind.
 - 2026-11-05 (`channel` #77): function backup gained `run_attempt`; the hosting backup,
   taken once in a `prepare` job and re-checked against the live site before writing,
   kept its name.
+
+## Cross-links
+
+- [keep-run-identity-out-of-durable-copies](../../deploy-performance/rules/keep-run-identity-out-of-durable-copies.md)
+  — no conflict: the attempt goes in the backup's NAME; large reusable copies keep run
+  identity out of their CONTENT

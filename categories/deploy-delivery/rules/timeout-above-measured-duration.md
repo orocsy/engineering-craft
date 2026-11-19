@@ -34,7 +34,7 @@ right, but it often removes the timing too, and timing is the one safe clue.
 ```js
 const started = Date.now();
 try {
-  upload();
+  await upload();   // await, or an async rejection skips this catch and leaks the raw SDK error
 } catch {
   // Results can include signed URLs; elapsed time is safe and tells timeout from rejection.
   const seconds = Math.round((Date.now() - started) / 1000);
@@ -50,3 +50,10 @@ try {
 - 2026-11-04 (`channel`): limit 300 s → 600 s with an elapsed/limit message. The next
   run uploaded the same ZIP in 35 s. Cross-border throughput varies that widely,
   which is exactly why the limit needs headroom.
+
+## Cross-links
+
+- [time-the-real-run-first](../../deploy-performance/rules/time-the-real-run-first.md) — read the
+  real step timings before choosing any number
+- [start-deadlines-when-work-starts](../../deploy-performance/rules/start-deadlines-when-work-starts.md)
+  — the same limit fails differently when work queues below it; test limits through the real layer
