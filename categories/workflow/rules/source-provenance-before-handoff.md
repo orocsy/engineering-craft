@@ -1,7 +1,7 @@
 ---
 title: State Source Repository, Hosting Source and Deployed Artifact Separately at Handoff
 type: process
-maturity: verified
+maturity: draft
 impact: HIGH
 impact-description: |
   A working preview can exist while its source is only local, mirrored to a

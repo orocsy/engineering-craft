@@ -14,6 +14,7 @@ applies-to: |
   refactor, replace_all edit, or rename.
 related-rules:
   - self-review-before-push (workflow)
+  - run-the-composed-gate-not-your-own (verification-integrity)
 historical-incidents:
   - broken hooks + an incomplete replace_all edit shipped a TS error to main
   - "private React refactor (2026-08-01): the production build alone did not define the full quality gate; adding strict `tsc --noEmit` initially scanned generated output and scratch dependency trees, then a deliberate first-party include/exclude boundary plus separate lint, unit and production-build gates produced a reliable check"

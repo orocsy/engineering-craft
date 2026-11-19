@@ -44,7 +44,7 @@ React's mental model breaks down at four specific seams:
    transition can complete later and move the user somewhere they no longer
    chose.
 
-## Incorrect — three real patterns
+## Incorrect — four real patterns
 
 ### Fire-and-forget IIFE
 

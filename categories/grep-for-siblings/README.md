@@ -29,12 +29,15 @@ This applies to:
 | [security-literal-grep](rules/security-literal-grep.md) | CRITICAL | Removing/changing any security-relevant literal |
 | [api-rename-cross-cut-grep](rules/api-rename-cross-cut-grep.md) | HIGH | Renaming a function/type referenced across modules |
 | [payload-shape-drift-against-strict-dto](rules/payload-shape-drift-against-strict-dto.md) | HIGH | Form `{...formState}` spread; regex tightening on legacy persisted values |
+| [collected-constraint-must-reach-every-consumer](rules/collected-constraint-must-reach-every-consumer.md) | CRITICAL | Collecting a value that must CONSTRAIN later behaviour — allergies, consent, tenant scope, age gate, quiet hours, entitlements |
 
 ## Anti-patterns
 
 - "I'll grep for the literal later" — deferred greps never happen
 - "The compiler will catch it" — secrets and dynamic strings are NOT type-checked
 - "I'll just fix the one I'm working on" — each unfixed sibling is the same vulnerability
+- "The value is in the store, so the feature has it" — being stored is not being *read* by the decision that must honour it
+- "`restrictions?: Restrictions` is friendlier to callers" — optional plus a default converts "nobody threaded it" into "the user has none", which is the dangerous direction
 
 ## Historical incidents
 

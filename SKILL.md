@@ -12,13 +12,22 @@ description: |
   push, gh CLI usage with secrets, choosing between hand-rolling vs. library functions for parsing/
   validation/dates/URLs, exact export/import, multi-user E2E identity, source provenance at
   handoff, post-merge deploy verification, commit message style.
+  ALSO use whenever you ADD a member to an existing family (a new case in a dispatcher, a new route
+  serving an existing data class), whenever you write or rely on a CHECK (contract probe, grep-based
+  scan, skipped test, `as T` on remote data), whenever a deploy job's relationship to the test job
+  matters, whenever a form or interactive surface has a no-JS state, and whenever a collected value
+  must constrain later behaviour.
   Trigger keywords: forgot-password, reset-password, otp, jwt, token, hmac, single-use, consume,
   invalidate, race, cas, compare-and-swap, lua, updateMany, optimistic, lock, tenantId, findFirst,
   enumeration, timing-oracle, env.schema, deploy.yml, third-party API key, gh secret, branch from
   main, self-review, code-reviewer, regex, parseISO, hand-rolled, hand-write a, hex color, URL host,
   webhook dedupe, payment SDK, event.account, terminal event, sensitive-field classification,
   headRevision, expectedRevision, exact round-trip, canonical artifact, identity header,
-  provider entitlement, where is the repo, saved vs deployed.
+  provider entitlement, where is the repo, saved vs deployed,
+  finalize, completeUpload, activate, settle, publish, claim, status transition, new case in switch,
+  contract probe, verify- script, containsAll, test.skip, describe.skip, xit, as T, res.json(),
+  JSON.parse, localStorage, workflow_run, needs:, deploy gating, <form> method, noscript,
+  progressive enhancement, allergy, dietary restriction, consent flag, entitlement, quiet hours.
 license: MIT
 metadata:
   author: luxebook
@@ -29,10 +38,10 @@ metadata:
     cover all engineering lessons, not just defensive patterns. New category groups added:
     workflow, tooling-footguns, library-choice, process, frontend, deploy-delivery,
     observability, auth-identity, and portable-artifacts.
-  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12), private architecture-builder consolidation (2026-08-01)
-  rule-count: 71
-  category-count: 20
-  last-mined: 2026-08-01
+  source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12), architecture-builder consolidation (2026-08-01)
+  rule-count: 106
+  category-count: 25
+  last-mined: 2026-05-12
 ---
 
 # Engineering Craft
@@ -43,13 +52,11 @@ itself — every commit matching review-fix patterns is journalled by a hook, an
 `/dev-pipeline:consolidate-lessons` folds journal entries into refined rules and pushes to the
 public mirror.
 
-Rules are organized into three practical groups:
+Rules are organized into TWO macro-groups:
 
 1. **Defensive patterns** — what to do (or not do) when writing code in security-, concurrency-,
    or config-sensitive paths. Pre-merge, before/during code review.
-2. **Frontend & interchange patterns** — latest-intent ownership, resilient E2E identity,
-   accessible state and canonical portable artifacts.
-3. **Process & habits** — workflow disciplines (branch from main, self-review, push-back),
+2. **Process & habits** — workflow disciplines (branch from main, self-review, push-back),
    tooling footguns (gh CLI gotchas), library choice reflexes (don't hand-roll), commit/PR style.
    Cross-cutting; applies to every PR.
 
@@ -77,6 +84,10 @@ Rules are organized into three practical groups:
 | Multi-user E2E behind a trusted identity-injecting proxy | **e2e-test-resilience (mock-edge-identity-at-trusted-boundary)** |
 | Exact export/import plus human documents/diagrams | **portable-artifacts (canonical-machine-artifact-human-projections)** |
 | Provider login expected to supply paid API quota | **auth-identity (identity-session-is-not-provider-entitlement)** |
+| Test fails intermittently on CI only, or you are about to fix such a flake | **e2e-test-resilience (ci-only-flake-measure-on-ci-then-ab)** |
+| Filtering a server-returned list in the UI; a journey routed through a field added after launch | **historical-data-compatibility (optional-field-gates-the-record)** |
+| `client:only`/lazy island in a shared shell; responsive lane chosen by measuring width in JS | **layout-stability (first-paint-must-equal-settled-layout)** |
+| A breakpoint enforced in BOTH a stylesheet and a script | **layout-stability (css-and-js-must-share-the-media-query)** |
 | ≥2 review rounds on same PR, deferred-P2 in earlier round | **review-discipline (round-cascade-and-deferred-p2)** |
 | Installing third-party middleware (multer/csurf/etc) | **silent-no-op-integrations (middleware-error-mapping)** |
 | Starting any new branch | workflow (pull-main-first, branch-naming) |
@@ -85,6 +96,7 @@ Rules are organized into three practical groups:
 | Reviewing a Codex/PR-bot finding | workflow (push-back-on-reviews-when-verified) |
 | Writing parsing / regex / date math / URL handling | library-choice (libs-first) |
 | After merging a PR with auto-deploy | process (post-merge-deploy-verification) |
+| Making a deploy faster (batching, parallel uploads, skipping unchanged artifacts) | deploy-performance (time-the-real-run-first, skip-unchanged-by-exact-proof) |
 | Setting a GitHub Secret via CLI | tooling-footguns (gh-secret-set-stdin) |
 
 If you skip this skill while working on the above, you are signing up for a multi-round post-merge
@@ -105,9 +117,6 @@ Before declaring "implementation done" on any feature, the implementer MUST be a
 9. ☐ **Self-review with code-reviewer agent** before push — see `categories/workflow/rules/self-review-before-push.md`
 10. ☐ **Library exists for what I'm about to hand-roll?** — see `categories/library-choice/rules/libs-first-no-reinventing.md`
 11. ☐ **Post-merge deploy watched to success** — see `categories/process/rules/post-merge-deploy-verification.md`
-12. ☐ **Shared-document head moves by storage CAS** and stale working copies remain recoverable — see `categories/concurrency-cas/rules/immutable-revision-log-and-head-cas.md`
-13. ☐ **Exact interchange has one canonical machine artifact**; documents and AI output are projections/proposals — see `categories/portable-artifacts/rules/canonical-machine-artifact-human-projections.md`
-14. ☐ **Source provenance states local repo, hosting source and runtime separately** — see `categories/workflow/rules/source-provenance-before-handoff.md`
 
 If any box is unchecked, do NOT mark the feature ready for review. Loop back.
 
@@ -124,27 +133,27 @@ the goal, knowledge is the moat", 2026-05).
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 15 | Two requests or shared-document saves interleave; one silently overwrites the other |
+| Concurrency & CAS | [categories/concurrency-cas/README.md](categories/concurrency-cas/README.md) | 16 | Two requests or shared-document saves interleave; one silently overwrites the other |
 | Enumeration safety | [categories/enumeration-safety/README.md](categories/enumeration-safety/README.md) | 4 | Attacker discovers which emails exist by status/timing diff |
 | Config drift | [categories/config-drift/README.md](categories/config-drift/README.md) | 5 | Env added in one consumer, missing in others → boot crash |
-| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 5 | Third-party wrapper "succeeds" while doing nothing |
-| Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 3 | Security literal removed in one file, lingers in two more |
+| Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 6 | Third-party wrapper "succeeds" while doing nothing |
+| Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 4 | Security literal removed in one file, lingers in two more |
 | Auth & identity | [categories/auth-identity/README.md](categories/auth-identity/README.md) | 3 | Login, linking, sensitive classification and paid provider entitlement are conflated |
 
 ### Frontend & interchange patterns
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Frontend async state | [categories/frontend-async-state/README.md](categories/frontend-async-state/README.md) | 2 | Async work or navigation outlives the user intent that started it |
-| E2E test resilience | [categories/e2e-test-resilience/README.md](categories/e2e-test-resilience/README.md) | 2 | Selectors drift or synthetic identity becomes an auth bypass |
+| Frontend async state | [categories/frontend-async-state/README.md](categories/frontend-async-state/README.md) | 4 | Async work or navigation outlives the user intent that started it |
+| E2E test resilience | [categories/e2e-test-resilience/README.md](categories/e2e-test-resilience/README.md) | 3 | Selectors drift, CI-only flakes, or synthetic identity becomes an auth bypass |
 | Portable artifacts | [categories/portable-artifacts/README.md](categories/portable-artifacts/README.md) | 1 | A human document is treated as a lossless editable-state handoff |
 
 ### Process & habits
 
 | Category | Index | Rule count | When it bites |
 |----------|-------|-----------|---------------|
-| Workflow | [categories/workflow/README.md](categories/workflow/README.md) | 5 | Branched from stale main, skipped self-review, or handed off ambiguous source ownership |
-| Tooling footguns | [categories/tooling-footguns/README.md](categories/tooling-footguns/README.md) | 2 | CLI behavior is different from what the docs imply (gh secret set --body -) |
+| Workflow | [categories/workflow/README.md](categories/workflow/README.md) | 5 | Branched from stale main, skipped self-review, accepted false-positive review feedback, or handed off ambiguous source ownership |
+| Tooling footguns | [categories/tooling-footguns/README.md](categories/tooling-footguns/README.md) | 3 | CLI behavior is different from what the docs imply (gh secret set --body -) |
 | Library choice | [categories/library-choice/README.md](categories/library-choice/README.md) | 1 | Hand-rolled regex/parsing for well-studied domains; library default was "almost right" |
 | Process | [categories/process/README.md](categories/process/README.md) | 2 | Tests pass + lint clean = floor; post-merge deploy not verified |
 

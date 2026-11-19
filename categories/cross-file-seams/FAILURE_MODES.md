@@ -1,6 +1,6 @@
 <!-- GENERATED — DO NOT EDIT.
      Canonical source: dev-pipeline plugin skills/cross-file-reasoning/FAILURE_MODES.md
-     Published by /dev-pipeline:consolidate-lessons on 2026-07-06.
+     Published by /dev-pipeline:consolidate-lessons on 2026-08-06.
      Hand-edits here are overwritten on the next consolidation. Edit the plugin instead. -->
 
 # Failure Mode Catalog
@@ -34,6 +34,14 @@ Net: add cross-file failure modes HERE and move on. Consolidation mirrors them t
 8. [Single-place fix where root cause spans multiple sites](#8-single-place-fix-pattern-blindness)
 9. [Removing "dead code" without proving what it guarded](#9-removing-load-bearing-code)
 10. [Test rewritten alongside behavior change (tautology)](#10-test-rewritten-to-match-new-behavior)
+11. [Claimed-but-unlanded fix (stale commit message vs reality)](#11-claimed-but-unlanded-fix-stale-commit-message-vs-reality)
+12. [Side effect ships untested because it's invisible to the return value](#12-side-effect-ships-untested-because-its-invisible-to-the-return-value)
+13. [Workspace package that works in one build context but not another](#13-workspace-package-that-works-in-one-build-context-but-not-another)
+
+> **Index completeness is load-bearing.** This list IS the firing mechanism: a mode that is
+> absent from it is undiscoverable no matter how well it is written below. Modes 11–13 sat
+> unindexed after they were appended, so nothing routed to them. When you append a mode,
+> add its row here in the same commit.
 
 ---
 

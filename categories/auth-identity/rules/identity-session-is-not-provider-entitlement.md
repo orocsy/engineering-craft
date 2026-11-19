@@ -1,7 +1,7 @@
 ---
 title: Identity OAuth Is Not Provider API Entitlement
 type: decision
-maturity: verified
+maturity: draft
 impact: HIGH
 impact-description: |
   A user signing in with an AI or SaaS account proves an identity to the

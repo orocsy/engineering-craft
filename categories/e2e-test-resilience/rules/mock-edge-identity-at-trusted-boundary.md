@@ -1,7 +1,7 @@
 ---
 title: Mock Edge Identity at the Trusted Boundary, Never with a Production Login Bypass
 type: guideline
-maturity: verified
+maturity: draft
 impact: HIGH
 impact-description: |
   Multi-user E2E tests need distinct identities, but an application-level

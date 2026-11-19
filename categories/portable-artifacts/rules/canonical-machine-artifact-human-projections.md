@@ -1,7 +1,7 @@
 ---
 title: Use a Canonical Machine Artifact; Treat Documents as Human Projections
 type: decision
-maturity: verified
+maturity: draft
 impact: HIGH
 impact-description: |
   A human-readable document cannot preserve every editable-system invariant.

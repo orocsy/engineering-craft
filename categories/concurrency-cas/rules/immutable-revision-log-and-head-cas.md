@@ -1,7 +1,7 @@
 ---
 title: Collaborative Documents Need Immutable Revisions Plus a Head CAS
 type: decision
-maturity: verified
+maturity: draft
 impact: CRITICAL
 impact-description: |
   A mutable shared-document row turns concurrent saves into last-writer-wins
@@ -14,6 +14,7 @@ applies-to: |
   editors where multiple people can open the same version and save complete
   snapshots.
 related-rules:
+  - postgres-optimistic-cas
   - storage-gate-not-js
   - race-test-contract
   - state-machine-first
@@ -131,7 +132,7 @@ const [first, stale] = await Promise.allSettled([
 
 expect(accepted(first, stale)).toHaveLength(1);
 expect(conflicts(first, stale)).toHaveLength(1);
-expect(await loadHead()).toMatchOneOf([a, b]);
+expect([a, b]).toContainEqual(await loadHead());
 ```
 
 ## Anti-patterns

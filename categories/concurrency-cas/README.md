@@ -30,7 +30,7 @@ They reduce the race window but never close it.
 | [storage-gate-not-js](rules/storage-gate-not-js.md) | CRITICAL | Whenever you write `if (x.consumed) throw; await x.update(consumed=true)` |
 | [redis-lua-cas](rules/redis-lua-cas.md) | CRITICAL | Mutating a Redis value conditionally on what you read |
 | [postgres-optimistic-cas](rules/postgres-optimistic-cas.md) | CRITICAL | Writing a row that another endpoint also writes |
-| [single-use-token-consumption](rules/single-use-token-consumption.md) | CRITICAL | Any `consumedAt`/`usedAt`/`spent` flag |
+| [single-use-token-consumption](rules/single-use-token-consumption.md) | CRITICAL | Any ONE-SHOT transition, matched by SHAPE not field name: `consumedAt`/`usedAt`/`spent` flags **and** `pending→active`, `draft→published`, and every `finalize`/`complete`/`claim`/`activate`/`settle` handler |
 | [sibling-resource-invariants](rules/sibling-resource-invariants.md) | HIGH | Multiple credentials grant the same action (link + OTP) |
 | [race-test-contract](rules/race-test-contract.md) | CRITICAL | Every shared-state mutation needs a `Promise.allSettled` test |
 | [cross-tx-cas-recompute-inside-tx](rules/cross-tx-cas-recompute-inside-tx.md) | HIGH | Read → derive → write across tx boundary; recompute INSIDE tx |
@@ -40,6 +40,7 @@ They reduce the race window but never close it.
 | [monetary-decimal-symmetry](rules/monetary-decimal-symmetry.md) | MEDIUM | Money fields use `Prisma.Decimal` end-to-end; cross-path selects must align |
 | [async-event-revalidates-live-pointer](rules/async-event-revalidates-live-pointer.md) | CRITICAL | Async success event (webhook, job completion) for an entity whose funding/source pointer is mutable |
 | [webhook-claim-adopt-completedat](rules/webhook-claim-adopt-completedat.md) | CRITICAL | Designing dedupe for any at-least-once event feed with post-commit effects |
+| [publish-transition-with-its-evidence](rules/publish-transition-with-its-evidence.md) | HIGH | A check reads state as EVIDENCE that a transition was legitimate (live sibling token, intent row, marker row) |
 | [immutable-revision-log-and-head-cas](rules/immutable-revision-log-and-head-cas.md) | CRITICAL | Multiple people can save complete snapshots of one shared document, workflow or diagram |
 
 ## Templates
@@ -56,6 +57,8 @@ They reduce the race window but never close it.
 - "I'll add a per-token gate" → doesn't help when N tokens lead to ONE write
 - "I'll use a transaction" → isolation alone doesn't add a CAS predicate
 - "It's behind a rate limit so the race is impossible" → rate limits gate request rate, not parallel concurrency
+- "This isn't a token, it's a status field" → the shape is what matters, not the vocabulary; `pending → active` is a one-shot transition
+- "The sibling handler already does the CAS" → the sibling's correctness is not inherited; enumerate the family (see [exhaustive-registry-beats-diff-review](../verification-integrity/rules/exhaustive-registry-beats-diff-review.md))
 - "Presence shows who is editing" → presence is advisory; shared-document saves still need a storage-level head CAS
 
 ## Historical incidents
@@ -67,4 +70,5 @@ They reduce the race window but never close it.
 | Round 3 | OTP consume race deleted freshly issued key | redis-lua-cas |
 | Round 4 | Cross-method password write race — link CAS + OTP CAS both → applyPasswordReset | postgres-optimistic-cas, sibling-resource-invariants |
 | Round 5 | Stale-state OTP consume — wrongAttempt counter swallowed by SET race | redis-lua-cas |
+| 2026-08-06 | Upload finalize: `if (status !== 'pending') return CONFLICT` + unpredicated `update({status:'active'})`, while the sibling finalize in the SAME FILE used an atomic claim | single-use-token-consumption (content matched; **its vocabulary-keyed trigger did not fire**) → now shape-keyed, plus exhaustive-registry-beats-diff-review |
 | Collaborative document | Two browsers edited revision 1; first save advanced the head, stale save received 409 and preserved its working copy | immutable-revision-log-and-head-cas |

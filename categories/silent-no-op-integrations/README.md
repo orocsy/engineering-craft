@@ -35,6 +35,7 @@ The three required behaviors:
 | [regression-test-the-no-op](rules/regression-test-the-no-op.md) | HIGH | Testing the wrapper itself |
 | [middleware-error-mapping](rules/middleware-error-mapping.md) | MEDIUM | Every npm middleware throwing non-HttpException needs a domain-specific filter |
 | [unconsumed-terminal-events](rules/unconsumed-terminal-events.md) | HIGH | Local code puts a vendor object into a state (cancel/expire/void) whose event type is unhandled |
+| [forked-sdk-transport](rules/forked-sdk-transport.md) | CRITICAL | You send an HTTP request built from values an SDK MINTED (presigned upload, signed URL, STS token) instead of calling the SDK method that would have sent it — and every version bump of such an SDK |
 
 ## Templates
 
