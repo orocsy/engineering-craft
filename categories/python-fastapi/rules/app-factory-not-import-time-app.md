@@ -1,6 +1,8 @@
 ---
 title: Build the App in a Factory — Never at Import Time
+last-referenced: 2026-10-22
 maturity: draft
+type: guideline
 impact: HIGH
 impact-description: |
   A module-level `app = FastAPI()` is created as a side effect of the first import and
@@ -17,7 +19,7 @@ related-rules:
   - override-every-default-error-path
   - validate-responses-against-the-contract-file
 historical-incidents:
-  - KidsBuddy MIU-B01 (2026-10): the identity boundary had to reject every request in normal runs while tests needed synthetic sessions; a factory plus per-instance dependency_overrides gave both without any test switch in backend code
+  - a real incident (2026-10), a new FastAPI service's entry point: the identity boundary had to reject every request in normal runs while tests needed synthetic sessions; a factory plus per-instance dependency_overrides gave both without any test switch in backend code
 ---
 
 ## The rule

@@ -1,6 +1,8 @@
 ---
 title: Request IDs Come From the Server, on Every Response
+last-referenced: 2026-10-22
 maturity: draft
+type: guideline
 impact: MEDIUM
 impact-description: |
   A request/correlation ID links a user's report ("it failed at 9:14") to one log line
@@ -15,7 +17,7 @@ applies-to: |
 related-rules:
   - override-every-default-error-path
 historical-incidents:
-  - KidsBuddy MIU-B01 (2026-10): middleware assigns req_<uuid4hex> to request.state and X-Request-ID; tests send "evil\nlog-line" and assert it's ignored
+  - a real incident (2026-10), a new FastAPI service: middleware assigns req_<uuid4hex> to request.state and X-Request-ID; tests send "evil\nlog-line" and assert it is ignored
 ---
 
 ## The rule

@@ -1,6 +1,8 @@
 ---
 title: Validate Responses Against the Contract File, Not a Copy
+last-referenced: 2026-10-22
 maturity: draft
+type: guideline
 impact: HIGH
 impact-description: |
   When the API contract (OpenAPI/JSON Schema) is the source clients generate from, tests
@@ -12,10 +14,11 @@ applies-to: |
   Services that implement a hand-written or shared contract (OpenAPI in the repo, schemas
   shared with mobile/web SDK generators).
 related-rules:
+  - payload-shape-drift-against-strict-dto
   - override-every-default-error-path
   - test-env-must-match-ci-install
 historical-incidents:
-  - KidsBuddy MIU-B01 (2026-10): every error and /v1/me body is validated with the repo's contract validator; a parity test compares FastAPI's generated MeResponse (fields, required, enums, additionalProperties) with the contract
+  - a real incident (2026-10), a new FastAPI service: every error and /v1/me body is validated with the repo's contract validator; a parity test compares FastAPI's generated MeResponse (fields, required, enums, additionalProperties) with the contract
 ---
 
 ## The rule

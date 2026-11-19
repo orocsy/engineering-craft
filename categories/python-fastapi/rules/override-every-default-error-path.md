@@ -1,6 +1,8 @@
 ---
 title: Override Every Default Error Path — Four Handlers, One Shape
+last-referenced: 2026-10-22
 maturity: draft
+type: pitfall
 impact: HIGH
 impact-description: |
   Clients branch on a contract error shape such as `{"error": {code, message, request_id,
@@ -16,7 +18,7 @@ related-rules:
   - validate-responses-against-the-contract-file
   - server-generated-request-id
 historical-incidents:
-  - KidsBuddy MIU-B01 (2026-10): all four paths mapped to the public Error schema; tests plant a fake DB credential in a crash and assert it never reaches the body
+  - a real incident (2026-10), a new FastAPI service: all four default paths mapped to the public Error schema; tests plant a fake DB credential in a crash and assert it never reaches the body
 ---
 
 ## The rule

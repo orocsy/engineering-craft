@@ -175,3 +175,11 @@ describe('calcTooltipPosition', () => {
 
 - [WAI-ARIA Authoring Practices: Tooltip](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/)
 - [WCAG 2.1 SC 1.4.13 Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html)
+
+## Example — 2026-11-12: a live region around a whole panel
+
+A status panel was wrapped in `role="status"`, so every reload after a save re-announced the
+entire block (status, checks, the reviewer's note) on top of the "Sent" message. Keep the live
+region on the one message that changes. Related: a sentence that depends on a second query
+("{Provider} couldn't accept this request") should wait for that query before rendering, or a
+screen reader hears it twice, first with a placeholder name.

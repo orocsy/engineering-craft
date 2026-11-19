@@ -146,3 +146,12 @@ stayed green. Wire it as a required check next to the probes it audits.
 
 - [skip-is-a-decision-not-a-default](skip-is-a-decision-not-a-default.md) — the other way a suite reports green without checking
 - [regression-test-the-no-op](../../silent-no-op-integrations/rules/regression-test-the-no-op.md) — same principle applied to integrations
+
+## Example — 2026-11-12: a "not found" from a check that never ran
+
+A release check grepped the live site's JavaScript for strings from the new build and reported
+them missing. The deploy was fine: in zsh the loop never split its list (one bogus URL), a loop
+variable named `path` clobbered `$PATH`, and a fourth variant only crawled scripts named in the
+HTML while the code arrived through streamed page data. The decoy discipline applies to
+"absence" checks too: before trusting "X is not there", prove the same check finds something
+that certainly is there (a positive control). See tooling-footguns/zsh-loops-and-special-variables.

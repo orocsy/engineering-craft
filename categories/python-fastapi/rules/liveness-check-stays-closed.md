@@ -1,6 +1,8 @@
 ---
 title: Liveness Checks Stay Dumb and Closed
+last-referenced: 2026-10-22
 maturity: draft
+type: guideline
 impact: MEDIUM
 impact-description: |
   `/health` is unauthenticated by design and is the first URL scanners probe. Health
@@ -13,7 +15,7 @@ applies-to: |
 related-rules:
   - app-factory-not-import-time-app
 historical-incidents:
-  - KidsBuddy MIU-B01 (2026-10): /health was specified as "no secrets, no internal config, no database address"; the test pins the exact body so new fields fail CI
+  - a real incident (2026-10), a new FastAPI service: /health was specified as "no secrets, no internal config, no database address"; the test pins the exact body so a new field fails CI
 ---
 
 ## The rule
