@@ -10,14 +10,14 @@
 | Group | Categories | Rules |
 |-------|-----------|-------|
 | Defensive patterns (backend correctness) | 6 | 38 |
-| Verification integrity (checks that aren't checking) | 1 | 6 |
-| Observability (errors, analytics, health) | 1 | 3 |
+| Verification integrity (checks that aren't checking) | 1 | 7 |
+| Observability (errors, analytics, health) | 1 | 4 |
 | Frontend patterns | 7 | 16 |
 | Data & interchange | 1 | 1 |
 | Process & habits (incl. time-and-timezone, review-discipline) | 6 | 13 |
 | Deploy & delivery (CI/CD) + deploy performance | 2 | 27 |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **25** | **106** |
+| **Total (hand-authored)** | **25** | **108** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -29,7 +29,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 ## Maturity distribution
 
 Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
-every rule incident-cited): 40 proven · 31 verified · 9 draft. The 26 `deploy-delivery` and
+every rule incident-cited): 40 proven · 31 verified · 11 draft. The 26 `deploy-delivery` and
 `deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
 maturity, so they are not in this count.
 
@@ -88,6 +88,8 @@ and both fixes are now part of the doctrine:
 | `findFirst`, `email` lookup, multi-tenant | enumeration-safety/multi-tenant-fail-closed |
 | `env.schema`, `deploy.yml`, `secrets.X`, `gh secret set` | config-drift + tooling-footguns |
 | `Resend`, `Twilio`, `Stripe`, `S3`, `OAuth` (any third-party API) | silent-no-op-integrations |
+| A third-party host/path/credential pairing copied from docs, a support reply or a `CONFIRMED` comment; a post-login error that blames your provisioning | **verification-integrity/third-party-endpoint-control-probe** |
+| OAuth / hosted checkout / 3DS redirect that may not come back; `startOAuth` sweeping old state rows; tuning authorize parameters after a failed login | **observability/redirect-handoff-attempt-trail** |
 | `dev-secret-change-in-production` removal, security literal change | grep-for-siblings/security-literal-grep |
 | `regex`, `parseISO`, `new RegExp`, hand-rolled parser | library-choice/libs-first-no-reinventing |
 | `parseISO`, `startOfDay`, `getHours`, `Date#`, scheduling | **time-and-timezone/server-local-trap** |
@@ -155,13 +157,13 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| verification-integrity | 6 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined; a size budget is set against the measured floor |
+| verification-integrity | 7 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined; a size budget is set against the measured floor; a third-party endpoint is confirmed by a real-vs-fabricated-key control probe, not by a document |
 
 ### Observability
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| observability | 3 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth; tag tenant unconditionally + guard untagged leaks; identify/reset lifecycle + contained captures |
+| observability | 4 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth; tag tenant unconditionally + guard untagged leaks; identify/reset lifecycle + contained captures; a redirect handoff to a third party keeps a durable, secret-free attempt trail separate from the short-lived security record |
 
 ### Frontend patterns
 
