@@ -12,6 +12,9 @@ description: |
   push, gh CLI usage with secrets, choosing between hand-rolling vs. library functions for parsing/
   validation/dates/URLs, exact export/import, multi-user E2E identity, source provenance at
   handoff, post-merge deploy verification, commit message style.
+  ALSO for FastAPI/Python services: app factory, exception handlers and error envelopes, request
+  IDs, health checks, uv workspace test environments, and validating responses against an
+  OpenAPI/JSON Schema contract.
   ALSO use whenever you ADD a member to an existing family (a new case in a dispatcher, a new route
   serving an existing data class), whenever you write or rely on a CHECK (contract probe, grep-based
   scan, skipped test, `as T` on remote data), whenever a deploy job's relationship to the test job
@@ -39,8 +42,8 @@ metadata:
     workflow, tooling-footguns, library-choice, process, frontend, deploy-delivery,
     observability, auth-identity, and portable-artifacts.
   source-incidents: PR#85 (5 review rounds, 11 findings), PR#86 (deploy regression), PR#87 (CORS), PR#59 (libraries first), PR#37 (push-back-on-reviews), PR#66 (5 rounds), PR#79 (deferred P2 cascade), PR#31 (broken hook), 2026-05 PDF digest, May 2026 cutover (gh secret), 196-commit fix-history mining (2026-05-12), architecture-builder consolidation (2026-08-01)
-  rule-count: 106
-  category-count: 25
+  rule-count: 114
+  category-count: 26
   last-mined: 2026-05-12
 ---
 
@@ -139,6 +142,7 @@ the goal, knowledge is the moat", 2026-05).
 | Silent no-op integrations | [categories/silent-no-op-integrations/README.md](categories/silent-no-op-integrations/README.md) | 6 | Third-party wrapper "succeeds" while doing nothing |
 | Grep-for-siblings | [categories/grep-for-siblings/README.md](categories/grep-for-siblings/README.md) | 4 | Security literal removed in one file, lingers in two more |
 | Auth & identity | [categories/auth-identity/README.md](categories/auth-identity/README.md) | 3 | Login, linking, sensitive classification and paid provider entitlement are conflated |
+| Python & FastAPI | [categories/python-fastapi/README.md](categories/python-fastapi/README.md) | 6 | Default `{"detail"}`/plain-text errors reach clients; a test-mode flag injects identities; CI installs a different env than tests import |
 
 ### Frontend & interchange patterns
 

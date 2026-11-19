@@ -68,6 +68,9 @@ catalog.
 - [auth-identity](categories/auth-identity/README.md) — unauthenticated OAuth may only
   sign in an already-linked subject; email_verified ≠ ownership; identity does
   not imply paid provider API entitlement
+- [python-fastapi](categories/python-fastapi/README.md) — app factory, closed liveness
+  checks, CI-matching test env, one error shape for all four default paths, server request
+  IDs, contract-file response validation
 - [cross-file-seams](categories/cross-file-seams/README.md) ⟳ — **generated mirror** of the
   dev-pipeline plugin's `cross-file-reasoning` catalog: the 7-trace seam check (env-var
   fallback, route prefix, SDK option name, event tx semantics, mock drift, conditional

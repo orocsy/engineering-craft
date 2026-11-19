@@ -9,7 +9,7 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 38 |
+| Defensive patterns (backend correctness, incl. python-fastapi) | 7 | 44 |
 | Verification integrity (checks that aren't checking) | 1 | 7 |
 | Observability (errors, analytics, health) | 1 | 4 |
 | Frontend patterns | 7 | 16 |
@@ -17,7 +17,7 @@
 | Process & habits (incl. time-and-timezone, review-discipline) | 6 | 13 |
 | Deploy & delivery (CI/CD) + deploy performance | 2 | 27 |
 | Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **25** | **108** |
+| **Total (hand-authored)** | **26** | **114** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 5
@@ -29,7 +29,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 ## Maturity distribution
 
 Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
-every rule incident-cited): 40 proven · 31 verified · 11 draft. The 26 `deploy-delivery` and
+every rule incident-cited): 40 proven · 31 verified · 17 draft. The 26 `deploy-delivery` and
 `deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
 maturity, so they are not in this count.
 
@@ -118,6 +118,12 @@ and both fixes are now part of the doctrine:
 | `Sentry`, `PostHog`, `beforeSend`, telemetry, `setTag`, error tracking, analytics | **observability** (tenant tagging + cross-tenant guard) |
 | PII in telemetry, `sendDefaultPii`, scrub, redact, exception message with user data | **observability/pii-scrubbing-defense-in-depth** |
 | `identify(`, `reset(`, analytics on logout / shared device, capture inside a tx | **observability/analytics-lifecycle-and-containment** |
+| `FastAPI(` at module level, `uvicorn module:app`, a "test mode" flag, `dependency_overrides` | **python-fastapi/app-factory-not-import-time-app** |
+| `/health`, `/healthz`, liveness/readiness probe | **python-fastapi/liveness-check-stays-closed** |
+| `[tool.uv.workspace]`, `dependency-groups`, `uv sync` in CI, pytest in a monorepo | **python-fastapi/test-env-must-match-ci-install** |
+| `add_exception_handler`, `HTTPException`, `RequestValidationError`, `{"detail"`, error envelope | **python-fastapi/override-every-default-error-path** |
+| `X-Request-ID`, correlation ID, request ID middleware | **python-fastapi/server-generated-request-id** |
+| `response_model`, Pydantic DTO, OpenAPI contract in repo, SDK generated from schema | **python-fastapi/validate-responses-against-the-contract-file** |
 | "Sign in with Google", OAuth login, `email_verified`, account linking, SSO | **auth-identity/federated-identity-linking** |
 | `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
 | A check reads a sibling token / intent row / marker row as PROOF a transition was legitimate | **concurrency-cas/publish-transition-with-its-evidence** |
@@ -151,6 +157,7 @@ and both fixes are now part of the doctrine:
 | silent-no-op-integrations | 6 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status; a forked SDK transport drops what the SDK signed; a vendor's terminal event must be consumed |
 | grep-for-siblings | 4 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO; a collected constraint must be threaded to every decision that must honour it |
 | auth-identity | 3 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session; a login session is not paid-API entitlement; sensitive classification is server-derived |
+| python-fastapi | 6 | App factory, never an import-time app; liveness stays closed; tests run in the env CI installs (uv workspaces); override all four default error paths; server-generated request IDs on every response; validate responses against the contract file plus a schema parity test |
 | cross-file-seams ⟳ | 13 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle, claimed-but-unlanded fix, untested side effect, workspace build context). Canonical source is the plugin; do not hand-edit. |
 
 ### Verification integrity (a green signal that is not checking)
