@@ -42,6 +42,6 @@ app.add_exception_handler(Exception, on_unexpected)                  # 500, gene
 
 One test per path, each validating the body against the contract's Error schema. The
 leak test makes the handler raise with a planted secret
-(`RuntimeError("postgres://admin:hunter2@...")`) and asserts that the secret, the
+(`RuntimeError("db password PLANTED-SECRET-7f3a")`) and asserts that the secret, the
 exception class name and `Traceback` are absent from `response.text`. Use
 `TestClient(app, raise_server_exceptions=False)` to see what a client sees.

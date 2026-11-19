@@ -34,7 +34,7 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
     return app
 ```
 
-Run it with `uvicorn pkg.api.app:create_app --factory`. Every caller (the server, each
+Run it with `uvicorn main:create_app --factory`. Every caller (the server, each
 test, a REPL) gets an independent, fully wired instance.
 
 ## Why
