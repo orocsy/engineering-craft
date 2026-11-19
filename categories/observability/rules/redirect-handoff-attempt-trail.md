@@ -71,6 +71,8 @@ a different job:
 // Retention is a DIAGNOSTIC decision (days), independent of the 10-minute state TTL.
 export const ATTEMPT_RETENTION_MS = 7 * 24 * 60 * 60_000
 
+const state = randomBytes(32).toString('base64url')
+const stateHash = sha256(state)
 const attemptId = await startAttempt({
   tenantId, requestedByUserId, now,        // tenant on every signal (see tenant-tagging rule)
   stateHash,                               // the HASH, so a late callback can still be matched
@@ -93,6 +95,7 @@ known, time), so it is visible rather than silently dropped:
 const stateHash = sha256(params.state)
 const attempt = await findAttemptByStateHash(stateHash)          // survives the state sweep
 if (!attempt) return recordUnmatchedCallback({ stateHash, now })  // still evidence
+await advance(attempt, 'callback_received')                       // they came back
 const stateRow = await getDoc('oauthStates', stateHash)
 if (!stateRow) return advance(attempt, 'rejected_expired_state')  // row swept, attempt known
 ```
