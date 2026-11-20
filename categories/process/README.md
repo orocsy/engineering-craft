@@ -14,6 +14,7 @@ generated/scratch trees until its first-party input boundary was made explicit.
 |------|--------|---------|
 | [post-merge-deploy-verification](rules/post-merge-deploy-verification.md) | HIGH | After merging any PR that auto-deploys |
 | [build-validation-before-commit](rules/build-validation-before-commit.md) | HIGH | Before every git commit on the API project |
+| [owner-steps-from-the-live-dashboard](rules/owner-steps-from-the-live-dashboard.md) | HIGH | Handing the account owner steps to do in a provider dashboard |
 
 ## Anti-patterns
 

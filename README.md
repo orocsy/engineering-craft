@@ -5,12 +5,10 @@ frontend state, portable data contracts, workflow discipline, tooling footguns,
 library-choice reflexes, and process habits. Every rule cites a historical
 incident so readers can trace back to evidence, not opinion.
 
-Public mirror: https://github.com/<org>/engineering-craft. Refresh cadence: a launchd
-job (`com.engineering-craft.consolidation-reminder`, every 2 days) counts pending
-journal entries and posts a macOS reminder; the user runs
-`/dev-pipeline:consolidate-lessons` in Claude to fold them into refined rules and
-push to this mirror. Classification stays interactive because deciding "new pattern
-vs refinement vs noise" needs LLM judgment.
+Public mirror: https://github.com/<org>/engineering-craft. Refresh cadence: the dev-pipeline
+learning watcher captures every session continuously and proposes new and refined rules daily
+on a local `learning/inbox` branch; a person reviews, merges and pushes (see "How this stays
+alive" below). Nothing private may land here — see [PRIVACY.md](PRIVACY.md).
 
 **Multi-machine setup**: each device runs the bootstrap (`bootstrap/curl-install.sh`)
 once. The journal hook captures fix-commits per-device-per-repo; consolidation can
@@ -113,33 +111,34 @@ boot-mode log.
 - [New env var](checklists/new-env-var.md)
 - [New third-party integration](checklists/new-third-party-integration.md)
 - [Auth/OTP/password feature](checklists/auth-otp-feature.md)
+- [iOS / SwiftUI surface](checklists/ios-swiftui-surface.md) — design-system components, Dynamic Type, VoiceOver, Reduce Motion, Swift 6 concurrency, tests
 
 ## How this stays alive
 
-A three-piece pipeline owned by the [dev-pipeline plugin](https://github.com/<org>/dev-pipeline):
+Owned by the [dev-pipeline plugin](https://github.com/<org>/dev-pipeline)'s learning watcher
+(`tools/learning-watcher/`). See [knowledge-management/capture-from-transcripts-on-a-schedule](categories/knowledge-management/rules/capture-from-transcripts-on-a-schedule.md) for why it works this way.
 
-1. **Capture** — `hooks/post-commit` (installed via `~/.claude/setup-git-hooks.sh`)
-   appends an entry to `<repo>/.learnings/JOURNAL.md` on every commit whose subject
-   matches `fix(`, `hotfix(`, `regression(`, `revert(`, or `review-fix:`. Failures
-   never block the commit.
-2. **Remind** — `~/Library/LaunchAgents/com.engineering-craft.consolidation-reminder.plist`
-   runs every 2 days (`StartInterval=172800`), invokes a sweep script that counts
-   unconsolidated entries across `~/projects/*/.learnings/JOURNAL.md`, and posts a
-   macOS notification when the backlog warrants it. Silent on zero backlog.
-   Installed automatically by `bootstrap/install.sh` (step 7); points at the
-   dev-pipeline plugin's `hooks/consolidate-lessons-notify.sh` so the script body
-   updates with `git pull` on the plugin, not with `git pull` on this repo.
-3. **Consolidate (interactive)** — the user runs `/dev-pipeline:consolidate-lessons`
-   in Claude. The command classifies each entry against existing categories
-   (`new-pattern` / `refinement` / `noise`), updates files in this repo's local
-   clone, commits + pushes, and marks processed entries with
-   `<!-- consolidated: YYYY-MM-DD verdict=... -->` so future runs skip them.
-   Source journals are edited in place but never auto-committed; the user pushes at
-   their own cadence.
+1. **Capture (every 15 min, no model).** A launchd job reads the lines appended to each Claude
+   Code session transcript since its cursor and writes a redacted journal entry per burst of
+   work: skills and commands used, tool errors and retry loops, reverts, review findings, user
+   corrections, recaps, tests that went green. The journal lives outside every repository.
+2. **Consolidate (daily, capped).** A size-capped digest of new entries goes to `claude -p`
+   with a hard dollar and turn cap, no shell, and write access only to a `learning/inbox`
+   worktree of this repo (and of dev-pipeline, for recipe proposals). It classifies entries
+   as `new-pattern` / `refinement` / `noise`, merges well-known practice for the stack with
+   sources cited, and commits locally — only if the privacy gate passes.
+3. **Publish (a person).** Review `git log main..learning/inbox`, merge, push. The pre-push
+   privacy gate checks every push to this public mirror, by hand or not. See [PRIVACY.md](PRIVACY.md).
 
-Why not fully automatic via `claude -p`? Classification is the LLM-judgment-heavy
-part — fully scheduled runs would either rubber-stamp noise into the repo or fail
-silently on auth issues. Notification + interactive review keeps quality high.
+The older pieces still work: the post-commit hook still journals fix-shaped commits into
+`<repo>/.learnings/JOURNAL.md`, and `/dev-pipeline:consolidate-lessons` still folds those in
+interactively (now privacy-linted, pushing only on a yes). The two-day reminder plist is
+superseded by the daily consolidation.
+
+Why an unattended `claude -p` is now acceptable when it was not before: it can no longer
+rubber-stamp noise into the catalog (it writes to a review branch, never `main`), and it
+cannot fail silently (a run that never reached the model leaves its entries pending and says
+so in the notification).
 
 ## Contributing
 

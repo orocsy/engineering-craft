@@ -20,6 +20,7 @@ the server says a record is published, the UI degrades the FEATURE, never the RE
 | [optional-field-gates-the-record](rules/optional-field-gates-the-record.md) | CRITICAL | Any list/grid that filters server results; any journey routed through a field added after launch |
 | [fixtures-must-include-the-oldest-shape](rules/fixtures-must-include-the-oldest-shape.md) | HIGH | Adding a field that feels required; writing fixtures for a new content contract |
 | [smoke-asserts-contract-not-inventory](rules/smoke-asserts-contract-not-inventory.md) | HIGH | Any deployed smoke that counts rows, requires non-empty collections, or probes a detail route |
+| [seed-only-rows-are-production-bugs](rules/seed-only-rows-are-production-bugs.md) | HIGH | A flow that reads a per-account companion row (default policy, settings); seeds that create "the usual" rows |
 
 ## Anti-patterns
 

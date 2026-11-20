@@ -1,6 +1,6 @@
 ---
 title: In zsh, `for x in $list` Doesn't Split and `path` Is $PATH — Checks Written That Way Silently Lie
-last-referenced: 2026-11-12
+last-referenced: 2026-11-18
 maturity: draft
 type: pitfall
 impact: HIGH
@@ -45,6 +45,23 @@ for route in /v1/a /v1/b; do …; done  # never name a variable path, cdpath, fp
 ```
 
 Or write the check in Python (or `bash -c` with a shebang) when the result matters.
+
+## Two more zsh differences that abort the command
+
+Both turn a harmless-looking line into an error, and in a chained command (`a; b; c`) the
+rest of the output is easy to misread as the result.
+
+| You wrote | bash does | zsh does | Write instead |
+|---|---|---|---|
+| `[ "$a" == "$b" ]` | compares | `= not found` (a word starting with `=` expands to a command's path) | `[[ $a == $b ]]` or `[ "$a" = "$b" ]` |
+| `echo ===== section` | prints it | `==== not found` | quote it: `echo "===== section"` |
+| `ls dir/*.log`, `grep --include=*.md` with no match | passes the pattern through | `no matches found: …`, command not run | quote the glob (`--include='*.md'`), `setopt nonomatch`, or run it under `bash -c` |
+
+## Example — 2026-11-18 (several agent sessions in one week)
+
+Agent sessions whose shell was zsh hit `(eval):1: == not found`, `(eval):1: ===== not found`
+(section separators in chained commands) and `no matches found: --include=*.md` repeatedly,
+across different projects. Each cost a retry. The fixes are in the table above.
 
 ## Verification step
 

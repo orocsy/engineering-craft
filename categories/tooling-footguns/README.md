@@ -10,7 +10,8 @@
 |------|--------|---------|
 | [gh-secret-set-stdin](rules/gh-secret-set-stdin.md) | HIGH | Setting any GitHub Secret via `gh secret set` |
 | [dockerignore-nested-patterns](rules/dockerignore-nested-patterns.md) | CRITICAL | Any monorepo .dockerignore meant to exclude nested files (env files, keys) |
-| [zsh-loops-and-special-variables](rules/zsh-loops-and-special-variables.md) | HIGH | Any zsh loop over `$var`, or a variable named `path`/`fpath`/`cdpath`/`manpath`, in a check whose result you act on |
+| [zsh-loops-and-special-variables](rules/zsh-loops-and-special-variables.md) | HIGH | Any zsh loop over `$var`, a variable named `path`/`fpath`/`cdpath`/`manpath`, `==` inside `[ ]`, a word starting with `=`, or an unquoted glob that may match nothing |
+| [mask-secrets-by-key-name](rules/mask-secrets-by-key-name.md) | HIGH | Printing an env file, `printenv` or a config while checking a setup |
 
 ## Anti-patterns
 
