@@ -154,3 +154,16 @@ describe('availability across midnight (TZ-invariant)', () => {
 
 - [date-fns-tz](https://github.com/marnusw/date-fns-tz)
 - [TC39 Temporal proposal](https://tc39.es/proposal-temporal/) (the future replacement for `Date`)
+
+## Example — 2026-11-20: a date of birth sent as the raw ISO date
+
+A consent step showed a child's date of birth as `2019-06-14` on web and iOS: the server sent
+the raw date as the display value and both clients render display values as given. The fix kept
+the rule above, backend formatting is canonical, with two details specific to DATE-ONLY values:
+
+- A birth date stored as UTC midnight is a calendar date, not an instant. Format it in **UTC**
+  (not the tenant's zone): in a zone behind UTC the same instant is the previous day.
+- Send both: the formatted display string (`14 June 2019`, the locale's long form) for people,
+  and the raw date for anything computed from it (a consent proof hash, comparisons), so
+  changing the wording never changes a stored proof.
+

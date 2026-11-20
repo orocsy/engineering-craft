@@ -12,12 +12,12 @@
 | Defensive patterns (backend correctness, incl. python-fastapi) | 7 | 44 |
 | Verification integrity (checks that aren't checking) | 1 | 7 |
 | Observability (errors, analytics, health) | 1 | 4 |
-| Frontend patterns | 7 | 16 |
+| Frontend patterns | 7 | 17 |
 | Data & interchange | 1 | 1 |
 | Process & habits (incl. time-and-timezone, review-discipline) | 6 | 15 |
 | Deploy & delivery (CI/CD) + deploy performance | 2 | 29 |
 | Knowledge management (meta) | 1 | 3 |
-| **Total (hand-authored)** | **26** | **119** |
+| **Total (hand-authored)** | **26** | **120** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 6
@@ -29,7 +29,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 ## Maturity distribution
 
 Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
-every rule incident-cited): 40 proven · 31 verified · 20 draft. The 28 `deploy-delivery` and
+every rule incident-cited): 40 proven · 31 verified · 21 draft. The 28 `deploy-delivery` and
 `deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
 maturity, so they are not in this count.
 
@@ -137,6 +137,7 @@ and both fixes are now part of the doctrine:
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
 | designing how agent sessions feed this catalog; a capture hook or "consolidate at task end" step | **knowledge-management/capture-from-transcripts-on-a-schedule** |
+| seed script, fixtures create defaults, onboarding, "only seeds create", per-workspace policy/settings row, backfill migration | **historical-data-compatibility/seed-only-rows-are-production-bugs** |
 | owner steps, dashboard instructions, "go to Settings and…", sandbox vs live, restricted key, OAuth client ID | **process/owner-steps-from-the-live-dashboard** |
 | `cat .env`, `printenv`, `sed` mask, "show the config", masking secrets | **tooling-footguns/mask-secrets-by-key-name** |
 | zsh, `(eval):1:`, `== not found`, `no matches found` | **tooling-footguns/zsh-loops-and-special-variables** |
@@ -188,7 +189,7 @@ and both fixes are now part of the doctrine:
 | frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), a newer navigation must cancel the pending one, latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 | progressive-degradation | 1 | Name the state your surface is in when the script has not run, and DECLARE it — a `<form>` with no `method` natively submits GET, putting every field in the URL, history, `Referer` and access logs |
-| historical-data-compatibility | 3 | Production records are older than the schema you write against: a client-side filter must never drop a published record; fixtures include the oldest shape; a smoke asserts the contract, not the inventory |
+| historical-data-compatibility | 4 | Production records are older than the schema you write against: a client-side filter must never drop a published record; fixtures include the oldest shape; a smoke asserts the contract, not the inventory; a row only the seeds create is a production bug |
 | layout-stability | 3 | The first paint must already equal the settled layout; CSS and JS share one media query; a container never paints its items' borders |
 
 ### Deploy & delivery (CI/CD)

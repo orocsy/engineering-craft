@@ -17,7 +17,8 @@ related-rules:
 historical-incidents:
   - "several weeks of parallel agent sessions (backend, web, mobile lanes) produced almost no journal entries: the commit hook caught only fix-shaped commit subjects, and the every-two-days reminder to consolidate by hand was rarely acted on because no task ever reached a clear end"
   - "first ten days of transcript capture: most sessions used no pipeline command at all, which no commit hook could have seen"
-last-referenced: 2026-11-18
+  - "two days of fix commits across several backend worktrees (a missing default row, a date format, a false-pass test) produced no commit-hook journal entries at all; the lessons were recovered from the commits, PRs and session transcripts"
+last-referenced: 2026-11-20
 ---
 
 ## The rule
