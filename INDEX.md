@@ -9,18 +9,18 @@
 
 | Group | Categories | Rules |
 |-------|-----------|-------|
-| Defensive patterns (backend correctness) | 6 | 35 |
-| Verification integrity (checks that aren't checking) | 1 | 5 |
-| Observability (errors, analytics, health) | 1 | 3 |
-| Frontend patterns | 5 | 9 |
-| Process & habits | 5 | 11 |
-| Deploy & delivery (CI/CD) | 1 | 13 |
-| Other (time, review-discipline) | — | (counted under process) |
-| Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **21** | **79** |
+| Defensive patterns (backend correctness, incl. python-fastapi) | 7 | 44 |
+| Verification integrity (checks that aren't checking) | 1 | 7 |
+| Observability (errors, analytics, health) | 1 | 4 |
+| Frontend patterns | 7 | 17 |
+| Data & interchange | 1 | 1 |
+| Process & habits (incl. time-and-timezone, review-discipline) | 6 | 15 |
+| Deploy & delivery (CI/CD) + deploy performance | 2 | 29 |
+| Knowledge management (meta) | 1 | 3 |
+| **Total (hand-authored)** | **26** | **120** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
-Templates: 15 · Checklists: 5
+Templates: 15 · Checklists: 6
 
 ⟳ = generated, read-only mirror. The `cross-file-seams` category is published from the
 dev-pipeline plugin's `cross-file-reasoning` catalog by `/dev-pipeline:consolidate-lessons`;
@@ -28,9 +28,10 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 
 ## Maturity distribution
 
-Hand-authored rules only (after fix-history mining + consolidations through
-2026-08-06, incl. the deploy-delivery and verification-integrity categories — every rule
-incident-cited): 24 proven · 43 verified · 3 draft (consolidations of 2026-11-12 added 5 rules).
+Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
+every rule incident-cited): 40 proven · 31 verified · 21 draft. The 28 `deploy-delivery` and
+`deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
+maturity, so they are not in this count.
 
 ## Reports
 
@@ -61,8 +62,8 @@ and both fixes are now part of the doctrine:
 |---------------|---------------------|---------------------|
 | **G1 — Requirements** | (none) | workflow (pull-main-before-branching) |
 | **G2 — Design** | concurrency-cas (state-machine-first); time-and-timezone (if scheduling) | enumeration-safety (if "do not leak" endpoint) |
-| **G3 — Architecture** | concurrency-cas (sibling-resource-invariants, tx-rollback-contract-layers, mint-once-vs-mint-on-demand) | silent-no-op-integrations (if 3rd-party API), library-choice |
-| **G4 — Implementation** | [checklists/impl-time-gates.md](checklists/impl-time-gates.md) — run its executable gates; concurrency-cas (storage-gate-not-js, race-test-contract, status-set-creep, monetary-decimal-symmetry, cross-tx-cas-recompute), config-drift (four-consumer-rule, empty-string-vs-undefined), verification-integrity (exhaustive-registry — did you join a family?) | tooling-footguns (gh CLI), frontend-async-state (if React mutations), progressive-degradation (if any `<form>`), accessibility-state-sync (if tooltip/popover) |
+| **G3 — Architecture** | concurrency-cas (sibling-resource-invariants, tx-rollback-contract-layers, mint-once-vs-mint-on-demand; immutable-revision-log-and-head-cas for shared documents) | portable-artifacts (if exact export/import), silent-no-op-integrations (if 3rd-party API), library-choice |
+| **G4 — Implementation** | [checklists/impl-time-gates.md](checklists/impl-time-gates.md) — run its executable gates; concurrency-cas (storage-gate-not-js, race-test-contract, status-set-creep, monetary-decimal-symmetry, cross-tx-cas-recompute), config-drift (four-consumer-rule, empty-string-vs-undefined), verification-integrity (exhaustive-registry — did you join a family?) | tooling-footguns (gh CLI), frontend-async-state (if React mutations or navigation), e2e-test-resilience (if multi-user tests behind a trusted proxy), progressive-degradation (if any `<form>`), accessibility-state-sync (if tooltip/popover) |
 | **Pre-push self-review** | **ALL relevant by diff keywords** (see by-trigger table below) **plus every surface the diff DEPENDS ON** + workflow (self-review-before-push) + verification-integrity (have you seen your checks fail?) | review-discipline (round-cascade), grep-for-siblings (if security literal removed), e2e-test-resilience (if rename touches E2E selectors), payload-shape-drift (if DTO/form changed) |
 | **Post-merge** | process (post-merge-deploy-verification) | review-discipline (deferred-P2 audit) |
 
@@ -83,14 +84,17 @@ and both fixes are now part of the doctrine:
 | `.github/workflows/deploy*`, `docker compose up`, `docker save`, `workflow_run`, `GHCR`/registry pull, `ssh-action`/`scp-action`, `.dockerignore`, deploy-time `npx` | **deploy-delivery** (+ tooling-footguns for the CLI scars) |
 | A job with `environment:` or a deploy step, in a workflow that is a SIBLING of the test workflow rather than its descendant | **deploy-delivery/deploy-must-be-causal-descendant-not-concurrent-sibling** |
 | A slow deploy, upload batch size/parallelism, "skip unchanged", verify-after-write loops, cleanup polling, deploy runner location | **deploy-performance** (never at the cost of any **deploy-delivery** rule) |
+| `timeout-minutes`, an SDK/upload timeout constant, a deploy step that failed with a redacted error; "Re-run failed jobs" on a job that backs up state before mutating it | **deploy-delivery/timeout-above-measured-duration** + **deploy-delivery/rerun-must-not-overwrite-the-before-backup** |
 | `forgot-password`, `reset-password`, `otp`, `jwt`, `session`, `tokenVersion` | concurrency-cas + enumeration-safety + auth-otp checklist |
 | `findFirst`, `email` lookup, multi-tenant | enumeration-safety/multi-tenant-fail-closed |
 | `env.schema`, `deploy.yml`, `secrets.X`, `gh secret set` | config-drift + tooling-footguns |
 | `Resend`, `Twilio`, `Stripe`, `S3`, `OAuth` (any third-party API) | silent-no-op-integrations |
+| A third-party host/path/credential pairing copied from docs, a support reply or a `CONFIRMED` comment; a post-login error that blames your provisioning | **verification-integrity/third-party-endpoint-control-probe** |
+| OAuth / hosted checkout / 3DS redirect that may not come back; `startOAuth` sweeping old state rows; tuning authorize parameters after a failed login | **observability/redirect-handoff-attempt-trail** |
 | `dev-secret-change-in-production` removal, security literal change | grep-for-siblings/security-literal-grep |
 | `regex`, `parseISO`, `new RegExp`, hand-rolled parser | library-choice/libs-first-no-reinventing |
 | `parseISO`, `startOfDay`, `getHours`, `Date#`, scheduling | **time-and-timezone/server-local-trap** |
-| `tx.commit`, `executeInSerializableTransaction`, multi-service mutation | **concurrency-cas/cross-tx-cas-recompute** + tx-rollback-contract-layers |
+| `tx.commit`, `executeInSerializableTransaction`, multi-service mutation | **concurrency-cas/cross-tx-cas-recompute-inside-tx** + tx-rollback-contract-layers |
 | `status !== 'X'`, status enum predicates | **concurrency-cas/status-set-creep-on-state-machine-evolution** |
 | `Decimal`, `as unknown as number`, money fields | **concurrency-cas/monetary-decimal-symmetry** |
 | `qrToken`, `magic link`, printable receipt | **concurrency-cas/mint-once-vs-mint-on-demand** |
@@ -115,6 +119,12 @@ and both fixes are now part of the doctrine:
 | `Sentry`, `PostHog`, `beforeSend`, telemetry, `setTag`, error tracking, analytics | **observability** (tenant tagging + cross-tenant guard) |
 | PII in telemetry, `sendDefaultPii`, scrub, redact, exception message with user data | **observability/pii-scrubbing-defense-in-depth** |
 | `identify(`, `reset(`, analytics on logout / shared device, capture inside a tx | **observability/analytics-lifecycle-and-containment** |
+| `FastAPI(` at module level, `uvicorn module:app`, a "test mode" flag, `dependency_overrides` | **python-fastapi/app-factory-not-import-time-app** |
+| `/health`, `/healthz`, liveness/readiness probe | **python-fastapi/liveness-check-stays-closed** |
+| `[tool.uv.workspace]`, `dependency-groups`, `uv sync` in CI, pytest in a monorepo | **python-fastapi/test-env-must-match-ci-install** |
+| `add_exception_handler`, `HTTPException`, `RequestValidationError`, `{"detail"`, error envelope | **python-fastapi/override-every-default-error-path** |
+| `X-Request-ID`, correlation ID, request ID middleware | **python-fastapi/server-generated-request-id** |
+| `response_model`, Pydantic DTO, OpenAPI contract in repo, SDK generated from schema | **python-fastapi/validate-responses-against-the-contract-file** |
 | "Sign in with Google", OAuth login, `email_verified`, account linking, SSO | **auth-identity/federated-identity-linking** |
 | `.dockerignore`, secrets in image, `docker build` of a monorepo | **tooling-footguns/dockerignore-nested-patterns** |
 | A check reads a sibling token / intent row / marker row as PROOF a transition was legitimate | **concurrency-cas/publish-transition-with-its-evidence** |
@@ -126,9 +136,22 @@ and both fixes are now part of the doctrine:
 | `basePath`, route file move, `process.env` fallback, SDK option name, `new Observable`/`new Promise` wrapper, mock vs extended class, effect under unrelated `if` | **cross-file-seams** (the 7-trace seam check; mirror of the plugin's `cross-file-reasoning`) |
 | `webhook`, webhook dedupe, at-least-once redelivery | **concurrency-cas/webhook-claim-adopt-completedat** |
 | payment SDK / `stripe` import (`@stripe/*`, `airwallex`, `adyen`, `braintree`) | **knowledge-management/payment-domain-routing-tripwire** (load the payment-engineering skill's vendor pages FIRST) |
+| designing how agent sessions feed this catalog; a capture hook or "consolidate at task end" step | **knowledge-management/capture-from-transcripts-on-a-schedule** |
+| seed script, fixtures create defaults, onboarding, "only seeds create", per-workspace policy/settings row, backfill migration | **historical-data-compatibility/seed-only-rows-are-production-bugs** |
+| owner steps, dashboard instructions, "go to Settings and…", sandbox vs live, restricted key, OAuth client ID | **process/owner-steps-from-the-live-dashboard** |
+| `cat .env`, `printenv`, `sed` mask, "show the config", masking secrets | **tooling-footguns/mask-secrets-by-key-name** |
+| zsh, `(eval):1:`, `== not found`, `no matches found` | **tooling-footguns/zsh-loops-and-special-variables** |
+| `SwiftUI`, `View`, `@Observable`, `@MainActor`, `Sendable`, `ScaledMetric`, `dynamicTypeSize`, `accessibilityLabel`, `XCUIApplication`, `@Test` | **checklists/ios-swiftui-surface** (iOS counterpart of the web-only accessibility and design-system categories) |
 | async completion event, late webhook, job-completion callback | **concurrency-cas/async-event-revalidates-live-pointer** |
 | sensitive field, medical, PII intake | **auth-identity/server-rederives-sensitive-classification** |
 | terminal event, `cancel` / `expire` of a vendor object | **silent-no-op-integrations/unconsumed-terminal-events** |
+| `headRevision`, `expectedRevision`, shared diagram/document save, fork, presence | **concurrency-cas/immutable-revision-log-and-head-cas** |
+| export/import of a workflow or diagram, exact round-trip, DOCX/PDF/Mermaid projection, checksum | **portable-artifacts/canonical-machine-artifact-human-projections** |
+| A person approves a report/PDF/preview and a later step acts on it; an agent told to "follow the report" | **portable-artifacts/canonical-machine-artifact-human-projections** (approval acts on the record) |
+| trusted-proxy identity headers, synthetic users, multi-user Playwright | **e2e-test-resilience/mock-edge-identity-at-trusted-boundary** |
+| a provider login is expected to pay for or authorize paid API calls | **auth-identity/identity-session-is-not-provider-entitlement** |
+| hosted preview handoff, "where is the repo/source?", saved vs deployed version | **workflow/source-provenance-before-handoff** |
+| a first navigation is still loading when the user chooses another route or anchor | **frontend-async-state/orphan-promise-and-stale-closure** |
 
 ## Categories at a glance
 
@@ -136,56 +159,65 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| concurrency-cas | 15 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
+| concurrency-cas | 16 | Read-Modify-Write across network is never atomic; gate must be in storage primitive; collaborative snapshots append immutably and move the head by CAS; tx scope matters; cross-tx recompute is mandatory; mint-once tokens never re-mint; status predicates use allow-lists |
 | enumeration-safety | 4 | Two responses on a sensitive condition must be indistinguishable on every observable channel |
 | config-drift | 5 | Every env var has 5+ consumers; same-commit rule; GH Actions emits "" not undefined; tighten validators with migration audits |
-| silent-no-op-integrations | 5 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status |
+| silent-no-op-integrations | 6 | Third-party wrapper that silently no-ops on missing API key is the worst failure mode; map middleware errors to HTTP status; a forked SDK transport drops what the SDK signed; a vendor's terminal event must be consumed |
 | grep-for-siblings | 4 | Security-relevant literal removal triggers repo-wide grep; payload shapes drift against strict DTO; a collected constraint must be threaded to every decision that must honour it |
-| auth-identity | 2 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session |
+| auth-identity | 3 | Unauthenticated OAuth may only sign in an already-linked subject; email_verified ≠ mailbox ownership; first-time linking requires an authenticated session; a login session is not paid-API entitlement; sensitive classification is server-derived |
+| python-fastapi | 6 | App factory, never an import-time app; liveness stays closed; tests run in the env CI installs (uv workspaces); override all four default error paths; server-generated request IDs on every response; validate responses against the contract file plus a schema parity test |
 | cross-file-seams ⟳ | 13 | **Generated mirror** of the dev-pipeline plugin's `cross-file-reasoning` catalog — the seam check (env fallback, route prefix, SDK option, event tx semantics, mock drift, conditional coupling, wrapper lifecycle, claimed-but-unlanded fix, untested side effect, workspace build context). Canonical source is the plugin; do not hand-edit. |
 
 ### Verification integrity (a green signal that is not checking)
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| verification-integrity | 5 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined |
+| verification-integrity | 7 | A signal is worth only what it costs to make it lie: probes must be proven to fail on a DECOY defect; skips are dated decisions, never defaults; `as T` on remote data is a false green from the compiler; and the family must be enumerated in code, because a rule scoped to the diff cannot see the twin the diff joined; a size budget is set against the measured floor; a third-party endpoint is confirmed by a real-vs-fabricated-key control probe, not by a document |
 
 ### Observability
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| observability | 3 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth; tag tenant unconditionally + guard untagged leaks; identify/reset lifecycle + contained captures |
+| observability | 4 | Three pillars (errors/analytics/health), every signal sliceable per-tenant; PII scrubbing is defense-in-depth; tag tenant unconditionally + guard untagged leaks; identify/reset lifecycle + contained captures; a redirect handoff to a third party keeps a durable, secret-free attempt trail separate from the short-lived security record |
 
 ### Frontend patterns
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| e2e-test-resilience | 2 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes. A CI-only flake is measured on CI with probes, and its fix is A/B'd there |
+| e2e-test-resilience | 3 | E2E selectors over-couple to rendered shape; treat renames as repo-wide grep through specs + i18n + lanes. A CI-only flake is measured on CI with probes, and its fix is A/B'd there. Multi-user tests behind a trusted proxy set identity in the harness, never through a login bypass in the app |
 | frontend-design-system-drift | 1 | Tailwind silently renders zero CSS for unknown classes; native input restyling drops behaviors; typed token maps + breakpoint bases |
-| frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
+| frontend-async-state | 4 | Orphan promises, stale closures (A→B→A), a newer navigation must cancel the pending one, latched init effects, step-transition slot reacquisition; Web Storage access is fallible in webviews; a `value`/`onChange` contract cannot express "in flight", so an async child must lift a busy channel or the parent's Save commits a partial value |
 | accessibility-state-sync | 1 | ARIA-describedby in lockstep with parent visibility; clamp tooltip both edges using documentElement.clientWidth |
 | progressive-degradation | 1 | Name the state your surface is in when the script has not run, and DECLARE it — a `<form>` with no `method` natively submits GET, putting every field in the URL, history, `Referer` and access logs |
+| historical-data-compatibility | 4 | Production records are older than the schema you write against: a client-side filter must never drop a published record; fixtures include the oldest shape; a smoke asserts the contract, not the inventory; a row only the seeds create is a production bug |
+| layout-stability | 3 | The first paint must already equal the settled layout; CSS and JS share one media query; a container never paints its items' borders |
 
 ### Deploy & delivery (CI/CD)
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-delivery | 13 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline. Born from LuxeBook scars + CoachFlow's chain-arming (2026-08-01). |
+| deploy-delivery | 15 | A deploy pipeline is production code — and the deploy job must be a CAUSAL DESCENDANT of the job that runs the tests, never a sibling triggered by the same event: runner-brokered image transport (no registry PATs); deploys touch only owned services (compose config-hash recreation); env-write guarded against empty secrets; never cancel-in-progress; on-box AND public gates; workflow_run chain edges incl. paths coverage; `**/.env` out of images; explicit tagged-image prune; pinned CLIs; first-run watch-items + fix-through-the-pipeline; step limits sized from measured runs, with elapsed time kept in redacted errors; rerun-safe pre-mutation backup names. Born from two production apps' deploy scars (2026-08-01). |
 
 ### Deploy performance
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| deploy-performance | 12 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation; re-measure after every lever; drop `needs:` edges that carry nothing; measure from the deployed base; keep CI fan-out below the runner limit. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
+| deploy-performance | 14 | Make a correct pipeline fast without weakening it: time the real run first; parallelize long-link uploads to the measured link cap; re-read only after a write; bounded concurrency that drains on failure; skip unchanged artifacts only on byte-exact proof with a self-validating deployed-by marker; raise concurrency only inside the existing recovery unit; bounded waits for eventual consistency; gate the first write, not read-only preparation; re-measure after every lever; drop `needs:` edges that carry nothing; measure from the deployed base; keep CI fan-out below the runner limit; keep run identity out of durable copies; start deadlines when the work starts, not when it is queued. Born from channel's deploy speed-up (2026-11): deploy job 79 → 15 min, a 533-page delivery 43.7 → 24.5 min. |
+
+### Data & interchange
+
+| Category | Rules | One-line |
+|----------|-------|----------|
+| portable-artifacts | 1 | Exact editable handoff uses one deterministic, versioned machine artifact; documents, diagrams and AI parses are projections or proposals, never lossless round-trip state, and an approval acts on the stored record, never on its rendering |
 
 ### Process & habits
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| workflow | 4 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence |
-| tooling-footguns | 3 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only) |
+| workflow | 5 | Branch from latest main; self-review with code-reviewer agent before push; push back on reviews after evidence; at handoff, state the local repo, hosting source and deployed artifact separately |
+| tooling-footguns | 4 | CLI/config behavior may differ from intuition (gh secret set --body - sets the literal "-"; .dockerignore bare patterns match context root only; zsh `==`, `=word` and no-match globs abort; mask secrets by key name, not value shape) |
 | library-choice | 1 | Don't hand-roll regex/parser/date/URL — battle-tested libs handle every edge case |
-| process | 2 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit |
+| process | 3 | "Tests pass" ≠ "deploy succeeded"; watch deploy after every merge; build-validate before commit; owner dashboard steps come from the live dashboard, click by click, per environment |
 | review-discipline | 1 | Automated-review rounds cascade; treat deferred P2 as scheduled; self-review BEFORE the automated reviewer; explicit careful flow review post-E2E green |
 | time-and-timezone | 1 | Every Date/parseISO without explicit TZ uses host TZ; pre-format strings backend-side; add a TZ=Asia/Hong_Kong test project |
 
@@ -193,7 +225,7 @@ and both fixes are now part of the doctrine:
 
 | Category | Rules | One-line |
 |----------|-------|----------|
-| knowledge-management | 2 | How the skill itself is structured, matured, decayed, and lint'd. Read once, apply forever. |
+| knowledge-management | 3 | How the skill itself is structured, matured, decayed, lint'd and fed (capture from transcripts on a schedule). Read once, apply forever. |
 
 ## Maturity legend
 

@@ -5,7 +5,8 @@ ran locally but not in CI; merged PR auto-deployed and crashed because nobody wa
 
 **Source incidents**: a post-merge deploy crash (CUSTOMER_CONTACT_HASH_SECRET
 missing); broken hooks shipped a TS error to main; constant E2E headless mode
-when the user wanted headed.
+when the user wanted headed; and a strict React typecheck that initially scanned
+generated/scratch trees until its first-party input boundary was made explicit.
 
 ## Rules in this category
 
@@ -13,6 +14,7 @@ when the user wanted headed.
 |------|--------|---------|
 | [post-merge-deploy-verification](rules/post-merge-deploy-verification.md) | HIGH | After merging any PR that auto-deploys |
 | [build-validation-before-commit](rules/build-validation-before-commit.md) | HIGH | Before every git commit on the API project |
+| [owner-steps-from-the-live-dashboard](rules/owner-steps-from-the-live-dashboard.md) | HIGH | Handing the account owner steps to do in a provider dashboard |
 
 ## Anti-patterns
 
@@ -27,3 +29,4 @@ when the user wanted headed.
 |------------|----------|------|
 | Post-merge deploy crash | Deploy crashed in prod (CUSTOMER_CONTACT_HASH_SECRET missing); not noticed for hours | post-merge-deploy-verification |
 | Broken hooks to main | Broken git hooks + incomplete `replace_all` shipped TS error to main | build-validation-before-commit |
+| React refactor quality gate | Production build passed, while a new standalone typecheck first produced out-of-scope noise; deliberate include/exclude scope and a four-part gate made it actionable | build-validation-before-commit |

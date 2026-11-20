@@ -33,6 +33,8 @@ irreversible step, and make every failure loud and every success verified.**
 | [explicit-prune-for-tagged-images](rules/explicit-prune-for-tagged-images.md) | sha-tagged images never dangle — prune by name, keep the deployed tag | P2 |
 | [pinned-cli-in-containers](rules/pinned-cli-in-containers.md) | `npx --no-install` from the workdir that resolves the pinned CLI — or you run LATEST | P1 |
 | [first-run-discipline](rules/first-run-discipline.md) | Name never-executed assumptions as watch-items; fix the pipeline through the pipeline | P2 |
+| [timeout-above-measured-duration](rules/timeout-above-measured-duration.md) | Size a deploy step limit from its measured successes; redacted errors still report elapsed vs limit | P1 |
+| [rerun-must-not-overwrite-the-before-backup](rules/rerun-must-not-overwrite-the-before-backup.md) | A rerun recaptures half-new state — put `run_attempt` in pre-mutation backup names | P1 |
 
 ## Cross-links
 

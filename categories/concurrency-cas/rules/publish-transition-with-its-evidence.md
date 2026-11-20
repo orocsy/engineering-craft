@@ -18,7 +18,7 @@ applies-to: |
   row proves compensation already ran.
 related-rules:
   - single-use-token-consumption
-  - cross-tx-cas-recompute
+  - cross-tx-cas-recompute-inside-tx
   - tx-rollback-contract-layers
 historical-incidents:
   - a real incident (July 2026): token rotation committed revoke and insert separately; a concurrent tab saw zero live tokens in the gap and the theft check revoked a legitimate session

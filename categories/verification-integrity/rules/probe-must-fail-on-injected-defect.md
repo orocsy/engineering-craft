@@ -155,3 +155,13 @@ variable named `path` clobbered `$PATH`, and a fourth variant only crawled scrip
 HTML while the code arrived through streamed page data. The decoy discipline applies to
 "absence" checks too: before trusting "X is not there", prove the same check finds something
 that certainly is there (a positive control). See tooling-footguns/zsh-loops-and-special-variables.
+
+## Example — 2026-11-19: cross-tenant checks that passed because every request failed
+
+A local abuse-test script checked that one provider could not read or change another's
+programs, and every check "passed": the attacker got 404. The owner's own requests also got 404.
+The script sent the tenant in the wrong header, so every request was refused for the wrong
+reason and the passes proved nothing. For authorization and isolation tests the positive control
+is the legitimate actor: assert the owner gets 200 on exactly the same request first, then
+assert the attacker is refused. A denial test with no allowed twin is not a test.
+

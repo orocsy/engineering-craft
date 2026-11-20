@@ -1,7 +1,9 @@
 # Concurrency & Compare-And-Swap
 
 **When this category bites**: two requests interleave; one silently overwrites the other.
-**Source incidents**: a single password-reset review went through 5 rounds, all in this category.
+**Source incidents**: a password-reset review went through 5 rounds, and an
+independent collaborative-document session reproduced the same last-writer risk
+through two live browser identities.
 
 ## The bedrock rule
 
@@ -39,6 +41,7 @@ They reduce the race window but never close it.
 | [async-event-revalidates-live-pointer](rules/async-event-revalidates-live-pointer.md) | CRITICAL | Async success event (webhook, job completion) for an entity whose funding/source pointer is mutable |
 | [webhook-claim-adopt-completedat](rules/webhook-claim-adopt-completedat.md) | CRITICAL | Designing dedupe for any at-least-once event feed with post-commit effects |
 | [publish-transition-with-its-evidence](rules/publish-transition-with-its-evidence.md) | HIGH | A check reads state as EVIDENCE that a transition was legitimate (live sibling token, intent row, marker row) |
+| [immutable-revision-log-and-head-cas](rules/immutable-revision-log-and-head-cas.md) | CRITICAL | Multiple people can save complete snapshots of one shared document, workflow or diagram |
 
 ## Templates
 
@@ -56,6 +59,7 @@ They reduce the race window but never close it.
 - "It's behind a rate limit so the race is impossible" → rate limits gate request rate, not parallel concurrency
 - "This isn't a token, it's a status field" → the shape is what matters, not the vocabulary; `pending → active` is a one-shot transition
 - "The sibling handler already does the CAS" → the sibling's correctness is not inherited; enumerate the family (see [exhaustive-registry-beats-diff-review](../verification-integrity/rules/exhaustive-registry-beats-diff-review.md))
+- "Presence shows who is editing" → presence is advisory; shared-document saves still need a storage-level head CAS
 
 ## Historical incidents
 
@@ -67,3 +71,4 @@ They reduce the race window but never close it.
 | Round 4 | Cross-method password write race — link CAS + OTP CAS both → applyPasswordReset | postgres-optimistic-cas, sibling-resource-invariants |
 | Round 5 | Stale-state OTP consume — wrongAttempt counter swallowed by SET race | redis-lua-cas |
 | 2026-08-06 | Upload finalize: `if (status !== 'pending') return CONFLICT` + unpredicated `update({status:'active'})`, while the sibling finalize in the SAME FILE used an atomic claim | single-use-token-consumption (content matched; **its vocabulary-keyed trigger did not fire**) → now shape-keyed, plus exhaustive-registry-beats-diff-review |
+| Collaborative document | Two browsers edited revision 1; first save advanced the head, stale save received 409 and preserved its working copy | immutable-revision-log-and-head-cas |
