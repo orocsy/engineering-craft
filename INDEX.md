@@ -14,10 +14,10 @@
 | Observability (errors, analytics, health) | 1 | 4 |
 | Frontend patterns | 7 | 16 |
 | Data & interchange | 1 | 1 |
-| Process & habits (incl. time-and-timezone, review-discipline) | 6 | 13 |
+| Process & habits (incl. time-and-timezone, review-discipline) | 6 | 15 |
 | Deploy & delivery (CI/CD) + deploy performance | 2 | 29 |
-| Knowledge management (meta) | 1 | 2 |
-| **Total (hand-authored)** | **26** | **116** |
+| Knowledge management (meta) | 1 | 3 |
+| **Total (hand-authored)** | **26** | **119** |
 | Generated mirror (`cross-file-seams` ⟳) | 1 | 13 (mirrored from plugin) |
 
 Templates: 15 · Checklists: 6
@@ -29,7 +29,7 @@ it is NOT hand-authored here and is excluded from the maturity distribution belo
 ## Maturity distribution
 
 Hand-authored rules with a `maturity:` field (recounted from the rule files on 2026-11-19;
-every rule incident-cited): 40 proven · 31 verified · 17 draft. The 28 `deploy-delivery` and
+every rule incident-cited): 40 proven · 31 verified · 20 draft. The 28 `deploy-delivery` and
 `deploy-performance` rules use their own format and carry a P0/P1/P2 risk instead of a
 maturity, so they are not in this count.
 
