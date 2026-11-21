@@ -246,6 +246,11 @@ Decay applies when a rule isn't referenced in `knowledgeReferences` for the time
 
 Run `/dev-pipeline:consolidate-lessons` (every 2 days via launchd reminder) to apply decay.
 
+## Website audit skills
+
+- [Technical SEO audit](skills/technical-seo-audit/SKILL.md) for crawlability, search platform reports and indexing evidence.
+- [Web performance audit](skills/web-performance-audit/SKILL.md) for browser and backend latency, controlled comparisons and production validation.
+
 ## How to read this skill
 
 1. **Always start here** (`INDEX.md`) — figure out which category matches your work.
